@@ -152,6 +152,10 @@ button{font-family:inherit}
 .chk{font-size:14px;color:var(--dim);display:flex;align-items:center;gap:4px;cursor:pointer}
 .big-btn{margin-left:auto;background:linear-gradient(135deg,#e03131,#c2255c);border:0;color:#fff;font-weight:800;padding:10px 22px;border-radius:10px;cursor:pointer;font-size:15px}
 .big-btn.stop{background:linear-gradient(135deg,#495057,#343a40)}
+.big-btn.deck-btn{background:linear-gradient(135deg,#7048e8,#1c7ed6)}
+.big-btn.deck-btn+.big-btn{margin-left:0}
+.deck-info{font-size:13px;color:#c9d6ff;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:10px}
+.deck-info b{color:#fff}
 .arena{position:relative;background:radial-gradient(ellipse at center,#2a1c4a,#141a2e 70%);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;align-items:center;min-height:240px;overflow:hidden}
 .enemy{display:flex;flex-direction:column;align-items:center;width:100%;max-width:420px;cursor:crosshair}
 .e-emoji{font-size:90px;line-height:1.1;filter:drop-shadow(0 0 18px #c77dff88);animation:bob 2s ease-in-out infinite;transition:transform .05s}
@@ -377,6 +381,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
         <div id="stageLbl" class="stage-lbl">스테이지 1</div>
         <button id="stNext" class="sbtn" title="다음 스테이지">▶</button>
         <label class="chk"><input type="checkbox" id="autoAdv"> 자동 진행</label>
+        <button id="bestDeck" class="big-btn deck-btn" title="보유 원소 중 현재 스테이지에 가장 강한 조합을 자동으로 편성합니다">✨ 최고 덱 편성</button>
         <button id="battleToggle" class="big-btn">⚔️ 전투 시작</button>
       </div>
       <div class="arena">
@@ -388,6 +393,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
         </div>
         <div class="arena-tip">👆 적을 클릭하면 파티 전원의 공격 쿨타임이 0.1초 줄어요! · 🛡️ 장벽보다 원자 번호가 낮은 원소는 피해를 못 줘요 · 5스테이지마다 보스</div>
       </div>
+      <div class="deck-info" id="deckInfo"></div>
       <div class="party-hp"><span>🧬 파티 체력</span><div class="bar"><div class="fill green" id="pHpFill"></div><span id="pHpText"></span></div></div>
       <div id="party" class="party"></div>
       <div id="bLog" class="blog"></div>
@@ -1068,6 +1074,83 @@ function partyUnits() {
   }
   return out;
 }
+
+/* ---------- 덱 평가 & 최고 덱 자동 편성 ---------- */
+// 팀이 적 E를 상대로 낼 예상 성능 (실제 전투 규칙과 동일한 계산)
+function evalTeam(units, E) {
+  const nL = units.filter(u => u.cat === 'lanthanide').length;
+  const nN = units.filter(u => u.cat === 'noble').length;
+  const lanth = 1 + 0.2 * nL;
+  const maxHp = units.reduce((s, u) => s + u.hp, 0);
+  let dps = 0, heal = 0, drain = 0;
+  for (const u of units) {
+    if (u.z < E.shield) continue; // 장벽에 막히면 피해 없음
+    const d = u.atk * lanth * u.speed * (E.weak === u.cat ? 2 : 1) * (u.cat === 'metalloid' ? 1.5 : 1);
+    dps += d;
+    if (u.cat === 'nonmetal') heal += d * 0.1;
+    if (u.cat === 'actinide') drain += u.speed * 0.01 * maxHp;
+  }
+  const eDps = E.atk / 1.5 * (1 - Math.min(0.6, 0.15 * nN));
+  const ttk = dps > 0 ? E.maxHp / dps : Infinity;           // 적 처치 시간
+  const net = eDps + drain - heal;
+  const ttd = net > 0 ? maxHp / net : Infinity;              // 파티가 버티는 시간
+  const limit = E.boss ? 30 : Infinity;
+  const win = dps > 0 && ttk < ttd * 0.9 && ttk < limit;
+  return { dps, ttk, ttd, win, maxHp, limit };
+}
+// 승리 가능한 덱 중에선 가장 빠르게 잡는 덱, 아니면 승리에 가장 가까운 덱
+function betterTeam(a, b) {
+  if (!b) return true;
+  if (a.win !== b.win) return a.win;
+  if (a.win) return a.dps > b.dps;
+  const ra = a.dps > 0 ? Math.min(a.ttd, a.limit) / a.ttk : -1;
+  const rb = b.dps > 0 ? Math.min(b.ttd, b.limit) / b.ttk : -1;
+  return ra !== rb ? ra > rb : a.dps > b.dps;
+}
+function bestDeck(stage) {
+  const E = makeEnemy(stage);
+  const owned = [];
+  for (let z = 1; z <= 118; z++) if (S.disc[z] && S.counts[z] >= 1) owned.push(unitStats(z));
+  if (!owned.some(u => u.z >= E.shield)) return null;
+  // 후보 압축: 딜러 / 탱커 / 시너지 원소 위주로 최대 ~20개
+  const solo = u => u.z < E.shield ? 0 : u.atk * u.speed * (E.weak === u.cat ? 2 : 1) * (u.cat === 'metalloid' ? 1.5 : 1);
+  const pick = new Set();
+  const top = (arr, key, n) => arr.slice().sort((a, b) => key(b) - key(a)).slice(0, n).forEach(u => pick.add(u));
+  top(owned.filter(u => u.z >= E.shield), solo, 10);
+  top(owned, u => u.hp, 4);
+  top(owned.filter(u => u.cat === 'noble'), u => u.hp, 2);
+  top(owned.filter(u => u.cat === 'lanthanide'), u => u.atk, 2);
+  top(owned.filter(u => u.cat === 'nonmetal' && u.z >= E.shield), solo, 2);
+  const cand = [...pick];
+  const k = Math.min(partySlots(), cand.length);
+  let best = null, bestTeam = null;
+  const combo = [];
+  (function rec(start) {
+    if (combo.length === k) {
+      const r = evalTeam(combo, E);
+      if (betterTeam(r, best)) { best = r; bestTeam = combo.slice(); }
+      return;
+    }
+    for (let i = start; i <= cand.length - (k - combo.length); i++) {
+      combo.push(cand[i]); rec(i + 1); combo.pop();
+    }
+  })(0);
+  // 공격력 높은 원소가 앞 슬롯에 오도록 정렬
+  bestTeam.sort((a, b) => solo(b) - solo(a) || b.hp - a.hp);
+  return { team: bestTeam, result: best, E };
+}
+function applyBestDeck() {
+  const B = S.battle;
+  const r = bestDeck(B.stage);
+  if (!r) { toast('🛡️ ' + noPierceMsg(B.stage), '', 5000); return; }
+  S.party = r.team.map(u => u.z).concat([0, 0, 0, 0, 0]).slice(0, 5);
+  R.unitT = [0, 0, 0, 0, 0];
+  SFX.ach();
+  const res = r.result;
+  toast(`✨ <b>최고 덱 편성 완료!</b> (스테이지 ${B.stage} 기준)<br>${r.team.map(u => EL[u.z].sym).join(' · ')}<br>` +
+    `<small>초당 피해 ${fmt(res.dps)} · 예상 처치 ${fmtSec(res.ttk)} · ${res.win ? '✅ 승리 예상' : '⚠️ 아직 힘들어요'}</small>`, 'disc', 5000);
+}
+function fmtSec(s) { return isFinite(s) ? s < 0.1 ? '0.1초 미만' : (s < 100 ? s.toFixed(1) : fmt(s)) + '초' : '∞'; }
 function rng(seed) {
   let s = seed >>> 0;
   return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
@@ -1493,6 +1576,16 @@ function renderBattle() {
   }
 
   const E = R.enemy || makeEnemy(B.stage);
+  if (R.slowTick || !R.sig.deck) {
+    R.sig.deck = 1;
+    const ev = evalTeam(units, makeEnemy(B.stage));
+    const di = units.length
+      ? `📊 현재 덱 예상 (스테이지 ${B.stage}): 초당 피해 <b>${fmt(ev.dps)}</b> · 처치 <b>${fmtSec(ev.ttk)}</b>${E.boss ? ' (제한 30초)' : ''} · 버티는 시간 <b>${fmtSec(ev.ttd)}</b> → ` +
+        (ev.dps <= 0 ? '<span style="color:#ff8787">🛡️ 장벽을 뚫을 원소 없음</span>' : ev.win ? '<span style="color:#8ce99a">✅ 승리 예상</span>' : '<span style="color:#ff8787">⚠️ 패배 위험</span>')
+      : '📊 파티가 비어 있어요. <b>✨ 최고 덱 편성</b>을 눌러보세요!';
+    const de = $('#deckInfo');
+    if (de.innerHTML !== di) de.innerHTML = di;
+  }
   const enemyEl = $('#enemy');
   enemyEl.classList.toggle('boss', E.boss);
   enemyEl.classList.toggle('dead', B.active && !R.enemy);
@@ -1662,6 +1755,7 @@ document.addEventListener('change', e => {
 $('#stPrev').onclick = () => changeStage(-1);
 $('#stNext').onclick = () => changeStage(1);
 $('#battleToggle').onclick = () => S.battle.active ? stopBattle() : startBattle();
+$('#bestDeck').onclick = applyBestDeck;
 $('#btnSave').onclick = () => { save(); toast('💾 저장되었습니다'); };
 $('#btnExport').onclick = () => {
   save();
