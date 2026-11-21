@@ -351,6 +351,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
     <!-- 융합 -->
     <div class="tab" id="tab-fusion">
       <p class="tip">⚛️ 두 원소를 융합하면 <b>원자 번호의 합</b>에 해당하는 원소가 만들어집니다. (예: H(1) + H(1) → He(2), He(2) + C(6) → O(8))<br>
+      ⚖️ 융합 1회에 각 재료가 <b>3개씩</b> 필요하고, 결과물은 <b>1개</b> 나옵니다. (H ×3 + H ×3 → He ×1)<br>
       🔥 실제 별처럼, <b>철(26)보다 무거운 원소</b>를 만들 때는 추가 에너지(수소)가 필요합니다.</p>
       <div class="fusion-stage">
         <div class="fslot" id="fsA" data-slot="A"></div>
@@ -414,7 +415,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
         <ol>
           <li><b>원자핵 클릭</b>으로 수소(H)를 모읍니다. 수소는 이 게임의 기본 화폐이자 재료입니다.</li>
           <li><b>생산</b> 탭에서 시설을 사면 수소가 자동으로 생산됩니다.</li>
-          <li><b>융합</b> 탭에서 두 원소를 합치면 <b>원자 번호의 합</b>인 원소가 됩니다. 새 원소를 발견할 때마다 생산량이 <b>+5%</b> 증가합니다.</li>
+          <li><b>융합</b> 탭에서 두 원소를 합치면 <b>원자 번호의 합</b>인 원소가 됩니다. 재료는 각각 <b>3개씩</b> 들어가고 결과물은 1개입니다. 새 원소를 발견할 때마다 생산량이 <b>+5%</b> 증가합니다.</li>
           <li><b>전투</b> 탭에서 원소로 파티를 꾸려 적과 싸웁니다. 보유 개수가 많고 원자 번호가 클수록 강합니다. 스테이지를 깰수록 생산량이 <b>+3%</b>씩 증가합니다.</li>
           <li>적에게는 <b>원자 장벽</b>이 있습니다. 장벽 번호보다 낮은 원소는 아무리 많아도 피해를 줄 수 없어요. (1~3스테이지: 10번 네온 이상, 이후 스테이지마다 +1)</li>
           <li>적을 클릭하면 파티 전원의 공격 쿨타임이 <b>0.1초</b> 줄어듭니다.</li>
@@ -504,32 +505,32 @@ for (let z = 1; z <= 118; z++) {
  *  게임 데이터
  * ===================================================================== */
 const GENERATORS = [
-  { name: '양성자 포집기',  icon: '🧲', base: 15,   rate: 0.5,   desc: '우주를 떠도는 양성자를 붙잡아 수소를 만듭니다' },
-  { name: '수소 구름',      icon: '☁️', base: 120,  rate: 4,     desc: '차가운 분자 구름에서 수소를 채집합니다' },
-  { name: '성운',           icon: '🌌', base: 1300, rate: 30,    desc: '별이 태어나는 거대한 가스 구름' },
-  { name: '원시별',         icon: '✨', base: 1.5e4, rate: 220,  desc: '중력 수축으로 뜨거워지는 아기 별' },
-  { name: '주계열성',       icon: '⭐', base: 2e5,  rate: 1600,  desc: '안정적으로 빛나는 어른 별' },
-  { name: '적색 거성',      icon: '🔴', base: 3e6,  rate: 1.3e4, desc: '부풀어 오른 늙은 별' },
-  { name: '초신성',         icon: '💥', base: 5e7,  rate: 1.1e5, desc: '별의 마지막 대폭발' },
-  { name: '중성자별',       icon: '🌀', base: 1e9,  rate: 1e6,   desc: '각설탕 하나 크기가 수억 톤' },
-  { name: '퀘이사',         icon: '🌠', base: 3e10, rate: 1e7,   desc: '우주에서 가장 밝은 천체' },
-  { name: '빅뱅 시뮬레이터', icon: '🎆', base: 1e12, rate: 1.2e8, desc: '새로운 우주를 통째로 만들어냅니다' },
+  { name: '양성자 포집기',  icon: '🧲', base: 45,   rate: 0.5,   desc: '우주를 떠도는 양성자를 붙잡아 수소를 만듭니다' },
+  { name: '수소 구름',      icon: '☁️', base: 400,  rate: 4,     desc: '차가운 분자 구름에서 수소를 채집합니다' },
+  { name: '성운',           icon: '🌌', base: 4000, rate: 30,    desc: '별이 태어나는 거대한 가스 구름' },
+  { name: '원시별',         icon: '✨', base: 5e4, rate: 220,  desc: '중력 수축으로 뜨거워지는 아기 별' },
+  { name: '주계열성',       icon: '⭐', base: 6e5,  rate: 1600,  desc: '안정적으로 빛나는 어른 별' },
+  { name: '적색 거성',      icon: '🔴', base: 1e7,  rate: 1.3e4, desc: '부풀어 오른 늙은 별' },
+  { name: '초신성',         icon: '💥', base: 1.5e8, rate: 1.1e5, desc: '별의 마지막 대폭발' },
+  { name: '중성자별',       icon: '🌀', base: 3e9,  rate: 1e6,   desc: '각설탕 하나 크기가 수억 톤' },
+  { name: '퀘이사',         icon: '🌠', base: 1e11, rate: 1e7,   desc: '우주에서 가장 밝은 천체' },
+  { name: '빅뱅 시뮬레이터', icon: '🎆', base: 3e12, rate: 1.2e8, desc: '새로운 우주를 통째로 만들어냅니다' },
 ];
 const REPEATS = [
-  { id: 'clickLv', name: '양성자 가속 장갑', icon: '👆', cost: lv => 10 * Math.pow(1.6, lv),
+  { id: 'clickLv', name: '양성자 가속 장갑', icon: '👆', cost: lv => 30 * Math.pow(1.8, lv),
     desc: lv => `클릭 기본 수소 +1 (현재 ${1 + lv})` },
-  { id: 'atkLv', name: '이온 빔 증폭기', icon: '🗡️', cost: lv => 40 * Math.pow(3.2, lv),
+  { id: 'atkLv', name: '이온 빔 증폭기', icon: '🗡️', cost: lv => 200 * Math.pow(3.8, lv),
     desc: lv => `파티 공격력 ×1.5 (현재 ×${fmt(Math.pow(1.5, lv))})` },
-  { id: 'hpLv', name: '전자기 보호막', icon: '🛡️', cost: lv => 40 * Math.pow(3.2, lv),
+  { id: 'hpLv', name: '전자기 보호막', icon: '🛡️', cost: lv => 200 * Math.pow(3.8, lv),
     desc: lv => `파티 체력 ×1.5 (현재 ×${fmt(Math.pow(1.5, lv))})` },
 ];
 const UPGRADES = [
-  { id: 'autoclick', name: '자동 클릭 장치', icon: '🤖', cost: 500,  desc: '1초에 5번 자동으로 클릭합니다' },
-  { id: 'quantum',   name: '양자 도약',      icon: '⚡', cost: 5000, desc: '클릭할 때 초당 생산량의 5%를 추가로 얻습니다' },
-  { id: 'catalyst',  name: '핵융합 촉매',    icon: '🧪', cost: 5e4,  desc: '철(26)보다 무거운 원소 융합 에너지 비용 50% 감소' },
-  { id: 'resonance', name: '원소 공명',      icon: '🔮', cost: 1e6,  desc: '원소 발견 보너스 2배 (원소당 +5% → +10%)' },
-  { id: 'warp',      name: '시공간 왜곡',    icon: '🕳️', cost: 1e8,  desc: '모든 수소 생산량 ×3' },
-  { id: 'gravity',   name: '중력 렌즈',      icon: '🔭', cost: 1e10, desc: '전투 보상 수소 ×5' },
+  { id: 'autoclick', name: '자동 클릭 장치', icon: '🤖', cost: 2500, desc: '1초에 5번 자동으로 클릭합니다' },
+  { id: 'quantum',   name: '양자 도약',      icon: '⚡', cost: 2.5e4, desc: '클릭할 때 초당 생산량의 5%를 추가로 얻습니다' },
+  { id: 'catalyst',  name: '핵융합 촉매',    icon: '🧪', cost: 2.5e5, desc: '철(26)보다 무거운 원소 융합 에너지 비용 50% 감소' },
+  { id: 'resonance', name: '원소 공명',      icon: '🔮', cost: 5e6,  desc: '원소 발견 보너스 2배 (원소당 +5% → +10%)' },
+  { id: 'warp',      name: '시공간 왜곡',    icon: '🕳️', cost: 5e8,  desc: '모든 수소 생산량 ×3' },
+  { id: 'gravity',   name: '중력 렌즈',      icon: '🔭', cost: 5e10, desc: '전투 보상 수소 ×5' },
 ];
 
 const E_PRE = ['불안정한', '들뜬', '이온화된', '방사성', '암흑', '반물질', '과열된', '양자', '혼돈의', '붕괴하는'];
@@ -686,6 +687,7 @@ const SFX = {
 };
 
 const SAVE_KEY = 'elementAlchemist_save_v1';
+const FUSE_RATIO = 3; // 융합 1회당 각 재료 소모 개수
 const OFFLINE_CAP = 8 * 3600;
 
 /* =====================================================================
@@ -921,7 +923,7 @@ function renderAch() {
     <div class="aicon">${S.ach[a.id] ? a.icon : '🔒'}</div><div><b>${a.name}</b><small>${a.desc}</small></div></div>`).join('');
 }
 
-const GEN_R = 1.15;
+const GEN_R = 1.18;
 function genCost(i, n) {
   const k = S.gens[i];
   return GENERATORS[i].base * Math.pow(GEN_R, k) * (Math.pow(GEN_R, n) - 1) / (GEN_R - 1);
@@ -980,8 +982,8 @@ function clickCore(x, y) {
 function fusionTax(z) { return z > 26 ? Math.ceil(5 * Math.pow(z - 26, 2) * (S.upg.catalyst ? 0.5 : 1)) : 0; }
 function fusionNeeds(a, b) {
   const need = {};
-  need[a] = (need[a] || 0) + 1;
-  need[b] = (need[b] || 0) + 1;
+  need[a] = (need[a] || 0) + FUSE_RATIO;
+  need[b] = (need[b] || 0) + FUSE_RATIO;
   const tax = fusionTax(a + b);
   if (tax) need[1] = (need[1] || 0) + tax;
   return need;
@@ -1310,10 +1312,10 @@ function renderHeader() {
   $('#battleDot').classList.toggle('on', S.battle.active);
 }
 function nextGoal() {
-  if (!S.disc[2]) return S.counts[1] >= 2
-    ? '🎯 <b>융합</b> 탭에서 H + H 로 헬륨(He)을 만들어 보세요!'
-    : '🎯 원자핵을 클릭해서 수소 2개를 모아보세요!';
-  if (S.gens[0] === 0) return '🎯 수소 15개로 <b>양성자 포집기</b>를 사서 자동 생산을 시작하세요!';
+  if (!S.disc[2]) return S.counts[1] >= 6
+    ? '🎯 <b>융합</b> 탭에서 H ×3 + H ×3 으로 헬륨(He)을 만들어 보세요!'
+    : '🎯 원자핵을 클릭해서 수소 6개를 모아보세요!';
+  if (S.gens[0] === 0) return '🎯 수소 45개로 <b>양성자 포집기</b>를 사서 자동 생산을 시작하세요!';
   if (S.battle.maxStage === 0) {
     let top = 0; for (let z = 118; z >= 1; z--) if (S.counts[z] >= 1) { top = z; break; }
     return top >= 10 ? '🎯 <b>전투</b> 탭에서 10번 이상 원소로 파티를 꾸려 첫 전투를 시작하세요!'
@@ -1413,7 +1415,7 @@ function renderFusion() {
   let info = '';
   if (a && b && z <= 118) {
     const tax = fusionTax(z);
-    info = `소모: ${EL[a].sym} ×1 + ${EL[b].sym} ×1` + (tax ? ` + <span style="color:#ffd43b">에너지 ${fmt(tax)} H</span>` : '') +
+    info = `소모: ${EL[a].sym} ×${FUSE_RATIO} + ${EL[b].sym} ×${FUSE_RATIO} → ${EL[z].sym} ×1` + (tax ? ` + <span style="color:#ffd43b">에너지 ${fmt(tax)} H</span>` : '') +
       `<br>${m >= 1 ? `최대 <b>${fmt(m)}</b>회 융합 가능` : '<span class="warn">재료가 부족합니다</span>'}` +
       (S.disc[z] ? '' : ' · <b style="color:#ffd43b">✨ 새로운 원소!</b>');
   } else if (z > 118) info = '<span class="warn">원자 번호 합이 118을 넘을 수 없습니다</span>';
