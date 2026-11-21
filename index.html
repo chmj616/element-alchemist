@@ -246,6 +246,9 @@ button{font-family:inherit}
 .tbar.danger{animation:blink .6s infinite}
 .tbar.danger .fill{background:linear-gradient(90deg,#c92a2a,#ff6b6b)}
 .warp-btn{width:auto;padding:0 10px;background:linear-gradient(135deg,#f59f00,#e8590c);border:0;color:#fff;font-weight:800}
+.e-synth{color:#c0eb75;font-weight:800}
+.enemy.synth .e-emoji{filter:drop-shadow(0 0 25px #c0eb75) drop-shadow(0 0 50px #5c940d)}
+.enemy.synth .e-name{color:#c0eb75}
 .cap-lbl{font-size:12px;color:#ffd43b}
 .rb-caps{font-size:12px;color:#c9d6ff;margin:-2px 0 8px}
 .fill.blue{background:linear-gradient(90deg,#1971c2,#74c0fc)}
@@ -490,7 +493,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <div class="e-name" id="eName"></div>
           <div class="bar"><div class="fill red" id="eHpFill"></div><span id="eHpText"></span></div>
           <div class="bar tbar" id="eTimeBar"><div class="fill gold" id="eTimeFill"></div><span id="eTimeText"></span></div>
-          <div class="e-meta"><span id="eAtk"></span><span id="eWeak"></span><span id="eTimer"></span></div>
+          <div class="e-meta"><span id="eSynth" class="e-synth"></span><span id="eAtk"></span><span id="eWeak"></span><span id="eTimer"></span></div>
         </div>
         <div class="arena-tip">👆 적을 클릭하면 파티 전원의 공격 쿨타임이 0.1초 줄어요! · 5스테이지마다 보스</div>
       </div>
@@ -514,7 +517,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
     <!-- 공허 -->
     <div class="tab" id="tab-void">
       <p class="tip">🕳️ <b>공허</b>에 주기율표 <b>순서대로</b>(수소 → 헬륨 → 리튬 …) 원소를 바치면 그 안에서 새로운 행성이 자라납니다.<br>
-      💧 수소는 얻기 쉬우니 <b>왕창</b> 필요하고, 뒤로 갈수록 필요한 개수가 점점 줄어들어요. 🧪 인공 원소(28종)는 각 <b>1개</b> — 해당 스테이지를 처음 클리어하면 얻어요.<br>
+      💧 수소는 얻기 쉬우니 <b>왕창</b> 필요하고, 뒤로 갈수록 필요한 개수가 점점 줄어들어요. 🧪 인공 원소(28종)는 각 <b>1개</b> — 지정된 보스 층에 <b>인공 원소 보스</b>로 등장하고, 처치하면 1개 확정이에요.<br>
       📈 원소 하나를 다 채울 때마다 <b>수소 생산량 ×1.02</b> (복리, 영구 · 환생해도 유지). 118번까지 모두 채우면 <b>행성 완성 → 엔딩</b>!</p>
       <div class="void-wrap">
         <div class="void-stage"><div class="void-hole"></div><div id="planet" class="planet"></div><div id="planetName" class="planet-name"></div></div>
@@ -552,7 +555,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허의 행성 완성 = <b>엔딩 2</b>.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
           <li><b>조합법 해금</b>: 처음엔 1~10번 원소만 융합할 수 있어요. 5스테이지마다 다음 단계 조합법이 열리고, 50스테이지를 클리어하면 자연 원소(1~92번)를 모두 만들 수 있어요.</li>
-          <li><b>인공 원소</b>: 테크네튬(43), 프로메튬(61), 93번 이후 원소는 자연에 거의 없어 융합할 수 없어요. 특정 스테이지를 처음 클리어하면 1개씩 얻어요. 등장 층은 <b>스테이지 상한의 8~60% 구간</b>에 퍼져 있어서 환생할수록 깊어져요 (환생 0회: 24~180층 · 1회: 48~360층 · … · 7회: 400~3000층).</li>
+          <li><b>인공 원소</b>: 테크네튬(43), 프로메튬(61), 93번 이후 원소는 자연에 거의 없어 융합할 수 없어요. 지정된 보스 층에 <b>인공 원소 보스</b>로 등장하고, 처치하면 1개 확정 획득. 이미 지나온 인공 원소는 다른 보스 층에서 <b>4% 확률</b>로 희귀 보스로 다시 나와요. 등장 층은 <b>25층(Tc) ~ 300층(Og)으로 고정</b>이라, 마지막 원소 Og는 300층 보스를 잡아야 얻어요. 환생하면 같은 층에서 다시 등장하고, 이번 회차에 이미 잡은 층에서는 다시 나오지 않아요.</li>
           <li><b>환생(빅뱅)</b>: 118개 원소를 모두 발견하면 별의 씨앗을 받고 새 우주에서 다시 시작해요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06이 복리로 영구 적용돼요. 환생 후엔 역대 최고 기록의 절반까지 ⏩ 워프할 수 있어요.</li>
           <li><b>스테이지 상한</b>: 최종 스테이지는 5000이에요. 환생 횟수에 따라 상한이 열려요 (0회 300 · 1회 600 · 2회 1000 · 3회 1500 · 4회 2200 · 5회 3000 · 6회 4000 · 7회 5000).</li>
           <li>적을 클릭하면 파티 전원의 공격 쿨타임이 <b>0.1초</b> 줄어듭니다.</li>
@@ -852,14 +855,31 @@ const RECIPE_TIERS = [[0, 10], [5, 18], [10, 26], [15, 36], [20, 45], [25, 54], 
 // 자연에서 거의 얻을 수 없는 인공 원소: 융합 불가, 특정 스테이지 클리어 보상으로만 획득
 const SYNTHETIC = new Set([43, 61]);
 for (let z = 93; z <= 118; z++) SYNTHETIC.add(z);
-// 인공 원소 등장 층: 환생 횟수별 스테이지 상한의 8% ~ 60% 구간에 순서대로 배치
-// (환생 0회: Tc 24층 … Og 180층 / 7회: Tc 400층 … Og 3000층) — 회차마다 새로 모아야 하는 목표가 상한과 함께 늘어남
+// 인공 원소 등장 층(고정): 환생 전 상한 300층 안에 순서대로 배치 — Tc 25층 … Og 300층
+// 환생해도 같은 층에서 다시 보스로 등장하고, 이번 회차에 이미 얻었으면 그 층에서 다시 나오지 않음
 const SYNTH_ORDER = [43, 61];
 for (let z = 93; z <= 118; z++) SYNTH_ORDER.push(z);
 const SYNTH_STAGE = {};
 function refreshSynthStages(count) {
-  const cap = stageCap(count);
-  SYNTH_ORDER.forEach((z, i) => { SYNTH_STAGE[z] = Math.round(cap * (0.08 + 0.52 * i / (SYNTH_ORDER.length - 1))); });
+  const cap = STAGE_CAPS[0]; // 회차와 무관하게 고정 (300층)
+  let prev = 0;
+  SYNTH_ORDER.forEach((z, i) => {
+    const s = Math.round(cap * (0.08 + 0.92 * i / (SYNTH_ORDER.length - 1)) / 5) * 5; // 보스 층(5의 배수)
+    SYNTH_STAGE[z] = prev = Math.max(s, prev + 5);
+  });
+}
+const SYNTH_RARE_CHANCE = 0.04; // 보스 층에서 이미 지나온 인공 원소 보스가 대신 나올 확률
+// 확정 인공 원소 보스: 자기 고정 층에서만, 이번 회차에 아직 얻지 못했을 때 등장 (워프로 건너뛰면 ◀로 돌아가서 처치)
+function synthBossFor(stage) {
+  if (stage % 5 || stage >= MAX_STAGE) return 0;
+  return SYNTH_ORDER.find(z => !S.disc[z] && SYNTH_STAGE[z] === stage) || 0;
+}
+function applySynthBoss(E, z, rare) {
+  E.synth = z;
+  E.name = (rare ? '✨ 희귀 출현! ' : '') + `${EL[z].name}(${EL[z].sym}) 원자핵`;
+  E.emoji = '☢️';
+  E.weak = 'actinide' === EL[z].cat ? 'noble' : E.weak;
+  return E;
 }
 const MAX_STAGE = 5000;
 // 환생 횟수별 도전 가능한 스테이지 상한 (인덱스 = 환생 횟수)
@@ -1117,8 +1137,8 @@ function checkAchs() {
 function prestigeProd() { return Math.pow(1.08, S.prestige ? S.prestige.seeds : 0); }
 function prestigeCombat() { return Math.pow(1.06, S.prestige ? S.prestige.seeds : 0); }
 function canRebirth() { return discCount() >= 118; }
-// 기본 10개 + 이번 회차 오가네손 등장 층 이후 3스테이지마다 1개
-function seedsGain() { return 10 + Math.max(0, Math.floor((S.battle.maxStage - SYNTH_STAGE[118]) / 3)); }
+// 기본 10개 + 127스테이지 이후 3스테이지마다 1개 (첫 환생 300층 기준 67개)
+function seedsGain() { return 10 + Math.max(0, Math.floor((S.battle.maxStage - 127) / 3)); }
 function rebirth() {
   if (!canRebirth()) return;
   const gain = seedsGain();
@@ -1142,9 +1162,9 @@ function rebirth() {
 function renderRebirth() {
   const d = discCount(), ok = canRebirth(), P = S.prestige;
   const html = `<div class="rb-head"><b>🌌 환생 (빅뱅)</b> <span>환생 ${P.count}회 · 🌱 별의 씨앗 ${P.seeds}개 → 생산량 ×${fmt(prestigeProd())}, 전투력 ×${fmt(prestigeCombat())}</span></div>
-    <div class="rb-caps">🧪 이번 회차 인공 원소 등장: <b>${SYNTH_STAGE[43]}~${SYNTH_STAGE[118]}층</b> · 🔒 도전 가능 스테이지: <b>${stageCap()}</b>${stageCap() < MAX_STAGE ? ` (환생 ${P.count + 1}회 → ${stageCap(P.count + 1)})` : ' (최종 5000)'} · 🏆 역대 최고: ${Math.max(P.best || 0, S.battle.maxStage)}</div>
+    <div class="rb-caps">🧪 인공 원소 보스: <b>${SYNTH_STAGE[43]}~${SYNTH_STAGE[118]}층 (고정)</b> · 🔒 도전 가능 스테이지: <b>${stageCap()}</b>${stageCap() < MAX_STAGE ? ` (환생 ${P.count + 1}회 → ${stageCap(P.count + 1)})` : ' (최종 5000)'} · 🏆 역대 최고: ${Math.max(P.best || 0, S.battle.maxStage)}</div>
     <div class="bar"><div class="fill ${ok ? 'red' : 'blue'}" style="width:${d / 118 * 100}%"></div><span>주기율표 ${d} / 118</span></div>
-    <div class="rb-foot">${ok ? `118개 원소를 모두 모았어요! 지금 환생하면 <b>별의 씨앗 +${seedsGain()}개</b> (${SYNTH_STAGE[118]}스테이지 이후 3스테이지마다 +1)`
+    <div class="rb-foot">${ok ? `118개 원소를 모두 모았어요! 지금 환생하면 <b>별의 씨앗 +${seedsGain()}개</b> (127스테이지 이후 3스테이지마다 +1)`
       : '118개 원소를 모두 발견하면 환생할 수 있어요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06 (복리, 영구)'}
       <button class="big-btn" id="btnRebirth" ${ok ? '' : 'disabled'}>🌌 빅뱅 일으키기</button></div>`;
   const el = $('#rebirth');
@@ -1227,7 +1247,7 @@ function fuseCap(stage = S.battle.maxStage) {
 function tierStageFor(z) { for (const [s, c] of RECIPE_TIERS) if (z <= c) return s; return Infinity; }
 function canFuse(z) { return z <= 118 && !SYNTHETIC.has(z) && z <= fuseCap(); }
 function lockReason(z) {
-  if (SYNTHETIC.has(z)) return `🧪 인공 원소라 융합할 수 없어요 · 스테이지 ${SYNTH_STAGE[z]} 클리어 보상`;
+  if (SYNTHETIC.has(z)) return `🧪 인공 원소라 융합할 수 없어요 · 스테이지 ${SYNTH_STAGE[z]} 인공 원소 보스 처치 시 확정 획득`;
   if (z > fuseCap()) return `🔒 스테이지 ${tierStageFor(z)} 클리어 시 조합법 해금`;
   return '';
 }
@@ -1664,7 +1684,9 @@ function makeEnemy(stage) {
   // 일반 몹: 150에서 시작해 스테이지당 ×1.18 / 보스: 일반 몹의 20배 (스테이지는 끝없이 이어짐)
   const hp = 150 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 20 : 1);
   const atk = 3 * stageGrowth(stage, 1.17, 1.048, 1.019) * (boss ? 1.6 : 1);
-  return { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, timeLeft: boss ? 30 : Infinity };
+  const E = { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, timeLeft: boss ? 30 : Infinity, synth: 0 };
+  const sz = boss ? synthBossFor(stage) : 0;
+  return sz ? applySynthBoss(E, sz, false) : E;
 }
 function blog(msg, cls = '') {
   R.log.push({ msg, cls });
@@ -1674,7 +1696,19 @@ function blog(msg, cls = '') {
 function spawnEnemy() {
   R.enemy = makeEnemy(S.battle.stage);
   R.enemyT = 0;
-  if (R.enemy.boss) {
+  const E0 = R.enemy;
+  if (E0.boss && !E0.synth && E0.stage < MAX_STAGE && Math.random() < SYNTH_RARE_CHANCE) {
+    const pool = SYNTH_ORDER.filter(z => SYNTH_STAGE[z] < E0.stage); // 자기 원래 층에서는 재등장 X
+    if (pool.length) {
+      applySynthBoss(E0, pool[Math.floor(Math.random() * pool.length)], true);
+      toast(`✨ <b>희귀 출현!</b> ${EL[E0.synth].name} 원자핵 보스가 나타났습니다! 처치 시 ${EL[E0.synth].sym} 1개`, 'disc', 4500);
+    }
+  }
+  if (R.enemy.synth) {
+    blog(`🧪 인공 원소 보스 등장: ${R.enemy.name}! 30초 안에 처치하면 ${EL[R.enemy.synth].sym} 1개 확정!`, 'boss');
+    SFX.boss();
+    if (R.tab === 'battle') shake();
+  } else if (R.enemy.boss) {
     blog(`⚠️ 보스 등장: ${R.enemy.name}! 30초 안에 처치하세요!`, 'boss');
     SFX.boss();
     if (R.tab === 'battle') shake();
@@ -1817,20 +1851,10 @@ function victory() {
     addEl(z, n);
     msg += ` · 🎁 ${EL[z].name}(${EL[z].sym}) ×${n}`;
   }
-  // 인공 원소: 지정 스테이지를 클리어하면 처음 합성 성공
-  const sz = Object.keys(SYNTH_STAGE).map(Number).filter(z => !S.disc[z] && SYNTH_STAGE[z] <= E.stage)
-    .sort((x, y) => SYNTH_STAGE[x] - SYNTH_STAGE[y])[0];
-  if (sz) {
-    addEl(sz, 1);
-    msg += ` · 🧪 인공 원소 <b>${EL[sz].name}(${EL[sz].sym})</b> 합성 성공!`;
-  } else if (Math.random() < 0.08) {
-    // 이미 발견한 인공 원소는 낮은 확률로 추가 획득 (파밍)
-    const pool = [...SYNTHETIC].filter(z => S.disc[z] && SYNTH_STAGE[z] <= E.stage);
-    if (pool.length) {
-      const z = pool[Math.floor(Math.random() * pool.length)];
-      addEl(z, 1);
-      msg += ` · 🧪 ${EL[z].name}(${EL[z].sym}) ×1`;
-    }
+  // 인공 원소 보스 처치 → 해당 원소 1개 확정
+  if (E.synth) {
+    addEl(E.synth, 1);
+    msg += ` · 🧪 인공 원소 <b>${EL[E.synth].name}(${EL[E.synth].sym})</b> 확정 획득!`;
   }
   blog(msg, 'win');
   if (E.stage > B.maxStage) {
@@ -1920,7 +1944,7 @@ function nextGoal() {
   const ns = Object.keys(SYNTH_STAGE).map(Number).filter(z => !S.disc[z]).sort((x, y) => SYNTH_STAGE[x] - SYNTH_STAGE[y])[0];
   const parts = [];
   if (nt) parts.push(`🔓 스테이지 <b>${nt[0]}</b> 클리어 → ${nt[1]}번까지 조합법 해금`);
-  if (ns) parts.push(`🧪 스테이지 <b>${SYNTH_STAGE[ns]}</b> 클리어 → 인공 원소 ${EL[ns].name}(${EL[ns].sym})`);
+  if (ns) parts.push(`🧪 스테이지 <b>${SYNTH_STAGE[ns]}</b> 보스 → 인공 원소 ${EL[ns].name}(${EL[ns].sym}) 확정`);
   return parts.length ? '🎯 ' + parts.join('<br>🎯 ') : '🏆 더 높은 스테이지에 도전하세요!';
 }
 function renderSide() {
@@ -2118,6 +2142,8 @@ function renderBattle() {
   $('#eHpFill').style.width = Math.max(0, E.hp / E.maxHp * 100) + '%';
   setText('eHpText', `${fmt(Math.max(0, E.hp))} / ${fmt(E.maxHp)}`);
   setText('eAtk', `💢 공격력 ${fmt(E.atk)} (1.5초마다)`);
+  setText('eSynth', E.synth ? `🎁 처치 시 ${EL[E.synth].sym} 1개 확정` : '');
+  $('#enemy').classList.toggle('synth', !!E.synth);
   const wc = CATS[E.weak];
   const wk = `약점: <b style="color:${wc.color}">${wc.name}</b> (2배 피해)`;
   if ($('#eWeak').innerHTML !== wk) $('#eWeak').innerHTML = wk;
