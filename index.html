@@ -1085,7 +1085,7 @@ function makeEnemy(stage) {
   }
   const keys = Object.keys(CATS);
   const weak = keys[Math.floor(r() * keys.length)];
-  const hp = 15 * Math.pow(1.3, stage - 1) * (boss ? 6 : 1);
+  const hp = 15 * Math.pow(1.3, stage - 1) * (boss ? 120 : 1); // 보스: 일반 적의 120배
   const atk = 1.5 * Math.pow(1.24, stage - 1) * (boss ? 1.6 : 1);
   return { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, shield: shieldOf(stage), timeLeft: boss ? 30 : Infinity };
 }
