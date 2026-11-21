@@ -171,6 +171,14 @@ button{font-family:inherit}
 .bar .fill{height:100%;width:100%;transition:width .15s}
 .fill.red{background:linear-gradient(90deg,#c92a2a,#ff6b6b)}
 .fill.green{background:linear-gradient(90deg,#2b8a3e,#69db7c)}
+.fill.gold{background:linear-gradient(90deg,#f08c00,#ffd43b);transition:width .1s linear}
+.tbar{height:14px;margin-top:6px}
+.tbar span{font-size:11px}
+.tbar.danger{animation:blink .6s infinite}
+.tbar.danger .fill{background:linear-gradient(90deg,#c92a2a,#ff6b6b)}
+.warp-btn{width:auto;padding:0 10px;background:linear-gradient(135deg,#f59f00,#e8590c);border:0;color:#fff;font-weight:800}
+.cap-lbl{font-size:12px;color:#ffd43b}
+.rb-caps{font-size:12px;color:#c9d6ff;margin:-2px 0 8px}
 .fill.blue{background:linear-gradient(90deg,#1971c2,#74c0fc)}
 .bar span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;text-shadow:0 1px 2px #000}
 .party-hp{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:14px;white-space:nowrap}
@@ -390,6 +398,8 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
         <button id="stPrev" class="sbtn" title="이전 스테이지">◀</button>
         <div id="stageLbl" class="stage-lbl">스테이지 1</div>
         <button id="stNext" class="sbtn" title="다음 스테이지">▶</button>
+        <button id="stWarp" class="sbtn warp-btn" style="display:none" title="환생 전 최고 기록의 절반까지 바로 이동">⏩ 워프</button>
+        <span id="stageCapLbl" class="cap-lbl"></span>
         <label class="chk"><input type="checkbox" id="autoAdv"> 자동 진행</label>
         <button id="bestDeck" class="big-btn deck-btn" title="보유 원소 중 현재 스테이지에 가장 강한 조합을 자동으로 편성합니다">✨ 최고 덱 편성</button>
         <button id="battleToggle" class="big-btn">⚔️ 전투 시작</button>
@@ -399,6 +409,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <div class="e-emoji" id="eEmoji">👾</div>
           <div class="e-name" id="eName"></div>
           <div class="bar"><div class="fill red" id="eHpFill"></div><span id="eHpText"></span></div>
+          <div class="bar tbar" id="eTimeBar"><div class="fill gold" id="eTimeFill"></div><span id="eTimeText"></span></div>
           <div class="e-meta"><span id="eAtk"></span><span id="eWeak"></span><span id="eTimer"></span></div>
         </div>
         <div class="arena-tip">👆 적을 클릭하면 파티 전원의 공격 쿨타임이 0.1초 줄어요! · 5스테이지마다 보스</div>
@@ -436,8 +447,8 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <li><b>전투</b> 탭에서 원소로 파티를 꾸려 적과 싸웁니다. 보유 개수가 많고 원자 번호가 클수록 강합니다. 스테이지를 깰수록 생산량이 <b>+3%</b>씩 증가합니다.</li>
           <li><b>조합법 해금</b>: 처음엔 1~10번 원소만 융합할 수 있어요. 5스테이지마다 다음 단계 조합법이 열리고, 50스테이지를 클리어하면 자연 원소(1~92번)를 모두 만들 수 있어요.</li>
           <li><b>인공 원소</b>: 테크네튬(43), 프로메튬(61), 93번 이후 원소는 자연에 거의 없어 융합할 수 없어요. 특정 스테이지(23, 38, 52~127)를 클리어하면 얻을 수 있어요.</li>
-          <li><b>환생(빅뱅)</b>: 118개 원소를 모두 발견하면 별의 씨앗을 받고 새 우주에서 다시 시작해요. 씨앗 1개당 생산량 +10%, 전투력 +5%가 영구 적용돼요.</li>
-          <li>스테이지는 끝없이 이어집니다.</li>
+          <li><b>환생(빅뱅)</b>: 118개 원소를 모두 발견하면 별의 씨앗을 받고 새 우주에서 다시 시작해요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06이 복리로 영구 적용돼요. 환생 후엔 역대 최고 기록의 절반까지 ⏩ 워프할 수 있어요.</li>
+          <li><b>스테이지 상한</b>: 최종 스테이지는 5000이에요. 환생 횟수에 따라 상한이 열려요 (0회 300 · 1회 600 · 2회 1000 · 3회 1500 · 4회 2200 · 5회 3000 · 6회 4000 · 7회 5000).</li>
           <li>적을 클릭하면 파티 전원의 공격 쿨타임이 <b>0.1초</b> 줄어듭니다.</li>
           <li>적에게는 <b>약점 계열</b>이 있습니다. 약점 계열 원소는 <b>2배</b> 피해를 줍니다.</li>
           <li>보스를 잡으면 무거운 원소를 얻을 수 있습니다. 목표는 <b>118개 원소 전부 발견!</b></li>
@@ -659,6 +670,8 @@ const ACHS = [
   { id: 's25',    icon: '🛡️', name: '원소 기사단',     desc: '스테이지 25 클리어',     check: () => S.battle.maxStage >= 25 },
   { id: 's50',    icon: '🐉', name: '우주 수호자',     desc: '스테이지 50 클리어',     check: () => S.battle.maxStage >= 50 },
   { id: 's100',   icon: '🌌', name: '엔트로피 정복자', desc: '스테이지 100 클리어',    check: () => S.battle.maxStage >= 100 },
+  { id: 's1000',  icon: '🌠', name: '은하 지배자',     desc: '스테이지 1000 클리어',   check: () => S.battle.maxStage >= 1000 },
+  { id: 's5000',  icon: '👑', name: '우주 정복',       desc: '최종 스테이지 5000 클리어', check: () => S.battle.maxStage >= 5000 },
   { id: 'f100',   icon: '⚗️', name: '연금술 입문',     desc: '융합 100회',            check: () => S.totalFusions >= 100 },
   { id: 'f10k',   icon: '🔮', name: '대연금술사',      desc: '융합 10,000회',         check: () => S.totalFusions >= 1e4 },
   { id: 'gold1',  icon: '🌟', name: '별똥별 사냥꾼',   desc: '초신성 파편 1개 획득',    check: () => S.goldens >= 1 },
@@ -718,6 +731,18 @@ const RECIPE_TIERS = [[0, 10], [5, 18], [10, 26], [15, 36], [20, 45], [25, 54], 
 const SYNTHETIC = new Set([43, 61]);
 const SYNTH_STAGE = { 43: 23, 61: 38 };
 for (let z = 93; z <= 118; z++) { SYNTHETIC.add(z); SYNTH_STAGE[z] = 52 + (z - 93) * 3; } // 93번 = 52스테이지 … 118번 = 127스테이지
+const MAX_STAGE = 5000;
+// 환생 횟수별 도전 가능한 스테이지 상한 (인덱스 = 환생 횟수)
+const STAGE_CAPS = [300, 600, 1000, 1500, 2200, 3000, 4000, 5000];
+function stageCap(count = S.prestige.count) { return STAGE_CAPS[Math.min(count, STAGE_CAPS.length - 1)]; }
+function warpStage() { return Math.min(stageCap(), Math.floor((S.prestige.best || 0) * 0.5)); }
+function maxSelectable() { return Math.min(stageCap(), Math.max(S.battle.maxStage + 1, warpStage())); }
+// 스테이지별 성장: 1~100 ×1.18, 101~1000 ×1.05, 1001~5000 ×1.02 (5000까지 숫자가 유한하게 유지)
+function stageGrowth(stage, a, b, c) {
+  const n = stage - 1;
+  const n1 = Math.min(n, 99), n2 = Math.min(Math.max(n - 99, 0), 900), n3 = Math.max(n - 999, 0);
+  return Math.pow(a, n1) * Math.pow(b, n2) * Math.pow(c, n3);
+}
 const STAGE_SYNTH = {};
 for (const z in SYNTH_STAGE) STAGE_SYNTH[SYNTH_STAGE[z]] = +z;
 const OFFLINE_CAP = 8 * 3600;
@@ -743,7 +768,7 @@ function defaultState() {
     battle: { stage: 1, maxStage: 0, auto: true, active: false, hp: 0, maxHp: 0 },
     totalClicks: 0, totalFusions: 0, kills: 0, playTime: 0, lastSave: Date.now(),
     totalH: 0, goldens: 0, ach: {}, sound: true,
-    prestige: { count: 0, seeds: 0 },
+    prestige: { count: 0, seeds: 0, best: 0 },
   };
 }
 function load() {
@@ -755,7 +780,7 @@ function load() {
     S.battle = Object.assign(defaultState().battle, d.battle || {});
     S.upg = d.upg || {};
     S.ach = d.ach || {};
-    S.prestige = Object.assign({ count: 0, seeds: 0 }, d.prestige || {});
+    S.prestige = Object.assign({ count: 0, seeds: 0, best: 0 }, d.prestige || {});
     if (!Array.isArray(S.counts) || S.counts.length < 119) S.counts = defaultState().counts;
     if (!Array.isArray(S.disc) || S.disc.length < 119) S.disc = defaultState().disc;
     S.counts = S.counts.map(v => (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0);
@@ -952,8 +977,9 @@ function checkAchs() {
   }
 }
 /* ---------- 환생 (빅뱅) ---------- */
-function prestigeProd() { return 1 + 0.10 * (S.prestige ? S.prestige.seeds : 0); }
-function prestigeCombat() { return 1 + 0.05 * (S.prestige ? S.prestige.seeds : 0); }
+// 별의 씨앗 1개당 생산 ×1.08, 전투력 ×1.06 (복리) — 높은 스테이지일수록 씨앗을 많이 받아 다음 회차가 빨라짐
+function prestigeProd() { return Math.pow(1.08, S.prestige ? S.prestige.seeds : 0); }
+function prestigeCombat() { return Math.pow(1.06, S.prestige ? S.prestige.seeds : 0); }
 function canRebirth() { return discCount() >= 118; }
 // 기본 10개 + 127스테이지(오가네손) 이후 3스테이지마다 1개
 function seedsGain() { return 10 + Math.max(0, Math.floor((S.battle.maxStage - 127) / 3)); }
@@ -964,24 +990,25 @@ function rebirth() {
   const keep = {
     ach: S.ach, sound: S.sound,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
-    prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain },
+    prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
   S = Object.assign(defaultState(), keep);
   R.enemy = null; R.buffs = {}; R.log = []; R.logVer++; R.fuseA = 1; R.fuseB = 1; R.activeSlot = 'A'; R.selZ = 1;
-  R.discQueue = []; R.sig = {};
+  R.discQueue = []; R.sig = {}; R.capWarned = false;
   save();
   SFX.discover();
   particles(innerWidth / 2, innerHeight / 2, 60, '#ffd43b');
   particles(innerWidth / 2, innerHeight / 2, 40, '#c77dff');
-  toast(`🌌 <b>빅뱅!</b> 새로운 우주가 탄생했습니다.<br>별의 씨앗 ${S.prestige.seeds}개 · 생산량 ×${prestigeProd().toFixed(1)} · 전투력 ×${prestigeCombat().toFixed(2)}`, 'disc', 8000);
+  toast(`🌌 <b>빅뱅!</b> 새로운 우주가 탄생했습니다.<br>별의 씨앗 ${S.prestige.seeds}개 · 생산량 ×${fmt(prestigeProd())} · 전투력 ×${fmt(prestigeCombat())}<br>도전 가능: 스테이지 ${stageCap()}까지 · ⏩ 워프: ${warpStage()}`, 'disc', 8000);
   switchTab('prod');
 }
 function renderRebirth() {
   const d = discCount(), ok = canRebirth(), P = S.prestige;
-  const html = `<div class="rb-head"><b>🌌 환생 (빅뱅)</b> <span>환생 ${P.count}회 · 🌱 별의 씨앗 ${P.seeds}개 → 생산량 ×${prestigeProd().toFixed(1)}, 전투력 ×${prestigeCombat().toFixed(2)}</span></div>
+  const html = `<div class="rb-head"><b>🌌 환생 (빅뱅)</b> <span>환생 ${P.count}회 · 🌱 별의 씨앗 ${P.seeds}개 → 생산량 ×${fmt(prestigeProd())}, 전투력 ×${fmt(prestigeCombat())}</span></div>
+    <div class="rb-caps">🔒 도전 가능 스테이지: <b>${stageCap()}</b>${stageCap() < MAX_STAGE ? ` (환생 ${P.count + 1}회 → ${stageCap(P.count + 1)})` : ' (최종 5000)'} · 🏆 역대 최고: ${Math.max(P.best || 0, S.battle.maxStage)}</div>
     <div class="bar"><div class="fill ${ok ? 'red' : 'blue'}" style="width:${d / 118 * 100}%"></div><span>주기율표 ${d} / 118</span></div>
     <div class="rb-foot">${ok ? `118개 원소를 모두 모았어요! 지금 환생하면 <b>별의 씨앗 +${seedsGain()}개</b> (127스테이지 이후 3스테이지마다 +1)`
-      : '118개 원소를 모두 발견하면 환생할 수 있어요. 씨앗 1개당 생산량 +10%, 전투력 +5% (영구)'}
+      : '118개 원소를 모두 발견하면 환생할 수 있어요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06 (복리, 영구)'}
       <button class="big-btn" id="btnRebirth" ${ok ? '' : 'disabled'}>🌌 빅뱅 일으키기</button></div>`;
   const el = $('#rebirth');
   if (el.innerHTML !== html) el.innerHTML = html;
@@ -1236,7 +1263,7 @@ function makeEnemy(stage) {
   const boss = stage % 5 === 0;
   let name, emoji;
   if (boss) {
-    [name, emoji] = BOSSES[(stage / 5 - 1) % BOSSES.length];
+    [name, emoji] = stage >= MAX_STAGE ? ['빅 크런치 (최종 보스)', '🌑'] : BOSSES[(stage / 5 - 1) % BOSSES.length];
   } else {
     const b = E_BASE[Math.floor(r() * E_BASE.length)];
     name = E_PRE[Math.floor(r() * E_PRE.length)] + ' ' + b[0];
@@ -1245,8 +1272,8 @@ function makeEnemy(stage) {
   const keys = Object.keys(CATS);
   const weak = keys[Math.floor(r() * keys.length)];
   // 일반 몹: 150에서 시작해 스테이지당 ×1.18 / 보스: 일반 몹의 20배 (스테이지는 끝없이 이어짐)
-  const hp = 150 * Math.pow(1.18, stage - 1) * (boss ? 20 : 1);
-  const atk = 3 * Math.pow(1.17, stage - 1) * (boss ? 1.6 : 1);
+  const hp = 150 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 20 : 1);
+  const atk = 3 * stageGrowth(stage, 1.17, 1.048, 1.019) * (boss ? 1.6 : 1);
   return { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, timeLeft: boss ? 30 : Infinity };
 }
 function blog(msg, cls = '') {
@@ -1383,7 +1410,7 @@ function victory() {
     particles(x, y, E.boss ? 40 : 16, E.boss ? '#ff6b6b' : '#c77dff');
     if (E.boss) shake();
   }
-  const reward = 10 * Math.pow(1.18, E.stage - 1) * (E.boss ? 5 : 1) * (S.upg.gravity ? 5 : 1);
+  const reward = 10 * stageGrowth(E.stage, 1.18, 1.05, 1.02) * (E.boss ? 5 : 1) * (S.upg.gravity ? 5 : 1);
   addH(reward);
   S.kills++;
   let msg = `✅ ${E.name} 처치! +${fmt(reward)} H`;
@@ -1401,8 +1428,9 @@ function victory() {
     msg += ` · 🎁 ${EL[z].name}(${EL[z].sym}) ×${n}`;
   }
   // 인공 원소: 지정 스테이지를 클리어하면 처음 합성 성공
-  const sz = STAGE_SYNTH[E.stage];
-  if (sz && !S.disc[sz]) {
+  const sz = Object.keys(SYNTH_STAGE).map(Number).filter(z => !S.disc[z] && SYNTH_STAGE[z] <= E.stage)
+    .sort((x, y) => SYNTH_STAGE[x] - SYNTH_STAGE[y])[0];
+  if (sz) {
     addEl(sz, 1);
     msg += ` · 🧪 인공 원소 <b>${EL[sz].name}(${EL[sz].sym})</b> 합성 성공!`;
   } else if (Math.random() < 0.08) {
@@ -1426,7 +1454,15 @@ function victory() {
       blog(`🔓 조합법 해금: ${cap + 1}~${nc}번 원소 융합 가능!`, 'boss');
     }
   }
-  if (B.auto) B.stage = E.stage + 1;
+  if (E.stage >= MAX_STAGE && !S.ach.s5000) {
+    toast('🏆 <b>우주 정복!</b> 최종 스테이지 5000을 클리어했습니다!', 'disc', 10000);
+    blog('🏆 최종 보스 빅 크런치를 쓰러뜨렸습니다! 우주를 정복했어요!', 'boss');
+  }
+  if (B.auto) {
+    if (E.stage + 1 > stageCap()) {
+      if (E.stage < MAX_STAGE && !R.capWarned) { R.capWarned = true; blog(`🔒 스테이지 ${E.stage + 1}부터는 환생 ${S.prestige.count + 1}회 이상 필요해요. 현재 스테이지를 반복합니다.`, 'info'); }
+    } else B.stage = E.stage + 1;
+  }
   R.enemy = null;
   R.cooldown = 0.6;
 }
@@ -1444,7 +1480,7 @@ function defeat(reason) {
 }
 function changeStage(delta) {
   const B = S.battle;
-  const ns = Math.min(B.maxStage + 1, Math.max(1, B.stage + delta));
+  const ns = Math.min(maxSelectable(), Math.max(1, B.stage + delta));
   if (ns === B.stage) return;
   B.stage = ns;
   R.enemy = null;
@@ -1478,6 +1514,7 @@ function nextGoal() {
     : '🎯 원자핵을 클릭해서 수소 6개를 모아보세요!';
   if (S.gens[0] === 0) return '🎯 수소 45개로 <b>양성자 포집기</b>를 사서 자동 생산을 시작하세요!';
   if (canRebirth()) return '🌌 <b>주기율표 완성!</b> 주기율표 탭에서 <b>환생(빅뱅)</b>할 수 있어요!';
+  if (S.battle.maxStage >= stageCap() && stageCap() < MAX_STAGE) return `🔒 스테이지 상한(${stageCap()}) 도달! 주기율표를 완성하고 환생하면 ${stageCap(S.prestige.count + 1)}까지 열려요.`;
   if (S.battle.maxStage === 0) return '🎯 <b>전투</b> 탭에서 첫 전투에 도전하세요! 적이 강하니 10번 근처 원소까지 융합해 두면 좋아요.';
   const h = fusionHints(1)[0];
   if (h) return `🎯 융합 가능: ${EL[h.a].sym} + ${EL[h.b].sym} → <b>${EL[h.z].name}(${EL[h.z].sym})</b>`;
@@ -1680,7 +1717,15 @@ function renderBattle() {
   const wc = CATS[E.weak];
   const wk = `약점: <b style="color:${wc.color}">${wc.name}</b> (2배 피해)`;
   if ($('#eWeak').innerHTML !== wk) $('#eWeak').innerHTML = wk;
-  setText('eTimer', E.boss ? `⏱️ ${Math.max(0, E.timeLeft).toFixed(1)}초` : '');
+  setText('eTimer', '');
+  const tbar = $('#eTimeBar');
+  tbar.style.display = E.boss ? '' : 'none';
+  if (E.boss) {
+    const left = Math.max(0, E.timeLeft);
+    $('#eTimeFill').style.width = (left / 30 * 100) + '%';
+    tbar.classList.toggle('danger', left <= 10);
+    setText('eTimeText', `⏱️ 남은 시간 ${left.toFixed(1)}초`);
+  }
 
   $('#pHpFill').style.width = (B.maxHp ? Math.max(0, B.hp / B.maxHp * 100) : 0) + '%';
   setText('pHpText', `${fmt(Math.max(0, B.hp))} / ${fmt(B.maxHp)}`);
@@ -1688,7 +1733,13 @@ function renderBattle() {
   setText('stageLbl', `스테이지 ${B.stage}${B.stage % 5 === 0 ? ' 👑보스' : ''}`);
   sl.classList.toggle('boss', B.stage % 5 === 0);
   $('#stPrev').disabled = B.stage <= 1;
-  $('#stNext').disabled = B.stage >= B.maxStage + 1;
+  $('#stNext').disabled = B.stage >= maxSelectable();
+  const wp = warpStage();
+  const warpBtn = $('#stWarp');
+  warpBtn.style.display = wp > B.maxStage + 1 && B.stage < wp ? '' : 'none';
+  setText('stWarp', `⏩ 워프 → ${wp}`);
+  const capTxt = B.stage >= stageCap() && stageCap() < MAX_STAGE ? `🔒 다음 스테이지는 환생 ${S.prestige.count + 1}회 필요` : (B.stage >= MAX_STAGE ? '🏁 최종 스테이지' : '');
+  setText('stageCapLbl', capTxt);
   $('#autoAdv').checked = B.auto;
   const tb = $('#battleToggle');
   setText('battleToggle', B.active ? '⏸️ 전투 중단' : '⚔️ 전투 시작');
@@ -1836,6 +1887,12 @@ document.addEventListener('change', e => {
 });
 $('#stPrev').onclick = () => changeStage(-1);
 $('#stNext').onclick = () => changeStage(1);
+$('#stWarp').onclick = () => {
+  const B = S.battle, wp = warpStage();
+  if (wp <= B.stage) return;
+  changeStage(wp - B.stage);
+  blog(`⏩ 스테이지 ${wp}(으)로 워프했습니다. 클리어하면 그 아래 조합법이 한 번에 해금돼요.`, 'info');
+};
 $('#battleToggle').onclick = () => S.battle.active ? stopBattle() : startBattle();
 $('#bestDeck').onclick = applyBestDeck;
 document.addEventListener('click', e => { if (e.target.closest('#btnRebirth')) rebirth(); });
