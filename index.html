@@ -143,6 +143,52 @@ button{font-family:inherit}
 .shop-row .elcard .sym{font-size:22px}
 .sell-btn{background:linear-gradient(135deg,#f08c00,#e67700)}
 .shop-row .buybtn{touch-action:none;-webkit-touch-callout:none}
+.void-wrap{display:flex;gap:16px;flex-wrap:wrap;align-items:stretch}
+.void-stage{position:relative;flex:1;min-width:300px;height:340px;border-radius:16px;border:1px solid var(--line);overflow:hidden;
+  background:radial-gradient(circle at center,#1a0f33 0%,#07050f 70%);display:flex;align-items:center;justify-content:center}
+.void-hole{position:absolute;width:300px;height:300px;border-radius:50%;background:conic-gradient(from 0deg,#5f3dc400,#7048e855,#1c7ed633,#5f3dc400);
+  filter:blur(18px);animation:spin 14s linear infinite}
+.planet{position:relative;border-radius:50%;transition:width .6s,height .6s,box-shadow .6s;animation:planetSpin 20s linear infinite}
+.planet::after{content:'';position:absolute;inset:0;border-radius:50%;background:repeating-linear-gradient(100deg,#ffffff10 0 8%,transparent 8% 16%);mix-blend-mode:overlay}
+.planet.grow{animation:planetGrow .7s ease-out,planetSpin 20s linear infinite}
+@keyframes planetGrow{40%{transform:scale(1.25);filter:brightness(1.8)}}
+@keyframes planetSpin{to{background-position:100% 0}}
+.planet-name{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-weight:800;font-size:16px;text-shadow:0 2px 6px #000}
+.void-panel{flex:1;min-width:300px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.void-panel h2{margin:0}
+.vp-head{font-size:14px;color:#c9d6ff}
+.vp-card{display:flex;gap:14px;align-items:center}
+.vp-card>div:last-child{flex:1;display:flex;flex-direction:column;gap:6px}
+.vp-name{font-size:20px;font-weight:900}
+.vp-need{font-size:13px;color:#c9d6ff}
+.vp-reward{font-size:12px;color:#8ce99a}
+.vp-tip{color:var(--dim)}
+.void-btn{margin-left:0;background:linear-gradient(135deg,#5f3dc4,#1c1c3c);touch-action:none;-webkit-touch-callout:none}
+.void-btn.half{background:linear-gradient(135deg,#495057,#343a40)}
+.void-track{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:3px}
+.vt{--c:#888;font-size:11px;font-weight:800;text-align:center;padding:5px 0;border-radius:5px;background:#10152a;color:#3a4470;border:1px solid #2a3560}
+.vt.done{background:color-mix(in srgb,var(--c) 35%,#10152a);color:#fff;border-color:var(--c)}
+.vt.cur{border-color:var(--gold);color:var(--gold);box-shadow:0 0 10px #ffd43b88;animation:blink 1.2s infinite}
+.endings{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.ending-card{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;opacity:.6}
+.ending-card.done{opacity:1;border-color:var(--gold);box-shadow:0 0 14px #ffd43b33}
+.ending-card .ec-icon{font-size:34px}
+.ending-card b{display:block}.ending-card small{color:var(--dim)}
+.ending-card .btn{margin-left:auto}
+#endModal{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at center,#140c2c 0%,#000 75%);cursor:pointer}
+#endModal.on{display:flex;animation:fadein 1.2s}
+.end-box{text-align:center;max-width:640px;padding:30px;cursor:default}
+.end-icon{font-size:90px;animation:popIn 1.2s cubic-bezier(.2,1.6,.4,1)}
+.end-sub{letter-spacing:8px;color:var(--gold);font-weight:800;margin-top:8px}
+.end-box h1{margin:6px 0 24px;font-size:34px;background:linear-gradient(90deg,#5cc8ff,#c77dff,#ffd43b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.end-box p,.end-stats,.end-both,.end-close{opacity:0;animation:endLine 1.4s forwards}
+.end-box p{font-size:16px;line-height:1.8;color:#dbe4ff;margin:10px 0}
+@keyframes endLine{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.end-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:24px 0 12px}
+.end-stats div{background:#ffffff0d;border-radius:8px;padding:8px;font-size:12px;color:var(--dim)}
+.end-stats b{display:block;color:#fff;font-size:16px}
+.end-both{color:var(--gold);font-weight:800;margin-bottom:12px}
+.end-close{margin:8px auto 0}
 .pick-foot{font-size:12px;color:var(--dim)}
 .fslot.flash{animation:flash .5s}
 @keyframes flash{0%{box-shadow:0 0 0 0 #ffd43b}50%{box-shadow:0 0 40px 10px #ffd43b}100%{box-shadow:0 0 0 0 transparent}}
@@ -336,6 +382,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
 <div id="golden" title="초신성 파편! 클릭하세요!">🌟</div>
 <div id="discModal"></div>
 <div id="pickModal"></div>
+<div id="endModal"></div>
 
 <header>
   <div class="logo"><span class="logo-icon">⚛️</span> 원소 연금술사</div>
@@ -376,6 +423,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
       <button class="tabbtn" data-tab="fusion">🔥 융합</button>
       <button class="tabbtn" data-tab="battle">⚔️ 전투<span class="dot" id="battleDot"></span></button>
       <button class="tabbtn" data-tab="shop">🏪 상점</button>
+      <button class="tabbtn" data-tab="void">🕳️ 공허</button>
       <button class="tabbtn" data-tab="table">🧪 주기율표</button>
       <button class="tabbtn" data-tab="ach">🏆 업적</button>
       <button class="tabbtn" data-tab="settings">⚙️ 설정</button>
@@ -463,6 +511,21 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
       <div id="shopList" class="list"></div>
     </div>
 
+    <!-- 공허 -->
+    <div class="tab" id="tab-void">
+      <p class="tip">🕳️ <b>공허</b>에 주기율표 <b>순서대로</b>(수소 → 헬륨 → 리튬 …) 원소를 바치면 그 안에서 새로운 행성이 자라납니다.<br>
+      💧 수소는 얻기 쉬우니 <b>왕창</b> 필요하고, 뒤로 갈수록 필요한 개수가 점점 줄어들어요. 🧪 인공 원소는 각 3개 이하.<br>
+      📈 원소 하나를 다 채울 때마다 <b>수소 생산량 ×1.02</b> (복리, 영구 · 환생해도 유지). 118번까지 모두 채우면 <b>행성 완성 → 엔딩</b>!</p>
+      <div class="void-wrap">
+        <div class="void-stage"><div class="void-hole"></div><div id="planet" class="planet"></div><div id="planetName" class="planet-name"></div></div>
+        <div class="void-panel" id="voidPanel"></div>
+      </div>
+      <div class="sec-head"><h3>📜 공허 진행도</h3><small id="voidProg"></small></div>
+      <div id="voidTrack" class="void-track"></div>
+      <div class="sec-head"><h3>🏁 엔딩</h3><small>엔딩 1: 5000층 최종 보스 처치 · 엔딩 2: 공허의 행성 완성</small></div>
+      <div id="endingList" class="endings"></div>
+    </div>
+
     <div class="tab" id="tab-table">
       <div id="rebirth" class="rebirth"></div>
       <div class="pt-wrap"><div id="ptable" class="ptable"></div></div>
@@ -485,6 +548,8 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <li><b>생산</b> 탭에서 시설을 사면 수소가 자동으로 생산됩니다.</li>
           <li><b>융합</b> 탭에서 두 원소를 합치면 <b>원자 번호의 합</b>인 원소가 됩니다. 재료는 각각 <b>30개씩</b> 들어가고 결과물은 1개입니다. 55~80번은 재료 3종(각 100개), 81번 이상은 4종(각 300개)을 합성해야 해요. 결과물 칸을 누르면 만들 원소를 바로 고를 수 있어요. 새 원소를 발견할 때마다 생산량이 <b>+5%</b> 증가합니다.</li>
           <li><b>전투</b> 탭에서 원소로 파티를 꾸려 적과 싸웁니다. 보유 개수가 많고 원자 번호가 클수록 강합니다. 스테이지를 깰수록 생산량이 <b>+3%</b>씩 증가합니다.</li>
+          <li><b>공허</b>: 주기율표 순서대로 원소를 바치면 행성이 자라요. 원소 하나를 다 채울 때마다 생산량 ×1.02 (영구). 118번까지 채우면 <b>엔딩 2</b>.</li>
+          <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허의 행성 완성 = <b>엔딩 2</b>.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
           <li><b>조합법 해금</b>: 처음엔 1~10번 원소만 융합할 수 있어요. 5스테이지마다 다음 단계 조합법이 열리고, 50스테이지를 클리어하면 자연 원소(1~92번)를 모두 만들 수 있어요.</li>
           <li><b>인공 원소</b>: 테크네튬(43), 프로메튬(61), 93번 이후 원소는 자연에 거의 없어 융합할 수 없어요. 특정 스테이지(23, 38, 52~127)를 클리어하면 얻을 수 있어요.</li>
@@ -722,6 +787,10 @@ const ACHS = [
   { id: 'unlock92', icon: '🔓', name: '자연의 끝',      desc: '자연 원소 조합법 모두 해금 (스테이지 50)', check: () => fuseCap() >= 92 },
   { id: 'sell1',   icon: '💰', name: '원소 상인',       desc: '코인 누적 1,000 획득',    check: () => S.totalCoins >= 1000 },
   { id: 'elv10',   icon: '⬆️', name: '단련된 원소',     desc: '원소 하나를 강화 Lv.10',  check: () => S.elv.some(v => v >= 10) },
+  { id: 'void10',  icon: '🕳️', name: '공허를 들여다보다', desc: '공허에 원소 10종 봉헌', check: () => voidDone() >= 10 },
+  { id: 'void54',  icon: '🪨', name: '대지의 형성',     desc: '공허에 원소 54종 봉헌',  check: () => voidDone() >= 54 },
+  { id: 'end1',    icon: '🌑', name: '엔딩 1',          desc: '빅 크런치를 넘어서',      check: () => S.endings.e1 },
+  { id: 'end2',    icon: '🌍', name: '엔딩 2',          desc: '새로운 행성의 탄생',      check: () => S.endings.e2 },
   { id: 'reb1',    icon: '🌌', name: '새로운 우주',     desc: '첫 환생',                check: () => S.prestige.count >= 1 },
   { id: 'reb5',    icon: '♾️', name: '윤회하는 우주',   desc: '환생 5회',               check: () => S.prestige.count >= 5 },
 ];
@@ -823,6 +892,7 @@ function defaultState() {
     totalH: 0, goldens: 0, ach: {}, sound: true,
     prestige: { count: 0, seeds: 0, best: 0 },
     coins: 0, totalCoins: 0, elv: new Array(119).fill(0),
+    void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false },
   };
 }
 function load() {
@@ -837,6 +907,8 @@ function load() {
     S.prestige = Object.assign({ count: 0, seeds: 0, best: 0 }, d.prestige || {});
     if (!Array.isArray(S.elv) || S.elv.length < 119) S.elv = new Array(119).fill(0);
     if (!isFinite(S.coins)) S.coins = 0;
+    S.void = Object.assign({ idx: 1, fed: 0 }, d.void || {});
+    S.endings = Object.assign({ e1: false, e2: false }, d.endings || {});
     if (!Array.isArray(S.counts) || S.counts.length < 119) S.counts = defaultState().counts;
     if (!Array.isArray(S.disc) || S.disc.length < 119) S.disc = defaultState().disc;
     S.counts = S.counts.map(v => (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0);
@@ -934,6 +1006,7 @@ function prodMult() {
   if (S.upg.warp) m *= 3;
   m *= 1 + 0.02 * achCount();
   m *= prestigeProd();
+  m *= voidMult();
   return m;
 }
 function buffMult(kind) { const b = R.buffs[kind]; return b && b.until > performance.now() ? b.mult : 1; }
@@ -1044,7 +1117,7 @@ function rebirth() {
   const gain = seedsGain();
   if (!confirm(`🌌 빅뱅을 일으켜 새로운 우주에서 다시 시작할까요?\n\n받는 것: 별의 씨앗 +${gain}개 (영구)\n유지: 업적, 통계, 별의 씨앗\n초기화: 원소, 수소, 시설, 강화, 스테이지`)) return;
   const keep = {
-    ach: S.ach, sound: S.sound,
+    ach: S.ach, sound: S.sound, void: S.void, endings: S.endings,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
     prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
@@ -1166,6 +1239,130 @@ const EL_VALUE = [0, 1];
     P[2][z] = p2; P[3][z] = p3; P[4][z] = p4;
     EL_VALUE[z] = ratioFor(z) * P[inputsFor(z)][z] + (z > 26 ? 5 * Math.pow(z - 26, 2) : 0);
   }
+}
+/* ---------- 공허: 원소별 필요 개수 ----------
+ * 수소 환산 예산(1000억 → 1e13, 완만히 증가)을 그 원소의 가치로 나눈 값.
+ * 수소는 왕창 필요하고 뒤로 갈수록 줄어들도록 단조 감소로 맞춤. 인공 원소는 최대 3개. */
+const VOID_REQ = [0];
+{
+  const nice = r => { if (r < 100) return Math.ceil(r); const p = Math.pow(10, Math.floor(Math.log10(r)) - 1); return Math.ceil(r / p) * p; };
+  let prev = Infinity;
+  for (let z = 1; z <= 118; z++) {
+    let r = Math.max(1, 1e11 * Math.pow(10, 2 * (z - 1) / 117) / EL_VALUE[z]);
+    r = Math.min(r, prev);
+    if (SYNTHETIC.has(z)) r = Math.min(r, 3);
+    VOID_REQ[z] = nice(r);
+    if (!SYNTHETIC.has(z)) prev = VOID_REQ[z];
+  }
+}
+function voidDone() { return Math.min(118, S.void.idx - 1); }
+function voidMult() { return Math.pow(1.02, S.void ? voidDone() : 0); }
+const PLANET_STAGES = [[0, '우주 먼지', '🌫️'], [10, '소행성', '☄️'], [26, '왜소행성', '🌑'], [54, '암석 행성', '🪨'], [86, '바다의 행성', '🌊'], [110, '생명의 행성', '🌱'], [118, '완성된 행성', '🌍']];
+function planetStage() { let s = PLANET_STAGES[0]; for (const p of PLANET_STAGES) if (voidDone() >= p[0]) s = p; return s; }
+function feedVoid(mode) {
+  const V = S.void;
+  if (V.idx > 118) return false;
+  const z = V.idx, need = VOID_REQ[z] - V.fed;
+  let have = Math.floor(S.counts[z]);
+  if (mode === 'half') have = Math.floor(have / 2);
+  const n = Math.min(have, need);
+  if (n < 1) return false;
+  S.counts[z] -= n;
+  V.fed += n;
+  SFX.shop(true);
+  const pl = $('#planet');
+  if (pl) { const [x, y] = centerOf(pl); particles(x, y, 8, CATS[EL[z].cat].color); }
+  if (V.fed >= VOID_REQ[z]) {
+    const before = planetStage();
+    V.idx++; V.fed = 0;
+    SFX.discover();
+    if (pl) { pl.classList.remove('grow'); void pl.offsetWidth; pl.classList.add('grow'); }
+    toast(`🕳️ <b>${EL[z].name}(${EL[z].sym})</b> 봉헌 완료! 행성이 자라났습니다 · 생산량 ×${fmt(voidMult())}`, 'disc', 3500);
+    const after = planetStage();
+    if (after !== before && V.idx <= 118) toast(`${after[2]} 행성이 <b>${after[1]}</b>(으)로 진화했습니다!`, 'disc', 5000);
+    if (V.idx > 118 && !S.endings.e2) { S.endings.e2 = true; setTimeout(() => showEnding(2), 900); }
+  }
+  return true;
+}
+function renderVoid() {
+  const V = S.void, done = voidDone(), z = Math.min(V.idx, 118), complete = V.idx > 118;
+  const st = planetStage();
+  const frac = complete ? 118 : done + V.fed / VOID_REQ[z];
+  const pl = $('#planet');
+  const size = 26 + frac * 2.1;
+  const c1 = complete ? '#4dabf7' : CATS[EL[Math.max(1, done)].cat].color, c2 = complete ? '#2f9e44' : CATS[EL[z].cat].color;
+  pl.style.width = pl.style.height = size + 'px';
+  pl.style.background = `radial-gradient(circle at 32% 28%, #ffffffcc 0%, ${c1} 22%, ${c2} 58%, #0b0e1a 100%)`;
+  pl.style.boxShadow = `0 0 ${20 + frac / 3}px ${c2}, inset -${size / 8}px -${size / 10}px ${size / 4}px #000a`;
+  setText('planetName', `${st[2]} ${st[1]}`);
+  const sig = V.idx + '|' + V.fed + '|' + Math.floor(S.counts[z]) + '|' + S.endings.e1 + S.endings.e2;
+  if (R.sig.void !== sig) {
+    R.sig.void = sig;
+    const need = VOID_REQ[z], have = Math.floor(S.counts[z]);
+    $('#voidPanel').innerHTML = complete
+      ? `<h2>🌍 행성 완성!</h2><p>118개의 원소가 모두 공허에 바쳐졌습니다.<br>생산량 보너스 <b>×${fmt(voidMult())}</b></p><button class="big-btn" data-ending="2">🎬 엔딩 2 다시 보기</button>`
+      : `<div class="vp-head">다음 봉헌: <b>${z}번</b> ${SYNTHETIC.has(z) ? '<span class="badge" style="background:#5f3dc4">🧪 인공</span>' : ''}</div>
+        <div class="vp-card">${elCard(z, { cls: 'big' + (S.disc[z] ? '' : ' unknown') })}
+          <div><div class="vp-name">${EL[z].name} (${EL[z].sym})</div>
+          <div class="vp-need">필요 <b>${fmt(need)}</b>개 · 투입 <b>${fmt(V.fed)}</b> · 보유 <b>${fmt(have)}</b></div>
+          <div class="bar"><div class="fill gold" style="width:${V.fed / need * 100}%"></div><span>${(V.fed / need * 100).toFixed(1)}%</span></div>
+          <div class="vp-reward">완료 보상: 생산량 ×1.02 (현재 ×${fmt(voidMult())})</div></div></div>
+        <div class="btnrow"><button class="big-btn void-btn" data-void="all" ${have < 1 ? 'disabled' : ''}>🕳️ 전부 투입</button>
+          <button class="big-btn void-btn half" data-void="half" ${have < 2 ? 'disabled' : ''}>절반 투입</button></div>
+        <small class="vp-tip">${have < 1 ? (SYNTHETIC.has(z) ? '🧪 인공 원소는 전투 보상으로 얻어요.' : '원소를 융합해서 모아오세요.') : '꾹 누르면 연속 투입 · 다 채우면 다음 원소로 넘어가요.'}</small>`;
+  }
+  const tsig = V.idx;
+  if (R.sig.vtrack !== tsig) {
+    R.sig.vtrack = tsig;
+    let h = '';
+    for (let i = 1; i <= 118; i++) {
+      const cls = i < V.idx ? 'done' : i === V.idx ? 'cur' : '';
+      h += `<div class="vt ${cls}" style="--c:${CATS[EL[i].cat].color}" title="${i}. ${EL[i].name} · 필요 ${fmt(VOID_REQ[i])}개">${EL[i].sym}</div>`;
+    }
+    $('#voidTrack').innerHTML = h;
+    setText('voidProg', `${done} / 118 완료 · ${st[2]} ${st[1]}`);
+  }
+  const esig = '' + S.endings.e1 + S.endings.e2;
+  if (R.sig.end !== esig) {
+    R.sig.end = esig;
+    $('#endingList').innerHTML = [1, 2].map(n => {
+      const ok = S.endings['e' + n], E = ENDINGS[n];
+      return `<div class="ending-card ${ok ? 'done' : ''}"><div class="ec-icon">${ok ? E.icon : '🔒'}</div><div><b>엔딩 ${n} · ${ok ? E.title : '???'}</b><small>${E.cond}</small></div>
+        ${ok ? `<button class="btn" data-ending="${n}">🎬 다시 보기</button>` : ''}</div>`;
+    }).join('');
+  }
+}
+
+/* ---------- 엔딩 ---------- */
+const ENDINGS = {
+  1: { icon: '🌑', title: '빅 크런치를 넘어서', cond: '5000층 최종 보스 「빅 크런치」 처치',
+    lines: ['5000번째 문 너머, 모든 것을 삼키려던 빅 크런치가 마침내 멈췄다.',
+      '수소 한 알에서 시작한 너의 연금술은 우주의 종말마저 되돌려 놓았다.',
+      '꺼져가던 별들이 다시 타오르고, 흩어졌던 원소들이 제자리를 찾아간다.',
+      '— 하지만 공허는 아직 텅 비어 있다. 그곳에 새로운 세계를 빚어낼 수 있을까?'] },
+  2: { icon: '🌍', title: '새로운 행성의 탄생', cond: '공허에 118개 원소를 모두 바쳐 행성 완성',
+    lines: ['수소부터 오가네손까지, 118개의 원소가 공허 속에서 하나가 되었다.',
+      '먼지는 바위가 되고, 바위는 대지가 되고, 대지 위로 바다가 출렁인다.',
+      '이름 없는 푸른 행성 위로, 첫 번째 아침이 밝아온다.',
+      '너는 이제 원소 연금술사가 아니다 — 세계의 창조자다.'] },
+};
+function showEnding(n) {
+  const E = ENDINGS[n], both = S.endings.e1 && S.endings.e2;
+  const stats = [['플레이 시간', fmtTime(S.playTime)], ['환생', S.prestige.count + '회'], ['총 클릭', fmt(S.totalClicks)],
+    ['총 융합', fmt(S.totalFusions)], ['처치한 적', fmt(S.kills)], ['최고 스테이지', Math.max(S.prestige.best || 0, S.battle.maxStage)]];
+  $('#endModal').innerHTML = `<div class="end-box">
+    <div class="end-icon">${E.icon}</div>
+    <div class="end-sub">ENDING ${n}</div>
+    <h1>${E.title}</h1>
+    ${E.lines.map((l, i) => `<p style="animation-delay:${0.8 + i * 1.6}s">${l}</p>`).join('')}
+    <div class="end-stats" style="animation-delay:${0.8 + E.lines.length * 1.6}s">${stats.map(([k, v]) => `<div>${k}<b>${v}</b></div>`).join('')}</div>
+    ${both ? `<div class="end-both" style="animation-delay:${1.4 + E.lines.length * 1.6}s">🏆 두 엔딩을 모두 보았습니다. 당신은 진정한 원소 연금술사!</div>` : ''}
+    <button class="big-btn end-close" style="animation-delay:${1.6 + E.lines.length * 1.6}s">계속 플레이하기</button>
+  </div>`;
+  $('#endModal').classList.add('on');
+  SFX.discover();
+  setTimeout(() => SFX.bonus(), 600);
+  particles(innerWidth / 2, innerHeight / 2, 60, n === 1 ? '#c77dff' : '#4dabf7');
 }
 function sellPrice(z) { return EL_VALUE[z] * 0.01 * (1 + z / 50) * (SYNTHETIC.has(z) ? 3 : 1); }
 function elvMult(z) { return Math.pow(1.2, S.elv[z] || 0); }
@@ -1639,9 +1836,10 @@ function victory() {
       blog(`🔓 조합법 해금: ${cap + 1}~${nc}번 원소 융합 가능!`, 'boss');
     }
   }
-  if (E.stage >= MAX_STAGE && !S.ach.s5000) {
-    toast('🏆 <b>우주 정복!</b> 최종 스테이지 5000을 클리어했습니다!', 'disc', 10000);
-    blog('🏆 최종 보스 빅 크런치를 쓰러뜨렸습니다! 우주를 정복했어요!', 'boss');
+  if (E.stage >= MAX_STAGE && !S.endings.e1) {
+    S.endings.e1 = true;
+    blog('🏆 최종 보스 빅 크런치를 쓰러뜨렸습니다! 엔딩 1 달성!', 'boss');
+    setTimeout(() => showEnding(1), 900);
   }
   if (B.auto) {
     if (E.stage + 1 > stageCap()) {
@@ -2010,7 +2208,7 @@ function renderSettings() {
   for (let z = 2; z <= 118; z++) total += S.counts[z];
   const html = [
     ['총 클릭 수', fmt(S.totalClicks)], ['총 융합 횟수', fmt(S.totalFusions)], ['처치한 적', fmt(S.kills)],
-    ['발견한 원소', discCount() + ' / 118'], ['보유 중인 무거운 원소', fmt(Math.floor(total))], ['플레이 시간', fmtTime(S.playTime)], ['환생 / 별의 씨앗', `${S.prestige.count}회 / ${S.prestige.seeds}개`],
+    ['발견한 원소', discCount() + ' / 118'], ['보유 중인 무거운 원소', fmt(Math.floor(total))], ['플레이 시간', fmtTime(S.playTime)], ['환생 / 별의 씨앗', `${S.prestige.count}회 / ${S.prestige.seeds}개`], ['공허 봉헌', `${voidDone()} / 118`], ['엔딩', `${(S.endings.e1 ? 1 : 0) + (S.endings.e2 ? 1 : 0)} / 2`],
   ].map(([k, v]) => `<div>${k}<b>${v}</b></div>`).join('');
   const box = $('#statsBox');
   if (box.innerHTML !== html) box.innerHTML = html;
@@ -2023,6 +2221,7 @@ function renderTab() {
   else if (R.tab === 'table') renderTable();
   else if (R.tab === 'ach') renderAch();
   else if (R.tab === 'shop') renderShop();
+  else if (R.tab === 'void') renderVoid();
   else if (R.tab === 'settings') renderSettings();
 }
 function switchTab(t) {
@@ -2064,6 +2263,9 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-rep]'))) return buyRep(el.dataset.rep);
   if ((el = t.closest('[data-upg]'))) return buyUpg(el.dataset.upg);
   if ((el = t.closest('[data-sell]'))) { if (e.detail === 0) sellEl(+el.dataset.sell, R.sellAmt); return; }
+  if ((el = t.closest('[data-void]'))) { if (e.detail === 0) feedVoid(el.dataset.void); return; }
+  if ((el = t.closest('[data-ending]'))) return showEnding(+el.dataset.ending);
+  if (t.closest('.end-close') || t.id === 'endModal') { $('#endModal').classList.remove('on'); return; }
   if ((el = t.closest('[data-elup]'))) { if (e.detail === 0) upgradeEl(+el.dataset.elup); return; }
   if ((el = t.closest('[data-sell-amt]'))) {
     R.sellAmt = el.dataset.sellAmt === 'half' ? 'half' : +el.dataset.sellAmt;
@@ -2098,17 +2300,17 @@ let holdTimer = null, holdEl = null;
 function stopHold() { clearTimeout(holdTimer); holdTimer = null; holdEl = null; }
 document.addEventListener('pointerdown', e => {
   if (e.button !== 0) return;
-  const el = e.target.closest('[data-sell], [data-elup]');
+  const el = e.target.closest('[data-sell], [data-elup], [data-void]');
   if (!el || el.disabled) return;
   e.preventDefault();
   stopHold();
   holdEl = el;
-  const isSell = el.dataset.sell !== undefined;
+  const isSell = el.dataset.sell !== undefined, isVoid = el.dataset.void !== undefined;
   const z = +(isSell ? el.dataset.sell : el.dataset.elup);
   let delay = 400, count = 0;
   const step = () => {
     if (holdEl !== el) return;
-    const ok = isSell ? sellEl(z, R.sellAmt) : upgradeEl(z);
+    const ok = isVoid ? feedVoid(el.dataset.void) : isSell ? sellEl(z, R.sellAmt) : upgradeEl(z);
     if (!ok) { stopHold(); return; }
     count++;
     holdTimer = setTimeout(step, count === 1 ? 400 : (delay = Math.max(30, delay * 0.8)));
@@ -2116,8 +2318,8 @@ document.addEventListener('pointerdown', e => {
   step();
 });
 ['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, stopHold));
-document.addEventListener('pointerout', e => { if (holdEl && e.target.closest && e.target.closest('[data-sell], [data-elup]') === holdEl && !holdEl.contains(e.relatedTarget)) stopHold(); });
-document.addEventListener('contextmenu', e => { if (e.target.closest('[data-sell], [data-elup]')) e.preventDefault(); });
+document.addEventListener('pointerout', e => { if (holdEl && e.target.closest && e.target.closest('[data-sell], [data-elup], [data-void]') === holdEl && !holdEl.contains(e.relatedTarget)) stopHold(); });
+document.addEventListener('contextmenu', e => { if (e.target.closest('[data-sell], [data-elup], [data-void]')) e.preventDefault(); });
 $('#stPrev').onclick = () => changeStage(-1);
 $('#stNext').onclick = () => changeStage(1);
 $('#stWarp').onclick = () => {
