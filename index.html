@@ -870,7 +870,7 @@ function setText(id, v) {
 }
 function elCard(z, opts = {}) {
   const e = EL[z], c = CATS[e.cat];
-  const cnt = opts.count === false ? '' : `<span class="cnt" data-cnt="${z}">${fmt(Math.floor(S.counts[z]))}</span>`;
+  const cnt = opts.count === false ? '' : `<span class="cnt" data-cnt="${z}"${opts.half ? ' data-half="1"' : ''}>${fmt(Math.floor(S.counts[z] / (opts.half ? 2 : 1)))}</span>`;
   return `<div class="elcard ${opts.cls || ''}" style="--c:${c.color}" ${opts.attrs || ''} title="${e.name} (${c.name})">
     <span class="z">${z}</span><span class="sym">${e.sym}</span><span class="nm">${e.name}</span>${cnt}</div>`;
 }
@@ -1627,7 +1627,7 @@ function changeStage(delta) {
  * ===================================================================== */
 function updateCounts() {
   for (const n of $$('[data-cnt]')) {
-    const c = S.counts[+n.dataset.cnt];
+    const c = S.counts[+n.dataset.cnt] / (n.dataset.half ? 2 : 1);
     const v = fmt(Math.floor(c));
     if (n.textContent !== v) n.textContent = v;
     const card = n.closest('.elcard');
@@ -1741,8 +1741,9 @@ function renderFusion() {
   if (R.sig.fsel !== ssig) {
     R.sig.fsel = ssig;
     const fa = $('#fsA'), fb = $('#fsB');
-    fa.innerHTML = a ? elCard(a, { cls: 'big' }) : '원소 선택';
-    fb.innerHTML = b ? elCard(b, { cls: 'big' }) : '원소 선택';
+    const same = a && a === b; // 같은 원소끼리면 보유량을 반씩 나눠 표시
+    fa.innerHTML = a ? elCard(a, { cls: 'big', half: same }) : '원소 선택';
+    fb.innerHTML = b ? elCard(b, { cls: 'big', half: same }) : '원소 선택';
     fa.classList.toggle('active', R.activeSlot === 'A');
     fb.classList.toggle('active', R.activeSlot === 'B');
     $('#fsR').innerHTML = (a && b) ? (z <= 118 ? elCard(z, { cls: 'big' + (S.disc[z] ? '' : ' unknown') }) : '❌<br>118번 초과') : '?';
@@ -1758,7 +1759,9 @@ function renderFusion() {
     info = `<span class="warn">${lockReason(z)}</span>`;
   } else if (a && b && z <= 118) {
     const tax = fusionTax(z);
-    info = `소모: ${EL[a].sym} ×${FUSE_RATIO} + ${EL[b].sym} ×${FUSE_RATIO} → ${EL[z].sym} ×1` + (tax ? ` + <span style="color:#ffd43b">에너지 ${fmt(tax)} H</span>` : '') +
+    info = (a === b
+      ? `소모: ${EL[a].sym} ×${FUSE_RATIO * 2} (칸마다 ${FUSE_RATIO}개) → ${EL[z].sym} ×1 <small style="color:#8b95bf">· 같은 원소라 보유량을 반씩 나눠 표시</small>`
+      : `소모: ${EL[a].sym} ×${FUSE_RATIO} + ${EL[b].sym} ×${FUSE_RATIO} → ${EL[z].sym} ×1`) + (tax ? ` + <span style="color:#ffd43b">에너지 ${fmt(tax)} H</span>` : '') +
       `<br>${m >= 1 ? `최대 <b>${fmt(m)}</b>회 융합 가능` : '<span class="warn">재료가 부족합니다</span>'}` +
       (S.disc[z] ? '' : ' · <b style="color:#ffd43b">✨ 새로운 원소!</b>');
   } else if (z > 118) info = '<span class="warn">원자 번호 합이 118을 넘을 수 없습니다</span>';
