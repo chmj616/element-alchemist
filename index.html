@@ -189,6 +189,50 @@ button{font-family:inherit}
 .end-stats b{display:block;color:#fff;font-size:16px}
 .end-both{color:var(--gold);font-weight:800;margin-bottom:12px}
 .end-close{margin:8px auto 0}
+.arc-menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.arc-card{background:linear-gradient(160deg,#2b1b4f,#141a2e);border:1px solid #5f3dc4;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.arc-card .arc-icon{font-size:40px}
+.arc-card b{font-size:16px}.arc-card small{color:#c9d6ff;font-size:12px;line-height:1.5;flex:1}
+.arc-best{font-size:12px;color:var(--gold)}
+.arc-card .big-btn{margin-left:0;width:100%;background:linear-gradient(135deg,#f76707,#d6336c)}
+.arc-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.arc-head span{flex:1;color:var(--gold);font-weight:800}
+.arc-result{text-align:center;padding:30px;background:var(--panel);border-radius:16px;border:1px solid var(--line)}
+.arc-big{font-size:64px}.arc-result h2{margin:6px 0}
+.arc-nb{color:var(--gold);font-weight:800;animation:blink 1s infinite}
+.arc-coins{font-size:28px;font-weight:900;color:#ffd43b;margin:10px 0 16px}
+.arc-coins small{font-size:14px;color:var(--dim)}
+.mem-grid{display:grid;grid-template-columns:repeat(4,minmax(70px,96px));gap:10px;justify-content:center}
+.mem-card{aspect-ratio:78/86;position:relative;cursor:pointer;perspective:600px}
+.mem-card>div{position:absolute;inset:0;backface-visibility:hidden;transition:transform .35s;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.mem-back{background:linear-gradient(135deg,#5f3dc4,#1971c2);font-size:30px;border:2px solid #748ffc}
+.mem-front{transform:rotateY(180deg)}
+.mem-front .elcard{width:100%;height:100%}
+.mem-card.flip .mem-back{transform:rotateY(180deg)}
+.mem-card.flip .mem-front{transform:rotateY(360deg)}
+.mem-card.done{opacity:.55;pointer-events:none}
+.quiz-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;text-align:center}
+.quiz-q{font-size:20px;margin-bottom:16px}
+.quiz-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:520px;margin:0 auto}
+.quiz-opt{background:var(--panel2);border:2px solid var(--line);color:var(--text);border-radius:12px;padding:14px;font-size:17px;font-weight:700;cursor:pointer}
+.quiz-opt:hover{border-color:var(--accent)}
+.quiz-opt.right{background:#2b8a3e;border-color:#69db7c}
+.quiz-opt.wrong{background:#c92a2a;border-color:#ff8787}
+.whack-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:420px;margin:0 auto}
+.whack-cell{aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 60%,#05081a 0%,#1b2340 70%);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:crosshair;user-select:none;touch-action:none}
+.mole{--c:#4dabf7;width:78%;height:78%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;
+  background:radial-gradient(circle at 35% 30%,#fff8,var(--c) 45%,#0b0e1a);box-shadow:0 0 18px var(--c);animation:popIn .2s ease-out;pointer-events:none}
+.mole.bomb{background:radial-gradient(circle,#ff8787,#5c0000);box-shadow:0 0 18px #ff6b6b;font-size:34px}
+.ud-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
+.ud-row{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap}
+.ud-row>div{display:flex;flex-direction:column;align-items:center;gap:8px}
+.ud-vs{font-size:30px;font-weight:900;color:var(--dim)}
+.ud-z{font-size:14px;color:#c9d6ff}
+.ud-hidden{--c:#5f3dc4;cursor:default}
+.ud-hidden .sym{font-size:48px!important}
+.ud-btns{justify-content:center;margin-top:16px}
+.ud-btns .big-btn{margin-left:0;min-width:150px;background:linear-gradient(135deg,#1c7ed6,#5f3dc4)}
+.ud-btns .big-btn+.big-btn{background:linear-gradient(135deg,#e8590c,#c2255c)}
 .pick-foot{font-size:12px;color:var(--dim)}
 .fslot.flash{animation:flash .5s}
 @keyframes flash{0%{box-shadow:0 0 0 0 #ffd43b}50%{box-shadow:0 0 40px 10px #ffd43b}100%{box-shadow:0 0 0 0 transparent}}
@@ -427,6 +471,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
       <button class="tabbtn" data-tab="battle">⚔️ 전투<span class="dot" id="battleDot"></span></button>
       <button class="tabbtn" data-tab="shop">🏪 상점</button>
       <button class="tabbtn" data-tab="void">🕳️ 공허</button>
+      <button class="tabbtn" data-tab="arcade">🎰 오락실</button>
       <button class="tabbtn" data-tab="table">🧪 주기율표</button>
       <button class="tabbtn" data-tab="ach">🏆 업적</button>
       <button class="tabbtn" data-tab="settings">⚙️ 설정</button>
@@ -514,6 +559,14 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
       <div id="shopList" class="list"></div>
     </div>
 
+    <!-- 오락실 -->
+    <div class="tab" id="tab-arcade">
+      <p class="tip">🎰 미니게임으로 <b>🪙 코인</b>을 벌어 원소 강화에 쓰세요! 보상은 <b>지금까지 발견한 가장 무거운 원소의 가치</b>에 비례해서, 진행할수록 커져요.<br>
+      현재 기본 보상: <b id="arcBase" style="color:#ffd43b"></b> × 성적 배율 · 누적 <span id="arcStat"></span></p>
+      <div id="arcMenu" class="arc-menu"></div>
+      <div id="arcStage" class="arc-stage"></div>
+    </div>
+
     <!-- 공허 -->
     <div class="tab" id="tab-void">
       <p class="tip">🕳️ <b>공허</b>에 주기율표 <b>순서대로</b>(수소 → 헬륨 → 리튬 …) 원소를 바치면 그 안에서 새로운 행성이 자라납니다.<br>
@@ -551,6 +604,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <li><b>생산</b> 탭에서 시설을 사면 수소가 자동으로 생산됩니다.</li>
           <li><b>융합</b> 탭에서 두 원소를 합치면 <b>원자 번호의 합</b>인 원소가 됩니다. 재료는 각각 <b>30개씩</b> 들어가고 결과물은 1개입니다. 55~80번은 재료 3종(각 100개), 81번 이상은 4종(각 300개)을 합성해야 해요. 결과물 칸을 누르면 만들 원소를 바로 고를 수 있어요. 새 원소를 발견할 때마다 생산량이 <b>+5%</b> 증가합니다.</li>
           <li><b>전투</b> 탭에서 원소로 파티를 꾸려 적과 싸웁니다. 보유 개수가 많고 원자 번호가 클수록 강합니다. 스테이지를 깰수록 생산량이 <b>+3%</b>씩 증가합니다.</li>
+          <li><b>오락실</b>: 카드 맞추기 · 원소 퀴즈 · 원자 잡기 · 원자번호 업다운 미니게임으로 코인 획득. 보상은 발견한 가장 무거운 원소 가치에 비례.</li>
           <li><b>공허</b>: 주기율표 순서대로 원소를 바치면 행성이 자라요. 원소 하나를 다 채울 때마다 생산량 ×1.02 (영구). 118번까지 채우면 <b>엔딩 2</b>.</li>
           <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허의 행성 완성 = <b>엔딩 2</b>.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
@@ -794,8 +848,33 @@ const ACHS = [
   { id: 'void54',  icon: '🪨', name: '대지의 형성',     desc: '공허에 원소 54종 봉헌',  check: () => voidDone() >= 54 },
   { id: 'end1',    icon: '🌑', name: '엔딩 1',          desc: '빅 크런치를 넘어서',      check: () => S.endings.e1 },
   { id: 'end2',    icon: '🌍', name: '엔딩 2',          desc: '새로운 행성의 탄생',      check: () => S.endings.e2 },
+  { id: 'c100k',   icon: '⚡', name: '광속의 손가락',     desc: '100,000번 클릭',          check: () => S.totalClicks >= 1e5 },
+  { id: 'h1q',     icon: '🌌', name: '은하의 질량',       desc: '누적 수소 1000조 생산',    check: () => S.totalH >= 1e15 },
+  { id: 'nat92',   icon: '🌿', name: '자연의 전부',       desc: '자연 원소 92종 모두 발견', check: () => { for (let z = 1; z <= 92; z++) if (!SYNTHETIC.has(z) && !S.disc[z]) return false; return true; } },
+  { id: 's300',    icon: '🧱', name: '첫 번째 벽',        desc: '스테이지 300 클리어',      check: () => S.battle.maxStage >= 300 },
+  { id: 's2000',   icon: '🕳️', name: '심연의 탐험가',     desc: '스테이지 2000 클리어',     check: () => S.battle.maxStage >= 2000 },
+  { id: 'k1000',   icon: '🗡️', name: '사냥꾼',            desc: '적 1,000마리 처치',        check: () => S.kills >= 1000 },
+  { id: 'k10000',  icon: '⚔️', name: '전설의 전사',       desc: '적 10,000마리 처치',       check: () => S.kills >= 1e4 },
+  { id: 'syn5',    icon: '☢️', name: '인공 원소 사냥꾼',  desc: '인공 원소 보스 5마리 처치', check: () => S.synthKills >= 5 },
+  { id: 'syn28',   icon: '🧪', name: '초중원소 정복',     desc: '인공 원소 보스 28마리 처치', check: () => S.synthKills >= 28 },
+  { id: 'rare1',   icon: '✨', name: '희귀한 만남',       desc: '희귀 출현 보스 처치',      check: () => S.rareKills >= 1 },
+  { id: 'elv25',   icon: '💪', name: '극한 단련',         desc: '원소 하나를 강화 Lv.25',   check: () => S.elv.some(v => v >= 25) },
+  { id: 'elvwide', icon: '🧬', name: '균형 잡힌 연금술',  desc: '원소 10종을 강화 Lv.5 이상', check: () => S.elv.filter(v => v >= 5).length >= 10 },
+  { id: 'coin1b',  icon: '🏦', name: '원소 재벌',         desc: '코인 누적 10억 획득',      check: () => S.totalCoins >= 1e9 },
+  { id: 'void92',  icon: '🌊', name: '자연의 봉헌',       desc: '공허에 원소 92종 봉헌',    check: () => voidDone() >= 92 },
+  { id: 'gold50',  icon: '🌠', name: '별똥별 수집가',     desc: '초신성 파편 50개 획득',     check: () => S.goldens >= 50 },
+  { id: 'fus1m',   icon: '🏭', name: '거대 융합로',       desc: '융합 1,000,000회',         check: () => S.totalFusions >= 1e6 },
+  { id: 'party5',  icon: '👥', name: '완전한 파티',       desc: '파티 5칸을 모두 채우기',    check: () => partySlots() >= 5 && S.party.every(z => z && S.counts[z] >= 1) },
+  { id: 'arc1',    icon: '🕹️', name: '첫 동전',           desc: '오락실 미니게임 1판',       check: () => S.arcade.plays >= 1 },
+  { id: 'arc50',   icon: '🎰', name: '오락실 단골',       desc: '오락실 미니게임 50판',      check: () => S.arcade.plays >= 50 },
+  { id: 'memo12',  icon: '🃏', name: '기억의 달인',       desc: '카드 맞추기 12번 이내 완성', check: () => S.arcade.best.memory != null && S.arcade.best.memory <= 12 },
+  { id: 'quiz10',  icon: '🎓', name: '원소 박사',         desc: '원소 퀴즈 10문제 전부 정답', check: () => S.arcade.best.quiz >= 10 },
+  { id: 'whack35', icon: '🔨', name: '원자 사냥꾼',       desc: '원자 잡기 35점 이상',       check: () => S.arcade.best.whack >= 35 },
+  { id: 'ud10',    icon: '🔮', name: '촉 좋은 연금술사',  desc: '업다운 10연속 정답',        check: () => S.arcade.best.updown >= 10 },
   { id: 'reb1',    icon: '🌌', name: '새로운 우주',     desc: '첫 환생',                check: () => S.prestige.count >= 1 },
+  { id: 'reb3',    icon: '🔁', name: '세 번째 우주',      desc: '환생 3회',                check: () => S.prestige.count >= 3 },
   { id: 'reb5',    icon: '♾️', name: '윤회하는 우주',   desc: '환생 5회',               check: () => S.prestige.count >= 5 },
+  { id: 'reb7',    icon: '🌈', name: '일곱 번째 하늘',    desc: '환생 7회 (5000층 개방)',   check: () => S.prestige.count >= 7 },
 ];
 function achCount() { return ACHS.filter(a => S.ach[a.id]).length; }
 
@@ -876,6 +955,7 @@ function synthBossFor(stage) {
 }
 function applySynthBoss(E, z, rare) {
   E.synth = z;
+  E.rare = !!rare;
   E.name = (rare ? '✨ 희귀 출현! ' : '') + `${EL[z].name}(${EL[z].sym}) 원자핵`;
   E.emoji = '☢️';
   E.weak = 'actinide' === EL[z].cat ? 'noble' : E.weak;
@@ -920,6 +1000,7 @@ function defaultState() {
     prestige: { count: 0, seeds: 0, best: 0 },
     coins: 0, totalCoins: 0, elv: new Array(119).fill(0),
     void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false },
+    arcade: { plays: 0, earned: 0, best: {} }, synthKills: 0, rareKills: 0,
   };
 }
 function load() {
@@ -936,6 +1017,8 @@ function load() {
     if (!isFinite(S.coins)) S.coins = 0;
     S.void = Object.assign({ idx: 1, fed: 0 }, d.void || {});
     S.endings = Object.assign({ e1: false, e2: false }, d.endings || {});
+    S.arcade = Object.assign({ plays: 0, earned: 0, best: {} }, d.arcade || {});
+    S.arcade.best = S.arcade.best || {};
     if (!Array.isArray(S.counts) || S.counts.length < 119) S.counts = defaultState().counts;
     if (!Array.isArray(S.disc) || S.disc.length < 119) S.disc = defaultState().disc;
     S.counts = S.counts.map(v => (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0);
@@ -1144,7 +1227,7 @@ function rebirth() {
   const gain = seedsGain();
   if (!confirm(`🌌 빅뱅을 일으켜 새로운 우주에서 다시 시작할까요?\n\n받는 것: 별의 씨앗 +${gain}개 (영구)\n유지: 업적, 통계, 별의 씨앗\n초기화: 원소, 수소, 시설, 강화, 스테이지`)) return;
   const keep = {
-    ach: S.ach, sound: S.sound, void: S.void, endings: S.endings,
+    ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
     prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
@@ -1359,6 +1442,189 @@ function renderVoid() {
         ${ok ? `<button class="btn" data-ending="${n}">🎬 다시 보기</button>` : ''}</div>`;
     }).join('');
   }
+}
+
+/* ---------- 오락실 (미니게임) ---------- */
+const ARC_GAMES = {
+  memory: { icon: '🃏', name: '원소 카드 맞추기', desc: '같은 원소 카드 8쌍을 찾아라! 적은 시도로 맞출수록 보상↑ (최대 ×2.2)', best: v => `최소 ${v}번`, lower: true },
+  quiz:   { icon: '❓', name: '원소 퀴즈',       desc: '이름·기호·원자번호 퀴즈 10문제. 1문제당 ×0.2 (최대 ×2.0)', best: v => `${v}/10` },
+  whack:  { icon: '🔨', name: '원자 잡기',       desc: '20초 동안 튀어나오는 원자를 잡아라! ☢️를 누르면 -2점 (1점당 ×0.07, 최대 ×2.5)', best: v => `${v}점` },
+  updown: { icon: '📈', name: '원자번호 업다운', desc: '다음 원소의 원자번호가 클까 작을까? 연속 정답 1개당 ×0.25 (최대 ×3.0)', best: v => `${v}연속` },
+};
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const randInt = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+function topDisc() { for (let z = 118; z >= 1; z--) if (S.disc[z]) return z; return 1; }
+// 기본 보상 = 가장 무거운 발견 원소 1개 판매가 (최고 성적 ×2~3 → 강화 1레벨에 약 9~10판)
+function arcScale() { return Math.max(5, sellPrice(topDisc())); }
+function arcStop() { clearInterval(R.arcTimer); clearTimeout(R.arcTimeout); R.arcTimer = null; }
+function arcExit() { arcStop(); R.arc = null; $('#arcStage').innerHTML = ''; $('#arcMenu').style.display = ''; R.sig.arc = null; }
+function arcBegin(game, html) {
+  arcStop();
+  $('#arcMenu').style.display = 'none';
+  $('#arcStage').innerHTML = `<div class="arc-head"><b>${ARC_GAMES[game].icon} ${ARC_GAMES[game].name}</b><span id="arcInfo"></span><button class="btn" data-arc-exit>✕ 그만두기</button></div>${html}`;
+}
+function arcFinish(game, factor, scoreText, bestVal) {
+  arcStop();
+  const coins = arcScale() * Math.max(0, factor);
+  S.coins += coins; S.totalCoins += coins; S.arcade.plays++; S.arcade.earned += coins;
+  const g = ARC_GAMES[game], b = S.arcade.best[game];
+  const nb = bestVal != null && (b == null || (g.lower ? bestVal < b : bestVal > b));
+  if (nb) S.arcade.best[game] = bestVal;
+  SFX.bonus();
+  R.arc = null;
+  $('#arcStage').innerHTML = `<div class="arc-result"><div class="arc-big">${g.icon}</div><h2>${scoreText}</h2>
+    ${nb ? '<div class="arc-nb">🏅 최고 기록!</div>' : ''}<div class="arc-coins">+🪙 ${fmt(coins)} <small>(×${factor.toFixed(2)})</small></div>
+    <div class="btnrow" style="justify-content:center"><button class="big-btn" data-arc="${game}">🔁 다시 하기</button><button class="btn" data-arc-exit>목록으로</button></div></div>`;
+  const [x, y] = centerOf($('#arcStage .arc-coins'));
+  particles(x, y, 24, '#ffd43b');
+  R.sig.arc = null;
+}
+function startArc(game) {
+  if (game === 'memory') {
+    const pool = [];
+    for (let z = 1; z <= 118; z++) if (S.disc[z]) pool.push(z);
+    while (pool.length < 8) { const z = randInt(1, 36); if (!pool.includes(z)) pool.push(z); }
+    const pick = shuffle(pool).slice(0, 8);
+    R.arc = { game, cards: shuffle(pick.concat(pick)), open: [], done: new Set(), moves: 0, lock: false };
+    arcBegin(game, `<div class="mem-grid">${R.arc.cards.map((z, i) => `<div class="mem-card" data-mem="${i}"><div class="mem-back">⚛️</div><div class="mem-front">${elCard(z, { count: false })}</div></div>`).join('')}</div>`);
+    setText('arcInfo', '시도 0번 · 0/8쌍');
+  } else if (game === 'quiz') {
+    R.arc = { game, q: 0, correct: 0, lock: false };
+    arcBegin(game, '<div id="quizBox" class="quiz-box"></div>');
+    nextQuiz();
+  } else if (game === 'whack') {
+    R.arc = { game, score: 0, end: performance.now() + 20000, cells: new Array(9).fill(null), nextSpawn: 0 };
+    arcBegin(game, `<div class="whack-grid">${[...Array(9)].map((_, i) => `<div class="whack-cell" data-whack="${i}"></div>`).join('')}</div>`);
+    R.arcTimer = setInterval(whackTick, 50);
+  } else if (game === 'updown') {
+    R.arc = { game, cur: randInt(1, 118), streak: 0, lock: false };
+    arcBegin(game, '<div id="udBox" class="ud-box"></div>');
+    renderUpdown();
+  }
+  SFX.buy();
+}
+// 카드 맞추기
+function clickMem(i) {
+  const A = R.arc;
+  if (!A || A.game !== 'memory' || A.lock || A.done.has(i) || A.open.includes(i)) return;
+  const card = document.querySelector(`[data-mem="${i}"]`);
+  card.classList.add('flip');
+  SFX.tone(600, 0.05, 'triangle', 0.04);
+  A.open.push(i);
+  if (A.open.length < 2) return;
+  A.moves++;
+  const [a, b] = A.open;
+  if (A.cards[a] === A.cards[b]) {
+    A.done.add(a); A.done.add(b); A.open = [];
+    for (const k of [a, b]) document.querySelector(`[data-mem="${k}"]`).classList.add('done');
+    SFX.tone(900, 0.12, 'triangle', 0.05, 1.3);
+    if (A.done.size === 16) {
+      const f = Math.min(2.2, Math.max(0.3, 2.2 - (A.moves - 8) * 0.1));
+      return setTimeout(() => arcFinish('memory', f, `${A.moves}번 만에 완성!`, A.moves), 500);
+    }
+  } else {
+    A.lock = true;
+    R.arcTimeout = setTimeout(() => {
+      for (const k of [a, b]) document.querySelector(`[data-mem="${k}"]`)?.classList.remove('flip');
+      A.open = []; A.lock = false;
+    }, 750);
+  }
+  setText('arcInfo', `시도 ${A.moves}번 · ${A.done.size / 2}/8쌍`);
+}
+// 원소 퀴즈
+function nextQuiz() {
+  const A = R.arc;
+  if (A.q >= 10) return arcFinish('quiz', A.correct * 0.2, `10문제 중 ${A.correct}개 정답!`, A.correct);
+  const maxZ = Math.max(36, topDisc());
+  const ans = randInt(1, maxZ), opts = new Set([ans]);
+  while (opts.size < 4) opts.add(randInt(1, maxZ));
+  const type = randInt(0, 2), e = EL[ans];
+  const q = type === 0 ? `'<b>${e.name}</b>'의 원소 기호는?` : type === 1 ? `원소 기호 <b>${e.sym}</b>는 어떤 원소일까요?` : `원자 번호 <b>${ans}번</b> 원소는?`;
+  const label = z => type === 0 ? EL[z].sym : type === 1 ? EL[z].name : `${EL[z].sym} (${EL[z].name})`;
+  A.ans = ans; A.lock = false;
+  $('#quizBox').innerHTML = `<div class="quiz-q">Q${A.q + 1}. ${q}</div><div class="quiz-opts">${shuffle([...opts]).map(z => `<button class="quiz-opt" data-quiz="${z}">${label(z)}</button>`).join('')}</div>`;
+  setText('arcInfo', `${A.q + 1}/10 · 정답 ${A.correct}`);
+}
+function answerQuiz(z, btn) {
+  const A = R.arc;
+  if (!A || A.game !== 'quiz' || A.lock) return;
+  A.lock = true;
+  const ok = z === A.ans;
+  if (ok) { A.correct++; SFX.tone(880, 0.1, 'triangle', 0.05, 1.3); } else SFX.hurt();
+  btn.classList.add(ok ? 'right' : 'wrong');
+  if (!ok) document.querySelector(`[data-quiz="${A.ans}"]`)?.classList.add('right');
+  A.q++;
+  R.arcTimeout = setTimeout(nextQuiz, ok ? 500 : 1100);
+}
+// 원자 잡기
+function whackTick() {
+  const A = R.arc;
+  if (!A || A.game !== 'whack') return arcStop();
+  const now = performance.now(), left = Math.max(0, (A.end - now) / 1000);
+  for (let i = 0; i < 9; i++) {
+    const c = A.cells[i];
+    if (c && now > c.until) { A.cells[i] = null; document.querySelector(`[data-whack="${i}"]`).innerHTML = ''; }
+  }
+  if (left <= 0) return arcFinish('whack', Math.min(2.5, A.score * 0.07), `원자 ${A.score}개 잡기!`, A.score);
+  if (now >= A.nextSpawn) {
+    const empty = A.cells.map((c, i) => c ? -1 : i).filter(i => i >= 0);
+    if (empty.length) {
+      const i = empty[Math.floor(Math.random() * empty.length)];
+      const bomb = Math.random() < 0.15, life = 900 - (20 - left) * 18;
+      const z = bomb ? 0 : randInt(1, Math.max(10, topDisc()));
+      A.cells[i] = { bomb, z, until: now + life };
+      document.querySelector(`[data-whack="${i}"]`).innerHTML = bomb ? '<div class="mole bomb">☢️</div>'
+        : `<div class="mole" style="--c:${CATS[EL[z].cat].color}">${EL[z].sym}</div>`;
+    }
+    A.nextSpawn = now + Math.max(330, 750 - (20 - left) * 22);
+  }
+  setText('arcInfo', `⏱️ ${left.toFixed(1)}초 · ${A.score}점`);
+}
+function hitWhack(i, x, y) {
+  const A = R.arc;
+  if (!A || A.game !== 'whack') return;
+  const c = A.cells[i];
+  if (!c) return;
+  A.cells[i] = null;
+  document.querySelector(`[data-whack="${i}"]`).innerHTML = '';
+  if (c.bomb) { A.score = Math.max(0, A.score - 2); SFX.hurt(); floatText(x, y, '-2 ☢️', 'hurt'); }
+  else { A.score++; SFX.hit(); floatText(x, y, '+1', 'fuse'); particles(x, y, 6, CATS[EL[c.z].cat].color); }
+}
+// 원자번호 업다운
+function renderUpdown(reveal) {
+  const A = R.arc;
+  $('#udBox').innerHTML = `<div class="ud-row"><div>${elCard(A.cur, { cls: 'big', count: false })}<div class="ud-z">원자 번호 <b>${A.cur}</b></div></div>
+    <div class="ud-vs">VS</div>
+    <div>${reveal ? elCard(reveal, { cls: 'big', count: false }) + `<div class="ud-z">원자 번호 <b>${reveal}</b></div>` : '<div class="elcard big ud-hidden"><span class="sym">?</span></div><div class="ud-z">다음 원소</div>'}</div></div>
+    <div class="btnrow ud-btns"><button class="big-btn" data-ud="up" ${reveal ? 'disabled' : ''}>⬆️ 더 크다</button><button class="big-btn" data-ud="down" ${reveal ? 'disabled' : ''}>⬇️ 더 작다</button></div>`;
+  setText('arcInfo', `연속 정답 ${A.streak}`);
+}
+function guessUpdown(dir) {
+  const A = R.arc;
+  if (!A || A.game !== 'updown' || A.lock) return;
+  A.lock = true;
+  let n; do { n = randInt(1, 118); } while (n === A.cur);
+  const ok = dir === 'up' ? n > A.cur : n < A.cur;
+  renderUpdown(n);
+  if (ok) {
+    A.streak++; SFX.tone(700 + A.streak * 40, 0.1, 'triangle', 0.05, 1.3);
+    R.arcTimeout = setTimeout(() => { A.cur = n; A.lock = false; renderUpdown(); }, 800);
+  } else {
+    SFX.hurt();
+    R.arcTimeout = setTimeout(() => arcFinish('updown', Math.min(3, A.streak * 0.25), `${A.streak}연속 정답!`, A.streak), 1000);
+  }
+}
+function renderArcade() {
+  setText('arcBase', '🪙 ' + fmt(arcScale()));
+  setText('arcStat', `${S.arcade.plays}판 · 🪙 ${fmt(S.arcade.earned)} 획득`);
+  const sig = JSON.stringify(S.arcade.best) + '|' + !!R.arc;
+  if (R.sig.arc === sig) return;
+  R.sig.arc = sig;
+  $('#arcMenu').style.display = R.arc ? 'none' : '';
+  $('#arcMenu').innerHTML = Object.entries(ARC_GAMES).map(([k, g]) => `<div class="arc-card">
+    <div class="arc-icon">${g.icon}</div><b>${g.name}</b><small>${g.desc}</small>
+    <div class="arc-best">🏅 최고 기록: ${S.arcade.best[k] != null ? g.best(S.arcade.best[k]) : '-'}</div>
+    <button class="big-btn" data-arc="${k}">▶ 시작</button></div>`).join('');
 }
 
 /* ---------- 엔딩 ---------- */
@@ -1853,6 +2119,8 @@ function victory() {
   }
   // 인공 원소 보스 처치 → 해당 원소 1개 확정
   if (E.synth) {
+    S.synthKills++;
+    if (E.rare) S.rareKills++;
     addEl(E.synth, 1);
     msg += ` · 🧪 인공 원소 <b>${EL[E.synth].name}(${EL[E.synth].sym})</b> 확정 획득!`;
   }
@@ -2256,6 +2524,7 @@ function renderTab() {
   else if (R.tab === 'ach') renderAch();
   else if (R.tab === 'shop') renderShop();
   else if (R.tab === 'void') renderVoid();
+  else if (R.tab === 'arcade') renderArcade();
   else if (R.tab === 'settings') renderSettings();
 }
 function switchTab(t) {
@@ -2271,17 +2540,52 @@ function switchTab(t) {
 /* =====================================================================
  *  이벤트
  * ===================================================================== */
-$('#core').addEventListener('click', e => clickCore(e.clientX, e.clientY));
-$('#golden').addEventListener('click', clickGolden);
+/* ---------- 오토마우스 방지 ----------
+ * 1) 스크립트로 만든 가짜 클릭(isTrusted=false) 무시
+ * 2) 대상별 초당 15회 초과 클릭 무시 (사람 최대 연타 수준)
+ * 3) 최근 20회가 '같은 위치' + '기계처럼 일정한 간격'이면 오토마우스로 보고 10초간 차단 */
+const CLICK_MAX_CPS = 15, CLICK_BLOCK_MS = 10000;
+const clickGuards = {};
+function clickAllowed(e, key, x, y) {
+  if (!e || e.isTrusted === false) return false;
+  const G = clickGuards[key] || (clickGuards[key] = { t: [], p: [], blockedUntil: 0, warned: 0 });
+  const now = performance.now();
+  if (now < G.blockedUntil) {
+    if (now - G.warned > 2000) { G.warned = now; toast(`🤖 자동 클릭이 감지되어 잠시 막혔어요 (${Math.ceil((G.blockedUntil - now) / 1000)}초)`, '', 2000); }
+    return false;
+  }
+  G.t.push(now); G.p.push(Math.round(x) + ',' + Math.round(y));
+  if (G.t.length > 20) { G.t.shift(); G.p.shift(); }
+  if (G.t.length >= 20) {
+    const iv = [];
+    for (let i = 1; i < G.t.length; i++) iv.push(G.t[i] - G.t[i - 1]);
+    const mean = iv.reduce((s, v) => s + v, 0) / iv.length;
+    const sd = Math.sqrt(iv.reduce((s, v) => s + (v - mean) * (v - mean), 0) / iv.length);
+    const samePos = G.p.every(p => p === G.p[0]);
+    if (samePos && mean < 500 && sd / mean < 0.06) {
+      G.blockedUntil = now + CLICK_BLOCK_MS; G.t = []; G.p = []; G.warned = now;
+      R.combo = 0;
+      toast('🤖 <b>오토마우스가 감지되었어요!</b><br>10초 동안 클릭이 막힙니다. 직접 클릭해 주세요.', '', 4000);
+      return false;
+    }
+  }
+  // 패턴 검사 후 초당 클릭 상한
+  let recent = 0;
+  for (const ti of G.t) if (now - ti < 1000) recent++;
+  if (recent > CLICK_MAX_CPS) return false;
+  return true;
+}
+$('#core').addEventListener('click', e => { if (clickAllowed(e, 'core', e.clientX, e.clientY)) clickCore(e.clientX, e.clientY); });
+$('#golden').addEventListener('click', e => { if (e.isTrusted) clickGolden(); });
 $('#discModal').addEventListener('click', () => { clearTimeout(R.discTimer); showNextDiscovery(); });
 function updateSoundBtn() { setText('btnSound', S.sound ? '🔊' : '🔇'); }
 $('#btnSound').onclick = () => { S.sound = !S.sound; updateSoundBtn(); if (S.sound) SFX.buy(); };
-$('#enemy').addEventListener('click', e => clickEnemy(e.clientX, e.clientY));
+$('#enemy').addEventListener('click', e => { if (clickAllowed(e, 'enemy', e.clientX, e.clientY)) clickEnemy(e.clientX, e.clientY); });
 document.addEventListener('keydown', e => {
   if (e.code === 'Space' && !e.repeat && !['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(document.activeElement.tagName)) {
     e.preventDefault();
     const [x, y] = centerOf($('#core'));
-    clickCore(x, y);
+    if (clickAllowed(e, 'core', -1, -1)) clickCore(x, y); // 키보드 매크로도 같은 규칙
   }
 });
 document.addEventListener('click', e => {
@@ -2296,6 +2600,11 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-gen]'))) return buyGen(+el.dataset.gen);
   if ((el = t.closest('[data-rep]'))) return buyRep(el.dataset.rep);
   if ((el = t.closest('[data-upg]'))) return buyUpg(el.dataset.upg);
+  if ((el = t.closest('[data-arc]'))) return startArc(el.dataset.arc);
+  if (t.closest('[data-arc-exit]')) return arcExit();
+  if ((el = t.closest('[data-mem]'))) return clickMem(+el.dataset.mem);
+  if ((el = t.closest('[data-quiz]'))) return answerQuiz(+el.dataset.quiz, el);
+  if ((el = t.closest('[data-ud]'))) return guessUpdown(el.dataset.ud);
   if ((el = t.closest('[data-sell]'))) { if (e.detail === 0) sellEl(+el.dataset.sell, R.sellAmt); return; }
   if ((el = t.closest('[data-void]'))) { if (e.detail === 0) feedVoid(el.dataset.void); return; }
   if ((el = t.closest('[data-ending]'))) return showEnding(+el.dataset.ending);
@@ -2328,6 +2637,10 @@ document.addEventListener('change', e => {
     R.unitT[+t.dataset.party] = 0;
   }
   if (t.id === 'autoAdv') S.battle.auto = t.checked;
+});
+document.addEventListener('pointerdown', e => {
+  const el = e.target.closest && e.target.closest('[data-whack]');
+  if (el) { e.preventDefault(); if (clickAllowed(e, 'whack', e.clientX, e.clientY)) hitWhack(+el.dataset.whack, e.clientX, e.clientY); }
 });
 /* ---------- 판매/강화 버튼 꾹 누르기 연속 실행 ---------- */
 let holdTimer = null, holdEl = null;
