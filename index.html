@@ -552,7 +552,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허의 행성 완성 = <b>엔딩 2</b>.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
           <li><b>조합법 해금</b>: 처음엔 1~10번 원소만 융합할 수 있어요. 5스테이지마다 다음 단계 조합법이 열리고, 50스테이지를 클리어하면 자연 원소(1~92번)를 모두 만들 수 있어요.</li>
-          <li><b>인공 원소</b>: 테크네튬(43), 프로메튬(61), 93번 이후 원소는 자연에 거의 없어 융합할 수 없어요. 특정 스테이지(23, 38, 52~127)를 클리어하면 얻을 수 있어요.</li>
+          <li><b>인공 원소</b>: 테크네튬(43), 프로메튬(61), 93번 이후 원소는 자연에 거의 없어 융합할 수 없어요. 특정 스테이지를 처음 클리어하면 1개씩 얻어요. 등장 층은 <b>스테이지 상한의 8~60% 구간</b>에 퍼져 있어서 환생할수록 깊어져요 (환생 0회: 24~180층 · 1회: 48~360층 · … · 7회: 400~3000층).</li>
           <li><b>환생(빅뱅)</b>: 118개 원소를 모두 발견하면 별의 씨앗을 받고 새 우주에서 다시 시작해요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06이 복리로 영구 적용돼요. 환생 후엔 역대 최고 기록의 절반까지 ⏩ 워프할 수 있어요.</li>
           <li><b>스테이지 상한</b>: 최종 스테이지는 5000이에요. 환생 횟수에 따라 상한이 열려요 (0회 300 · 1회 600 · 2회 1000 · 3회 1500 · 4회 2200 · 5회 3000 · 6회 4000 · 7회 5000).</li>
           <li>적을 클릭하면 파티 전원의 공격 쿨타임이 <b>0.1초</b> 줄어듭니다.</li>
@@ -851,8 +851,16 @@ function ratioFor(z) { return RATIO_BY_INPUTS[inputsFor(z)]; }
 const RECIPE_TIERS = [[0, 10], [5, 18], [10, 26], [15, 36], [20, 45], [25, 54], [30, 64], [35, 71], [40, 80], [45, 86], [50, 92]];
 // 자연에서 거의 얻을 수 없는 인공 원소: 융합 불가, 특정 스테이지 클리어 보상으로만 획득
 const SYNTHETIC = new Set([43, 61]);
-const SYNTH_STAGE = { 43: 23, 61: 38 };
-for (let z = 93; z <= 118; z++) { SYNTHETIC.add(z); SYNTH_STAGE[z] = 52 + (z - 93) * 3; } // 93번 = 52스테이지 … 118번 = 127스테이지
+for (let z = 93; z <= 118; z++) SYNTHETIC.add(z);
+// 인공 원소 등장 층: 환생 횟수별 스테이지 상한의 8% ~ 60% 구간에 순서대로 배치
+// (환생 0회: Tc 24층 … Og 180층 / 7회: Tc 400층 … Og 3000층) — 회차마다 새로 모아야 하는 목표가 상한과 함께 늘어남
+const SYNTH_ORDER = [43, 61];
+for (let z = 93; z <= 118; z++) SYNTH_ORDER.push(z);
+const SYNTH_STAGE = {};
+function refreshSynthStages(count) {
+  const cap = stageCap(count);
+  SYNTH_ORDER.forEach((z, i) => { SYNTH_STAGE[z] = Math.round(cap * (0.08 + 0.52 * i / (SYNTH_ORDER.length - 1))); });
+}
 const MAX_STAGE = 5000;
 // 환생 횟수별 도전 가능한 스테이지 상한 (인덱스 = 환생 횟수)
 const STAGE_CAPS = [300, 600, 1000, 1500, 2200, 3000, 4000, 5000];
@@ -865,8 +873,7 @@ function stageGrowth(stage, a, b, c) {
   const n1 = Math.min(n, 99), n2 = Math.min(Math.max(n - 99, 0), 900), n3 = Math.max(n - 999, 0);
   return Math.pow(a, n1) * Math.pow(b, n2) * Math.pow(c, n3);
 }
-const STAGE_SYNTH = {};
-for (const z in SYNTH_STAGE) STAGE_SYNTH[SYNTH_STAGE[z]] = +z;
+refreshSynthStages(0);
 const OFFLINE_CAP = 8 * 3600;
 
 /* =====================================================================
@@ -1110,8 +1117,8 @@ function checkAchs() {
 function prestigeProd() { return Math.pow(1.08, S.prestige ? S.prestige.seeds : 0); }
 function prestigeCombat() { return Math.pow(1.06, S.prestige ? S.prestige.seeds : 0); }
 function canRebirth() { return discCount() >= 118; }
-// 기본 10개 + 127스테이지(오가네손) 이후 3스테이지마다 1개
-function seedsGain() { return 10 + Math.max(0, Math.floor((S.battle.maxStage - 127) / 3)); }
+// 기본 10개 + 이번 회차 오가네손 등장 층 이후 3스테이지마다 1개
+function seedsGain() { return 10 + Math.max(0, Math.floor((S.battle.maxStage - SYNTH_STAGE[118]) / 3)); }
 function rebirth() {
   if (!canRebirth()) return;
   const gain = seedsGain();
@@ -1124,6 +1131,7 @@ function rebirth() {
   S = Object.assign(defaultState(), keep);
   R.enemy = null; R.buffs = {}; R.log = []; R.logVer++; R.fuse = [1, 1, 0, 0]; R.activeSlot = 0; R.hintCache = null; R.selZ = 1;
   R.discQueue = []; R.sig = {}; R.capWarned = false;
+  refreshSynthStages(S.prestige.count);
   save();
   SFX.discover();
   particles(innerWidth / 2, innerHeight / 2, 60, '#ffd43b');
@@ -1134,9 +1142,9 @@ function rebirth() {
 function renderRebirth() {
   const d = discCount(), ok = canRebirth(), P = S.prestige;
   const html = `<div class="rb-head"><b>🌌 환생 (빅뱅)</b> <span>환생 ${P.count}회 · 🌱 별의 씨앗 ${P.seeds}개 → 생산량 ×${fmt(prestigeProd())}, 전투력 ×${fmt(prestigeCombat())}</span></div>
-    <div class="rb-caps">🔒 도전 가능 스테이지: <b>${stageCap()}</b>${stageCap() < MAX_STAGE ? ` (환생 ${P.count + 1}회 → ${stageCap(P.count + 1)})` : ' (최종 5000)'} · 🏆 역대 최고: ${Math.max(P.best || 0, S.battle.maxStage)}</div>
+    <div class="rb-caps">🧪 이번 회차 인공 원소 등장: <b>${SYNTH_STAGE[43]}~${SYNTH_STAGE[118]}층</b> · 🔒 도전 가능 스테이지: <b>${stageCap()}</b>${stageCap() < MAX_STAGE ? ` (환생 ${P.count + 1}회 → ${stageCap(P.count + 1)})` : ' (최종 5000)'} · 🏆 역대 최고: ${Math.max(P.best || 0, S.battle.maxStage)}</div>
     <div class="bar"><div class="fill ${ok ? 'red' : 'blue'}" style="width:${d / 118 * 100}%"></div><span>주기율표 ${d} / 118</span></div>
-    <div class="rb-foot">${ok ? `118개 원소를 모두 모았어요! 지금 환생하면 <b>별의 씨앗 +${seedsGain()}개</b> (127스테이지 이후 3스테이지마다 +1)`
+    <div class="rb-foot">${ok ? `118개 원소를 모두 모았어요! 지금 환생하면 <b>별의 씨앗 +${seedsGain()}개</b> (${SYNTH_STAGE[118]}스테이지 이후 3스테이지마다 +1)`
       : '118개 원소를 모두 발견하면 환생할 수 있어요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06 (복리, 영구)'}
       <button class="big-btn" id="btnRebirth" ${ok ? '' : 'disabled'}>🌌 빅뱅 일으키기</button></div>`;
   const el = $('#rebirth');
@@ -2359,6 +2367,7 @@ window.addEventListener('beforeunload', save);
  *  메인 루프
  * ===================================================================== */
 const offline = load();
+refreshSynthStages(S.prestige.count);
 if (offline > 10) {
   const gain = totalRate() * offline;
   if (gain > 0) {
