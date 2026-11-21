@@ -142,6 +142,7 @@ button{font-family:inherit}
 .shop-row .elcard{width:64px;height:72px}
 .shop-row .elcard .sym{font-size:22px}
 .sell-btn{background:linear-gradient(135deg,#f08c00,#e67700)}
+.shop-row .buybtn{touch-action:none;-webkit-touch-callout:none}
 .pick-foot{font-size:12px;color:var(--dim)}
 .fslot.flash{animation:flash .5s}
 @keyframes flash{0%{box-shadow:0 0 0 0 #ffd43b}50%{box-shadow:0 0 40px 10px #ffd43b}100%{box-shadow:0 0 0 0 transparent}}
@@ -752,6 +753,13 @@ const SFX = {
   lose() { [392, 311, 233, 175].forEach((f, i) => this.tone(f, 0.25, 'sawtooth', 0.035, 0.95, i * 0.16)); },
   boss() { this.tone(70, 0.8, 'sawtooth', 0.06, 0.6); this.tone(105, 0.8, 'square', 0.03, 0.6, 0.1); },
   bonus() { [784, 988, 1175, 1568, 1976].forEach((f, i) => this.tone(f, 0.14, 'sine', 0.06, 1, i * 0.06)); },
+  lastShop: 0,
+  shop(up) {
+    const now = performance.now();
+    if (now - this.lastShop < 60) return;
+    this.lastShop = now;
+    up ? this.tone(880 + Math.random() * 120, 0.08, 'triangle', 0.04, 1.4) : this.tone(1200 + Math.random() * 200, 0.05, 'square', 0.02, 0.8);
+  },
   ach() { [880, 1109, 1319].forEach((f, i) => this.tone(f, 0.2, 'triangle', 0.05, 1, i * 0.1)); },
 };
 
@@ -1140,22 +1148,24 @@ function elvCost(z) { return Math.max(5, sellPrice(z) * 20) * Math.pow(1.7, S.el
 function sellEl(z, mode) {
   const have = Math.floor(S.counts[z]);
   let n = mode === 'half' ? Math.floor(have / 2) : Math.min(have, mode);
-  if (n < 1) return;
+  if (n < 1) return false;
   const gain = sellPrice(z) * n;
   S.counts[z] -= n;
   S.coins += gain; S.totalCoins += gain;
-  SFX.buy();
+  SFX.shop();
   const row = document.getElementById('shopRow' + z);
   if (row) { const [x, y] = centerOf(row); floatText(x, y, '+🪙' + fmt(gain), 'fuse'); }
+  return true;
 }
 function upgradeEl(z) {
   const c = elvCost(z);
-  if (S.coins < c) return;
+  if (S.coins < c) return false;
   S.coins -= c;
   S.elv[z] = (S.elv[z] || 0) + 1;
-  SFX.ach();
+  SFX.shop(true);
   const row = document.getElementById('shopRow' + z);
   if (row) { const [x, y] = centerOf(row); floatText(x, y, `⬆️ ${EL[z].sym} Lv.${S.elv[z]}`, 'crit'); particles(x, y, 12, CATS[EL[z].cat].color); }
+  return true;
 }
 function renderShop() {
   const disc = [];
@@ -1988,8 +1998,8 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-gen]'))) return buyGen(+el.dataset.gen);
   if ((el = t.closest('[data-rep]'))) return buyRep(el.dataset.rep);
   if ((el = t.closest('[data-upg]'))) return buyUpg(el.dataset.upg);
-  if ((el = t.closest('[data-sell]'))) return sellEl(+el.dataset.sell, R.sellAmt);
-  if ((el = t.closest('[data-elup]'))) return upgradeEl(+el.dataset.elup);
+  if ((el = t.closest('[data-sell]'))) { if (e.detail === 0) sellEl(+el.dataset.sell, R.sellAmt); return; }
+  if ((el = t.closest('[data-elup]'))) { if (e.detail === 0) upgradeEl(+el.dataset.elup); return; }
   if ((el = t.closest('[data-sell-amt]'))) {
     R.sellAmt = el.dataset.sellAmt === 'half' ? 'half' : +el.dataset.sellAmt;
     $$('[data-sell-amt]').forEach(b => b.classList.toggle('on', b === el));
@@ -2023,6 +2033,31 @@ document.addEventListener('change', e => {
   }
   if (t.id === 'autoAdv') S.battle.auto = t.checked;
 });
+/* ---------- 판매/강화 버튼 꾹 누르기 연속 실행 ---------- */
+let holdTimer = null, holdEl = null;
+function stopHold() { clearTimeout(holdTimer); holdTimer = null; holdEl = null; }
+document.addEventListener('pointerdown', e => {
+  if (e.button !== 0) return;
+  const el = e.target.closest('[data-sell], [data-elup]');
+  if (!el || el.disabled) return;
+  e.preventDefault();
+  stopHold();
+  holdEl = el;
+  const isSell = el.dataset.sell !== undefined;
+  const z = +(isSell ? el.dataset.sell : el.dataset.elup);
+  let delay = 400, count = 0;
+  const step = () => {
+    if (holdEl !== el) return;
+    const ok = isSell ? sellEl(z, R.sellAmt) : upgradeEl(z);
+    if (!ok) { stopHold(); return; }
+    count++;
+    holdTimer = setTimeout(step, count === 1 ? 400 : (delay = Math.max(30, delay * 0.8)));
+  };
+  step();
+});
+['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, stopHold));
+document.addEventListener('pointerout', e => { if (holdEl && e.target.closest && e.target.closest('[data-sell], [data-elup]') === holdEl && !holdEl.contains(e.relatedTarget)) stopHold(); });
+document.addEventListener('contextmenu', e => { if (e.target.closest('[data-sell], [data-elup]')) e.preventDefault(); });
 $('#stPrev').onclick = () => changeStage(-1);
 $('#stNext').onclick = () => changeStage(1);
 $('#stWarp').onclick = () => {
