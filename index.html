@@ -383,9 +383,9 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <div class="e-emoji" id="eEmoji">👾</div>
           <div class="e-name" id="eName"></div>
           <div class="bar"><div class="fill red" id="eHpFill"></div><span id="eHpText"></span></div>
-          <div class="e-meta"><span id="eAtk"></span><span id="eWeak"></span><span id="eTimer"></span></div>
+          <div class="e-meta"><span id="eShield"></span><span id="eAtk"></span><span id="eWeak"></span><span id="eTimer"></span></div>
         </div>
-        <div class="arena-tip">👆 적을 클릭하면 직접 공격할 수 있어요! · 5스테이지마다 보스 등장</div>
+        <div class="arena-tip">👆 적을 클릭하면 파티 전원의 공격 쿨타임이 0.1초 줄어요! · 🛡️ 장벽보다 원자 번호가 낮은 원소는 피해를 못 줘요 · 5스테이지마다 보스</div>
       </div>
       <div class="party-hp"><span>🧬 파티 체력</span><div class="bar"><div class="fill green" id="pHpFill"></div><span id="pHpText"></span></div></div>
       <div id="party" class="party"></div>
@@ -416,6 +416,8 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <li><b>생산</b> 탭에서 시설을 사면 수소가 자동으로 생산됩니다.</li>
           <li><b>융합</b> 탭에서 두 원소를 합치면 <b>원자 번호의 합</b>인 원소가 됩니다. 새 원소를 발견할 때마다 생산량이 <b>+5%</b> 증가합니다.</li>
           <li><b>전투</b> 탭에서 원소로 파티를 꾸려 적과 싸웁니다. 보유 개수가 많고 원자 번호가 클수록 강합니다. 스테이지를 깰수록 생산량이 <b>+3%</b>씩 증가합니다.</li>
+          <li>적에게는 <b>원자 장벽</b>이 있습니다. 장벽 번호보다 낮은 원소는 아무리 많아도 피해를 줄 수 없어요. (1~3스테이지: 10번 네온 이상, 이후 스테이지마다 +1)</li>
+          <li>적을 클릭하면 파티 전원의 공격 쿨타임이 <b>0.1초</b> 줄어듭니다.</li>
           <li>적에게는 <b>약점 계열</b>이 있습니다. 약점 계열 원소는 <b>2배</b> 피해를 줍니다.</li>
           <li>보스를 잡으면 무거운 원소를 얻을 수 있습니다. 목표는 <b>118개 원소 전부 발견!</b></li>
         </ol>
@@ -1081,7 +1083,15 @@ function makeEnemy(stage) {
   const weak = keys[Math.floor(r() * keys.length)];
   const hp = 15 * Math.pow(1.3, stage - 1) * (boss ? 6 : 1);
   const atk = 1.5 * Math.pow(1.24, stage - 1) * (boss ? 1.6 : 1);
-  return { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, timeLeft: boss ? 30 : Infinity };
+  return { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, shield: shieldOf(stage), timeLeft: boss ? 30 : Infinity };
+}
+// 원자 장벽: 이 번호 미만의 원소는 적에게 피해를 주지 못함 (1~3스테이지 = 10번 네온)
+function shieldOf(stage) { return Math.min(118, Math.max(10, 7 + stage)); }
+function canPierce(z, stage) { return z >= shieldOf(stage); }
+function piercers(units, stage) { return units.filter(u => canPierce(u.z, stage)); }
+function noPierceMsg(stage) {
+  const s = shieldOf(stage);
+  return `원자 장벽을 뚫을 원소가 없습니다! 원자 번호 ${s}(${EL[s].sym}, ${EL[s].name}) 이상이 필요해요.`;
 }
 function blog(msg, cls = '') {
   R.log.push({ msg, cls });
@@ -1120,6 +1130,7 @@ function projectile(slot, color, big) {
 function startBattle() {
   const B = S.battle;
   if (!partyUnits().length) { toast('⚠️ 파티에 보유 중인 원소를 배치하세요!'); return; }
+  if (!piercers(partyUnits(), B.stage).length) { toast('🛡️ ' + noPierceMsg(B.stage), '', 5000); blog('🛡️ ' + noPierceMsg(B.stage), 'lose'); return; }
   B.active = true;
   B.hp = B.maxHp;
   R.unitT = [0, 0, 0, 0, 0];
@@ -1149,6 +1160,12 @@ function battleTick(dt) {
   }
   if (!R.enemy) spawnEnemy();
   const E = R.enemy;
+  if (!piercers(units, E.stage).length) {
+    // 장벽을 뚫을 수 없으면 한 단계 후퇴, 1스테이지면 전투 중단
+    if (B.stage > 1) defeat(noPierceMsg(E.stage));
+    else { B.active = false; R.enemy = null; blog('🛡️ ' + noPierceMsg(1), 'lose'); toast('🛡️ ' + noPierceMsg(1), '', 5000); }
+    return;
+  }
   const lanth = 1 + 0.2 * units.filter(u => u.cat === 'lanthanide').length;
   const nobleRed = Math.min(0.6, 0.15 * units.filter(u => u.cat === 'noble').length);
   for (const u of units) {
@@ -1179,6 +1196,14 @@ function battleTick(dt) {
 }
 function unitAttack(u, lanth) {
   const E = R.enemy, B = S.battle;
+  if (u.z < E.shield) {
+    // 장벽에 막힘: 피해 없음
+    if (R.tab === 'battle' && Math.random() < 0.35) {
+      const [x, y] = centerOf($('#eEmoji'));
+      floatText(x, y + 30, '🛡️막힘', 'hurt');
+    }
+    return;
+  }
   let d = u.atk * lanth, crit = false;
   const weak = E.weak === u.cat;
   if (weak) d *= 2;
@@ -1201,16 +1226,11 @@ function unitAttack(u, lanth) {
 }
 function clickEnemy(x, y) {
   if (!S.battle.active || !R.enemy || R.cooldown > 0) return;
-  const total = partyUnits().reduce((s, u) => s + u.atk, 0);
-  const d = Math.max(1 + S.clickLv, total * 0.15);
-  R.enemy.hp -= d;
-  floatText(x, y, '👆' + fmt(d), 'crit');
-  const em = $('#eEmoji');
-  em.classList.add('hit');
-  setTimeout(() => em.classList.remove('hit'), 80);
-  SFX.hit(true);
-  particles(x, y, 6, '#ffd43b');
-  if (R.enemy.hp <= 0) victory();
+  // 클릭은 직접 피해 대신 파티 전원의 공격 쿨타임을 0.1초 단축 (공격은 다음 틱에 발동)
+  for (const u of partyUnits()) R.unitT[u.slot] += 0.1 * u.speed;
+  floatText(x, y, '⏩ -0.1초', 'h');
+  SFX.tone(700 + Math.random() * 100, 0.05, 'triangle', 0.04, 1.3);
+  particles(x, y, 4, '#74c0fc');
 }
 function victory() {
   const E = R.enemy, B = S.battle;
@@ -1227,7 +1247,7 @@ function victory() {
   S.kills++;
   let msg = `✅ ${E.name} 처치! +${fmt(reward)} H`;
   if (E.boss) {
-    const z = Math.min(118, E.stage + 2), n = 1 + Math.floor(E.stage / 20);
+    const z = Math.min(118, shieldOf(E.stage + 1) + 2), n = 1 + Math.floor(E.stage / 20);
     addEl(z, n);
     msg += ` · 🎁 ${EL[z].name}(${EL[z].sym}) ×${n}`;
   } else if (Math.random() < 0.3) {
@@ -1294,7 +1314,11 @@ function nextGoal() {
     ? '🎯 <b>융합</b> 탭에서 H + H 로 헬륨(He)을 만들어 보세요!'
     : '🎯 원자핵을 클릭해서 수소 2개를 모아보세요!';
   if (S.gens[0] === 0) return '🎯 수소 15개로 <b>양성자 포집기</b>를 사서 자동 생산을 시작하세요!';
-  if (S.battle.maxStage === 0) return '🎯 <b>전투</b> 탭에서 첫 전투를 시작해 보세요!';
+  if (S.battle.maxStage === 0) {
+    let top = 0; for (let z = 118; z >= 1; z--) if (S.counts[z] >= 1) { top = z; break; }
+    return top >= 10 ? '🎯 <b>전투</b> 탭에서 10번 이상 원소로 파티를 꾸려 첫 전투를 시작하세요!'
+      : `🎯 전투하려면 원자 번호 <b>10(Ne, 네온)</b> 이상 원소가 필요해요! 융합으로 만들어 보세요. (현재 최고: ${top ? EL[top].sym : '-'})`;
+  }
   const h = fusionHints(1)[0];
   if (h) return `🎯 융합 가능: ${EL[h.a].sym} + ${EL[h.b].sym} → <b>${EL[h.z].name}(${EL[h.z].sym})</b>`;
   const nz = S.disc.indexOf(false, 1);
@@ -1456,7 +1480,9 @@ function renderBattle() {
     const u = unitStats(S.party[i]);
     const el = document.getElementById('pst' + i);
     if (!el) continue;
-    const txt = u ? `⚔️ 공격 <b>${fmt(u.atk * lanth)}</b> · ❤️ 체력 <b>${fmt(u.hp)}</b><br>${CATS[u.cat].name} · 공속 ×${u.speed}`
+    const txt = u ? `⚔️ 공격 <b>${fmt(u.atk * lanth)}</b> · ❤️ 체력 <b>${fmt(u.hp)}</b><br>${CATS[u.cat].name} · 공속 ×${u.speed}<br>` +
+        (canPierce(u.z, B.stage) ? '<span style="color:#8ce99a">🛡️ 장벽 관통 가능</span>'
+          : `<span style="color:#ff8787">🛡️ 장벽에 막힘 (체력만 보탬)</span>`)
       : (S.party[i] ? '<span style="color:#ff8787">보유량이 없어 싸울 수 없음</span>' : '원소를 배치하세요');
     if (el.innerHTML !== txt) el.innerHTML = txt;
     $('#ptm' + i).style.width = (u && B.active ? Math.min(1, R.unitT[i]) * 100 : 0) + '%';
@@ -1471,6 +1497,9 @@ function renderBattle() {
   $('#eHpFill').style.width = Math.max(0, E.hp / E.maxHp * 100) + '%';
   setText('eHpText', `${fmt(Math.max(0, E.hp))} / ${fmt(E.maxHp)}`);
   setText('eAtk', `💢 공격력 ${fmt(E.atk)} (1.5초마다)`);
+  const sh = E.shield, shOk = piercers(units, E.stage).length > 0;
+  const shHtml = `<b style="color:${shOk ? '#8ce99a' : '#ff8787'}">🛡️ 원자 장벽: ${sh}번(${EL[sh].sym}) 이상만 피해</b>`;
+  if ($('#eShield').innerHTML !== shHtml) $('#eShield').innerHTML = shHtml;
   const wc = CATS[E.weak];
   const wk = `약점: <b style="color:${wc.color}">${wc.name}</b> (2배 피해)`;
   if ($('#eWeak').innerHTML !== wk) $('#eWeak').innerHTML = wk;
