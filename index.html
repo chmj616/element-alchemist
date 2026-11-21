@@ -223,6 +223,16 @@ button{font-family:inherit}
 .mole{--c:#4dabf7;width:78%;height:78%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;
   background:radial-gradient(circle at 35% 30%,#fff8,var(--c) 45%,#0b0e1a);box-shadow:0 0 18px var(--c);animation:popIn .2s ease-out;pointer-events:none}
 .mole.bomb{background:radial-gradient(circle,#ff8787,#5c0000);box-shadow:0 0 18px #ff6b6b;font-size:34px}
+.link-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.link-title{text-align:center;font-size:18px;font-weight:800;margin-bottom:14px;color:var(--gold)}
+.link-area{position:relative;display:grid;grid-template-columns:1fr minmax(60px,160px) 1fr;max-width:640px;margin:0 auto}
+.link-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.link-col{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.link-item{--c:#748ffc;background:var(--panel2);border:2px solid var(--line);color:var(--text);border-radius:10px;padding:11px 10px;font-size:15px;font-weight:700;cursor:pointer;transition:transform .1s}
+.link-item:hover{border-color:var(--accent)}
+.link-item.sel{border-color:var(--gold);box-shadow:0 0 12px #ffd43b88;transform:scale(1.04)}
+.link-item.ok{border-color:var(--c);background:color-mix(in srgb,var(--c) 30%,#141a2e);cursor:default}
+.link-item.bad{border-color:#ff6b6b;background:#c92a2a55;animation:shake .3s}
 .ud-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
 .ud-row{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap}
 .ud-row>div{display:flex;flex-direction:column;align-items:center;gap:8px}
@@ -604,7 +614,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <li><b>생산</b> 탭에서 시설을 사면 수소가 자동으로 생산됩니다.</li>
           <li><b>융합</b> 탭에서 두 원소를 합치면 <b>원자 번호의 합</b>인 원소가 됩니다. 재료는 각각 <b>30개씩</b> 들어가고 결과물은 1개입니다. 55~80번은 재료 3종(각 100개), 81번 이상은 4종(각 300개)을 합성해야 해요. 결과물 칸을 누르면 만들 원소를 바로 고를 수 있어요. 새 원소를 발견할 때마다 생산량이 <b>+5%</b> 증가합니다.</li>
           <li><b>전투</b> 탭에서 원소로 파티를 꾸려 적과 싸웁니다. 보유 개수가 많고 원자 번호가 클수록 강합니다. 스테이지를 깰수록 생산량이 <b>+3%</b>씩 증가합니다.</li>
-          <li><b>오락실</b>: 카드 맞추기 · 원소 퀴즈 · 원자 잡기 · 원자번호 업다운 미니게임으로 코인 획득. 보상은 발견한 가장 무거운 원소 가치에 비례.</li>
+          <li><b>오락실</b>: 카드 맞추기 · 원소 퀴즈 · 원자 잡기 · 짝 잇기 · 원자번호 업다운 미니게임으로 코인 획득. 보상은 발견한 가장 무거운 원소 가치에 비례.</li>
           <li><b>공허</b>: 주기율표 순서대로 원소를 바치면 행성이 자라요. 원소 하나를 다 채울 때마다 생산량 ×1.02 (영구). 118번까지 채우면 <b>엔딩 2</b>.</li>
           <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허의 행성 완성 = <b>엔딩 2</b>.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
@@ -870,6 +880,7 @@ const ACHS = [
   { id: 'memo12',  icon: '🃏', name: '기억의 달인',       desc: '카드 맞추기 12번 이내 완성', check: () => S.arcade.best.memory != null && S.arcade.best.memory <= 12 },
   { id: 'quiz10',  icon: '🎓', name: '원소 박사',         desc: '원소 퀴즈 10문제 전부 정답', check: () => S.arcade.best.quiz >= 10 },
   { id: 'whack35', icon: '🔨', name: '원자 사냥꾼',       desc: '원자 잡기 35점 이상',       check: () => S.arcade.best.whack >= 35 },
+  { id: 'link0',   icon: '🔗', name: '완벽한 연결',       desc: '짝 잇기를 실수 없이 완료',  check: () => !!S.arcade.linkPerfect },
   { id: 'ud10',    icon: '🔮', name: '촉 좋은 연금술사',  desc: '업다운 10연속 정답',        check: () => S.arcade.best.updown >= 10 },
   { id: 'reb1',    icon: '🌌', name: '새로운 우주',     desc: '첫 환생',                check: () => S.prestige.count >= 1 },
   { id: 'reb3',    icon: '🔁', name: '세 번째 우주',      desc: '환생 3회',                check: () => S.prestige.count >= 3 },
@@ -1449,6 +1460,7 @@ const ARC_GAMES = {
   memory: { icon: '🃏', name: '원소 카드 맞추기', desc: '같은 원소 카드 8쌍을 찾아라! 적은 시도로 맞출수록 보상↑ (최대 ×2.2)', best: v => `최소 ${v}번`, lower: true },
   quiz:   { icon: '❓', name: '원소 퀴즈',       desc: '이름·기호·원자번호 퀴즈 10문제. 1문제당 ×0.2 (최대 ×2.0)', best: v => `${v}/10` },
   whack:  { icon: '🔨', name: '원자 잡기',       desc: '20초 동안 튀어나오는 원자를 잡아라! ☢️를 누르면 -2점 (1점당 ×0.07, 최대 ×2.5)', best: v => `${v}점` },
+  link:   { icon: '🔗', name: '원소 짝 잇기',     desc: '왼쪽과 오른쪽의 짝을 선으로 이어라! 이름↔기호 · 기호↔번호 · 원소↔계열 3라운드. 실수 적고 빠를수록 보상↑ (최대 ×2.4)', best: v => `최단 ${v}초`, lower: true },
   updown: { icon: '📈', name: '원자번호 업다운', desc: '다음 원소의 원자번호가 클까 작을까? 연속 정답 1개당 ×0.25 (최대 ×3.0)', best: v => `${v}연속` },
 };
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -1496,6 +1508,11 @@ function startArc(game) {
     R.arc = { game, score: 0, end: performance.now() + 20000, cells: new Array(9).fill(null), nextSpawn: 0 };
     arcBegin(game, `<div class="whack-grid">${[...Array(9)].map((_, i) => `<div class="whack-cell" data-whack="${i}"></div>`).join('')}</div>`);
     R.arcTimer = setInterval(whackTick, 50);
+  } else if (game === 'link') {
+    R.arc = { game, round: 0, mistakes: 0, t0: performance.now(), sel: null, matched: 0, lock: false };
+    arcBegin(game, '<div id="linkBox" class="link-box"></div>');
+    nextLinkRound();
+    R.arcTimer = setInterval(() => { const A = R.arc; if (A && A.game === 'link') setText('arcInfo', `라운드 ${A.round + 1}/3 · 실수 ${A.mistakes} · ⏱️ ${((performance.now() - A.t0) / 1000).toFixed(1)}초`); }, 100);
   } else if (game === 'updown') {
     R.arc = { game, cur: randInt(1, 118), streak: 0, lock: false };
     arcBegin(game, '<div id="udBox" class="ud-box"></div>');
@@ -1589,6 +1606,69 @@ function hitWhack(i, x, y) {
   document.querySelector(`[data-whack="${i}"]`).innerHTML = '';
   if (c.bomb) { A.score = Math.max(0, A.score - 2); SFX.hurt(); floatText(x, y, '-2 ☢️', 'hurt'); }
   else { A.score++; SFX.hit(); floatText(x, y, '+1', 'fuse'); particles(x, y, 6, CATS[EL[c.z].cat].color); }
+}
+// 원소 짝 잇기
+const LINK_ROUNDS = [
+  { title: '이름 ↔ 원소 기호', L: z => EL[z].name, Rt: z => EL[z].sym },
+  { title: '원소 기호 ↔ 원자 번호', L: z => EL[z].sym, Rt: z => `${z}번` },
+  { title: '원소 ↔ 계열', L: z => `${EL[z].sym} ${EL[z].name}`, Rt: z => CATS[EL[z].cat].name },
+];
+function nextLinkRound() {
+  const A = R.arc;
+  if (A.round >= LINK_ROUNDS.length) {
+    const time = (performance.now() - A.t0) / 1000;
+    const f = Math.min(2.4, Math.max(0.3, 2.4 - A.mistakes * 0.12 - Math.max(0, time - 40) * 0.01));
+    if (A.mistakes === 0) S.arcade.linkPerfect = true;
+    return arcFinish('link', f, `${time.toFixed(1)}초 · 실수 ${A.mistakes}번`, Math.round(time * 10) / 10);
+  }
+  const maxZ = Math.max(36, topDisc()), picks = [];
+  const usedCat = new Set();
+  let guard = 0;
+  while (picks.length < 6 && guard++ < 500) {
+    const z = randInt(1, maxZ);
+    if (picks.includes(z)) continue;
+    if (A.round === 2 && usedCat.has(EL[z].cat)) continue; // 계열 라운드는 계열이 겹치지 않게
+    picks.push(z); usedCat.add(EL[z].cat);
+  }
+  const RD = LINK_ROUNDS[A.round];
+  A.pairs = picks; A.sel = null; A.matched = 0; A.lock = false;
+  const right = shuffle(picks.slice());
+  $('#linkBox').innerHTML = `<div class="link-title">라운드 ${A.round + 1} · ${RD.title}</div>
+    <div class="link-area" id="linkArea"><svg class="link-svg" id="linkSvg"></svg>
+      <div class="link-col">${shuffle(picks.slice()).map(z => `<button class="link-item" data-link-l="${z}" style="--c:${CATS[EL[z].cat].color}">${RD.L(z)}</button>`).join('')}</div>
+      <div></div>
+      <div class="link-col">${right.map(z => `<button class="link-item" data-link-r="${z}">${RD.Rt(z)}</button>`).join('')}</div>
+    </div>`;
+}
+function clickLink(side, z, btn) {
+  const A = R.arc;
+  if (!A || A.game !== 'link' || A.lock || btn.classList.contains('ok')) return;
+  if (!A.sel || A.sel.side === side) {
+    if (A.sel) A.sel.btn.classList.remove('sel');
+    A.sel = { side, z, btn };
+    btn.classList.add('sel');
+    SFX.tone(500, 0.04, 'triangle', 0.03);
+    return;
+  }
+  const a = A.sel, l = side === 'l' ? btn : a.btn, r = side === 'r' ? btn : a.btn;
+  A.sel = null;
+  a.btn.classList.remove('sel');
+  if (a.z === z) {
+    for (const b of [l, r]) b.classList.add('ok');
+    const color = CATS[EL[z].cat].color;
+    l.style.setProperty('--c', color); r.style.setProperty('--c', color);
+    const area = $('#linkArea').getBoundingClientRect(), lr = l.getBoundingClientRect(), rr = r.getBoundingClientRect();
+    $('#linkSvg').insertAdjacentHTML('beforeend', `<line x1="${lr.right - area.left}" y1="${lr.top + lr.height / 2 - area.top}" x2="${rr.left - area.left}" y2="${rr.top + rr.height / 2 - area.top}" stroke="${color}" stroke-width="4" stroke-linecap="round"/>`);
+    SFX.tone(880, 0.1, 'triangle', 0.05, 1.3);
+    if (++A.matched === A.pairs.length) {
+      A.lock = true; A.round++;
+      R.arcTimeout = setTimeout(nextLinkRound, 600);
+    }
+  } else {
+    A.mistakes++;
+    SFX.hurt();
+    for (const b of [l, r]) { b.classList.add('bad'); setTimeout(() => b.classList.remove('bad'), 400); }
+  }
 }
 // 원자번호 업다운
 function renderUpdown(reveal) {
@@ -2605,6 +2685,8 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-mem]'))) return clickMem(+el.dataset.mem);
   if ((el = t.closest('[data-quiz]'))) return answerQuiz(+el.dataset.quiz, el);
   if ((el = t.closest('[data-ud]'))) return guessUpdown(el.dataset.ud);
+  if ((el = t.closest('[data-link-l]'))) return clickLink('l', +el.dataset.linkL, el);
+  if ((el = t.closest('[data-link-r]'))) return clickLink('r', +el.dataset.linkR, el);
   if ((el = t.closest('[data-sell]'))) { if (e.detail === 0) sellEl(+el.dataset.sell, R.sellAmt); return; }
   if ((el = t.closest('[data-void]'))) { if (e.detail === 0) feedVoid(el.dataset.void); return; }
   if ((el = t.closest('[data-ending]'))) return showEnding(+el.dataset.ending);
