@@ -125,7 +125,24 @@ button{font-family:inherit}
 .fusion-stage{display:flex;align-items:center;justify-content:center;gap:14px;padding:16px;background:var(--panel);border-radius:14px;border:1px solid var(--line);flex-wrap:wrap}
 .fslot{width:118px;height:130px;border:2px dashed var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--dim);font-size:13px;text-align:center}
 .fslot.active{border-color:var(--accent);background:#5cc8ff11}
-.fslot.result{cursor:default;border-style:solid}
+.fslot.result{cursor:pointer;border-style:solid;position:relative}
+.fslot.result:hover{border-color:var(--gold);box-shadow:0 0 16px #ffd43b55}
+.fslot.result::after{content:'🎯 클릭해서 선택';position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--gold);white-space:nowrap}
+#pickModal{position:fixed;inset:0;background:#05081acc;z-index:2500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#pickModal.on{display:flex;animation:fadein .2s}
+.pick-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;width:min(900px,94vw);max-height:86vh;display:flex;flex-direction:column;gap:10px}
+.pick-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pick-head span{color:var(--dim);font-size:13px;flex:1}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;overflow-y:auto;padding:6px}
+.pick-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;border-radius:12px;padding:6px}
+.pick-item:hover{background:#ffffff0d}
+.pick-item.dis{opacity:.4}
+.pick-item small{font-size:11px;text-align:center}
+.pk-ok{color:#8ce99a}.pk-lack{color:#ffa94d}.pk-no{color:#868e96}
+.shop-row .elcard{width:64px;height:72px}
+.shop-row .elcard .sym{font-size:22px}
+.sell-btn{background:linear-gradient(135deg,#f08c00,#e67700)}
+.pick-foot{font-size:12px;color:var(--dim)}
 .fslot.flash{animation:flash .5s}
 @keyframes flash{0%{box-shadow:0 0 0 0 #ffd43b}50%{box-shadow:0 0 40px 10px #ffd43b}100%{box-shadow:0 0 0 0 transparent}}
 .fop{font-size:30px;font-weight:900;color:var(--dim)}
@@ -312,6 +329,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
 <canvas id="bg"></canvas>
 <div id="golden" title="초신성 파편! 클릭하세요!">🌟</div>
 <div id="discModal"></div>
+<div id="pickModal"></div>
 
 <header>
   <div class="logo"><span class="logo-icon">⚛️</span> 원소 연금술사</div>
@@ -321,6 +339,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
     <div class="hstat"><span class="lbl">생산 배율</span><span class="val" id="hMult">×1</span></div>
     <div class="hstat"><span class="lbl">발견한 원소</span><span class="val" id="hDisc">1/118</span></div>
     <div class="hstat"><span class="lbl">최고 스테이지</span><span class="val" id="hStage">0</span></div>
+    <div class="hstat"><span class="lbl">코인</span><span class="val" id="hCoins" style="color:#ffd43b">🪙 0</span></div>
     <button class="hbtn" id="btnSound" title="소리 켜기/끄기">🔊</button>
   </div>
 </header>
@@ -350,6 +369,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
       <button class="tabbtn active" data-tab="prod">🏭 생산</button>
       <button class="tabbtn" data-tab="fusion">🔥 융합</button>
       <button class="tabbtn" data-tab="battle">⚔️ 전투<span class="dot" id="battleDot"></span></button>
+      <button class="tabbtn" data-tab="shop">🏪 상점</button>
       <button class="tabbtn" data-tab="table">🧪 주기율표</button>
       <button class="tabbtn" data-tab="ach">🏆 업적</button>
       <button class="tabbtn" data-tab="settings">⚙️ 설정</button>
@@ -371,7 +391,8 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
     <!-- 융합 -->
     <div class="tab" id="tab-fusion">
       <p class="tip">⚛️ 두 원소를 융합하면 <b>원자 번호의 합</b>에 해당하는 원소가 만들어집니다. (예: H(1) + H(1) → He(2), He(2) + C(6) → O(8))<br>
-      ⚖️ 융합 1회에 각 재료가 <b>3개씩</b> 필요하고, 결과물은 <b>1개</b> 나옵니다. (H ×3 + H ×3 → He ×1)<br>
+      ⚖️ 융합 1회에 각 재료가 <b>30개씩</b> 필요하고, 결과물은 <b>1개</b> 나옵니다. (H ×30 + H ×30 → He ×1)<br>
+      🎯 <b>결과물 칸(=)을 누르면</b> 해금된 원소 중 만들고 싶은 원소를 골라 재료를 자동으로 세팅할 수 있어요.<br>
       🔥 실제 별처럼, <b>철(26)보다 무거운 원소</b>를 만들 때는 추가 에너지(수소)가 필요합니다.<br>
       🔓 처음엔 <b>10번까지</b>만 융합할 수 있고, <b>5스테이지마다</b> 다음 조합법이 해금됩니다. 🧪 인공 원소는 전투 보상으로만 얻어요.</p>
       <div id="capInfo" class="finfo" style="min-height:0;margin:0 0 10px"></div>
@@ -380,7 +401,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
         <div class="fop">+</div>
         <div class="fslot" id="fsB" data-slot="B"></div>
         <div class="fop">=</div>
-        <div class="fslot result" id="fsR"></div>
+        <div class="fslot result" id="fsR" title="클릭해서 만들 원소를 선택하세요"></div>
       </div>
       <div id="fInfo" class="finfo"></div>
       <div class="fbtns">
@@ -423,6 +444,14 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
     </div>
 
     <!-- 주기율표 -->
+    <!-- 상점 -->
+    <div class="tab" id="tab-shop">
+      <p class="tip">💰 원소를 팔아 <b>🪙 코인</b>을 얻고, 코인으로 <b>원소 강화</b>를 하세요. 강화 1레벨마다 그 원소의 전투 <b>공격력·체력 ×1.2</b> (복리).<br>
+      판매 가격은 그 원소를 만드는 데 드는 수소 비용에 비례해요. 무거운 원소일수록, 🧪 인공 원소일수록 비싸게 팔립니다. ⚠️ 파티에 넣은 원소를 팔면 보유량이 줄어 전투력이 떨어져요.</p>
+      <div class="sec-head"><h3>🏪 원소 상점</h3><div class="seg" id="sellAmt"><button data-sell-amt="1" class="on">판매 ×1</button><button data-sell-amt="10">×10</button><button data-sell-amt="100">×100</button><button data-sell-amt="half">절반</button></div></div>
+      <div id="shopList" class="list"></div>
+    </div>
+
     <div class="tab" id="tab-table">
       <div id="rebirth" class="rebirth"></div>
       <div class="pt-wrap"><div id="ptable" class="ptable"></div></div>
@@ -443,8 +472,9 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
         <ol>
           <li><b>원자핵 클릭</b>으로 수소(H)를 모읍니다. 수소는 이 게임의 기본 화폐이자 재료입니다.</li>
           <li><b>생산</b> 탭에서 시설을 사면 수소가 자동으로 생산됩니다.</li>
-          <li><b>융합</b> 탭에서 두 원소를 합치면 <b>원자 번호의 합</b>인 원소가 됩니다. 재료는 각각 <b>3개씩</b> 들어가고 결과물은 1개입니다. 새 원소를 발견할 때마다 생산량이 <b>+5%</b> 증가합니다.</li>
+          <li><b>융합</b> 탭에서 두 원소를 합치면 <b>원자 번호의 합</b>인 원소가 됩니다. 재료는 각각 <b>30개씩</b> 들어가고 결과물은 1개입니다. 결과물 칸을 누르면 만들 원소를 바로 고를 수 있어요. 새 원소를 발견할 때마다 생산량이 <b>+5%</b> 증가합니다.</li>
           <li><b>전투</b> 탭에서 원소로 파티를 꾸려 적과 싸웁니다. 보유 개수가 많고 원자 번호가 클수록 강합니다. 스테이지를 깰수록 생산량이 <b>+3%</b>씩 증가합니다.</li>
+          <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
           <li><b>조합법 해금</b>: 처음엔 1~10번 원소만 융합할 수 있어요. 5스테이지마다 다음 단계 조합법이 열리고, 50스테이지를 클리어하면 자연 원소(1~92번)를 모두 만들 수 있어요.</li>
           <li><b>인공 원소</b>: 테크네튬(43), 프로메튬(61), 93번 이후 원소는 자연에 거의 없어 융합할 수 없어요. 특정 스테이지(23, 38, 52~127)를 클리어하면 얻을 수 있어요.</li>
           <li><b>환생(빅뱅)</b>: 118개 원소를 모두 발견하면 별의 씨앗을 받고 새 우주에서 다시 시작해요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06이 복리로 영구 적용돼요. 환생 후엔 역대 최고 기록의 절반까지 ⏩ 워프할 수 있어요.</li>
@@ -549,7 +579,7 @@ const GENERATORS = [
 ];
 const REPEATS = [
   { id: 'clickLv', name: '양성자 가속 장갑', icon: '👆', cost: lv => 30 * Math.pow(1.8, lv),
-    desc: lv => `클릭 기본 수소 +1 (현재 ${1 + lv})` },
+    desc: lv => `클릭 기본 수소 +0.1 (현재 클릭당 ${((1 + lv) * 0.1).toFixed(1)})` },
   { id: 'atkLv', name: '이온 빔 증폭기', icon: '🗡️', cost: lv => 300 * Math.pow(2.5, lv),
     desc: lv => `파티 공격력 ×1.5 (현재 ×${fmt(Math.pow(1.5, lv))})` },
   { id: 'hpLv', name: '전자기 보호막', icon: '🛡️', cost: lv => 300 * Math.pow(2.5, lv),
@@ -679,6 +709,8 @@ const ACHS = [
   { id: 'bigbang', icon: '🎆', name: '창조주',        desc: '빅뱅 시뮬레이터 보유',    check: () => S.gens[9] >= 1 },
   { id: 'synth1',  icon: '🧪', name: '인공의 손길',     desc: '인공 원소 첫 획득',       check: () => [...SYNTHETIC].some(z => S.disc[z]) },
   { id: 'unlock92', icon: '🔓', name: '자연의 끝',      desc: '자연 원소 조합법 모두 해금 (스테이지 50)', check: () => fuseCap() >= 92 },
+  { id: 'sell1',   icon: '💰', name: '원소 상인',       desc: '코인 누적 1,000 획득',    check: () => S.totalCoins >= 1000 },
+  { id: 'elv10',   icon: '⬆️', name: '단련된 원소',     desc: '원소 하나를 강화 Lv.10',  check: () => S.elv.some(v => v >= 10) },
   { id: 'reb1',    icon: '🌌', name: '새로운 우주',     desc: '첫 환생',                check: () => S.prestige.count >= 1 },
   { id: 'reb5',    icon: '♾️', name: '윤회하는 우주',   desc: '환생 5회',               check: () => S.prestige.count >= 5 },
 ];
@@ -724,7 +756,7 @@ const SFX = {
 };
 
 const SAVE_KEY = 'elementAlchemist_save_v1';
-const FUSE_RATIO = 3; // 융합 1회당 각 재료 소모 개수
+const FUSE_RATIO = 30; // 융합 1회당 각 재료 소모 개수
 // 조합법 해금: [클리어해야 하는 스테이지, 융합 가능한 최대 원자 번호]
 const RECIPE_TIERS = [[0, 10], [5, 18], [10, 26], [15, 36], [20, 45], [25, 54], [30, 64], [35, 71], [40, 80], [45, 86], [50, 92]];
 // 자연에서 거의 얻을 수 없는 인공 원소: 융합 불가, 특정 스테이지 클리어 보상으로만 획득
@@ -755,7 +787,7 @@ const R = {
   tab: 'prod', buyAmt: 1, fuseA: 1, fuseB: 1, activeSlot: 'A',
   enemy: null, enemyT: 0, unitT: [0, 0, 0, 0, 0], cooldown: 0,
   log: [], logVer: 0, sig: {}, selZ: 1, floats: 0, slowAcc: 0,
-  combo: 0, lastClick: 0, buffs: {}, goldenAt: 0, goldenUntil: 0, discQueue: [],
+  sellAmt: 1, combo: 0, lastClick: 0, buffs: {}, goldenAt: 0, goldenUntil: 0, discQueue: [],
 };
 
 function defaultState() {
@@ -769,6 +801,7 @@ function defaultState() {
     totalClicks: 0, totalFusions: 0, kills: 0, playTime: 0, lastSave: Date.now(),
     totalH: 0, goldens: 0, ach: {}, sound: true,
     prestige: { count: 0, seeds: 0, best: 0 },
+    coins: 0, totalCoins: 0, elv: new Array(119).fill(0),
   };
 }
 function load() {
@@ -781,6 +814,8 @@ function load() {
     S.upg = d.upg || {};
     S.ach = d.ach || {};
     S.prestige = Object.assign({ count: 0, seeds: 0, best: 0 }, d.prestige || {});
+    if (!Array.isArray(S.elv) || S.elv.length < 119) S.elv = new Array(119).fill(0);
+    if (!isFinite(S.coins)) S.coins = 0;
     if (!Array.isArray(S.counts) || S.counts.length < 119) S.counts = defaultState().counts;
     if (!Array.isArray(S.disc) || S.disc.length < 119) S.disc = defaultState().disc;
     S.counts = S.counts.map(v => (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0);
@@ -884,7 +919,7 @@ function buffMult(kind) { const b = R.buffs[kind]; return b && b.until > perform
 function comboMult() { return 1 + Math.min(R.combo, 50) * 0.02; }
 function baseRate() { return GENERATORS.reduce((s, g, i) => s + S.gens[i] * g.rate, 0) * prodMult() * buffMult('prod'); }
 function clickValue(withCombo = true) {
-  let v = (1 + S.clickLv) * prodMult();
+  let v = 0.1 * (1 + S.clickLv) * prodMult(); // 기본: 클릭 10번에 수소 1개
   if (S.upg.quantum) v += baseRate() * 0.05;
   return v * buffMult('click') * (withCombo ? comboMult() : 1);
 }
@@ -1091,6 +1126,67 @@ function lockReason(z) {
   if (z > fuseCap()) return `🔒 스테이지 ${tierStageFor(z)} 클리어 시 조합법 해금`;
   return '';
 }
+/* ---------- 상점: 원소 가치 · 판매 · 강화 ---------- */
+// 수소로 환산한 최소 제작 비용 (인공 원소도 같은 방식으로 환산)
+const EL_VALUE = [0, 1];
+for (let z = 2; z <= 118; z++) {
+  let m = Infinity;
+  for (let a = 1; a <= z / 2; a++) m = Math.min(m, FUSE_RATIO * (EL_VALUE[a] + EL_VALUE[z - a]));
+  EL_VALUE[z] = m + (z > 26 ? 5 * Math.pow(z - 26, 2) : 0);
+}
+function sellPrice(z) { return EL_VALUE[z] * 0.01 * (1 + z / 50) * (SYNTHETIC.has(z) ? 3 : 1); }
+function elvMult(z) { return Math.pow(1.2, S.elv[z] || 0); }
+function elvCost(z) { return Math.max(5, sellPrice(z) * 20) * Math.pow(1.7, S.elv[z] || 0); }
+function sellEl(z, mode) {
+  const have = Math.floor(S.counts[z]);
+  let n = mode === 'half' ? Math.floor(have / 2) : Math.min(have, mode);
+  if (n < 1) return;
+  const gain = sellPrice(z) * n;
+  S.counts[z] -= n;
+  S.coins += gain; S.totalCoins += gain;
+  SFX.buy();
+  const row = document.getElementById('shopRow' + z);
+  if (row) { const [x, y] = centerOf(row); floatText(x, y, '+🪙' + fmt(gain), 'fuse'); }
+}
+function upgradeEl(z) {
+  const c = elvCost(z);
+  if (S.coins < c) return;
+  S.coins -= c;
+  S.elv[z] = (S.elv[z] || 0) + 1;
+  SFX.ach();
+  const row = document.getElementById('shopRow' + z);
+  if (row) { const [x, y] = centerOf(row); floatText(x, y, `⬆️ ${EL[z].sym} Lv.${S.elv[z]}`, 'crit'); particles(x, y, 12, CATS[EL[z].cat].color); }
+}
+function renderShop() {
+  const disc = [];
+  for (let z = 1; z <= 118; z++) if (S.disc[z]) disc.push(z);
+  const sig = disc.join();
+  if (R.sig.shop !== sig) {
+    R.sig.shop = sig;
+    $('#shopList').innerHTML = disc.map(z => `
+      <div class="row shop-row" id="shopRow${z}">
+        ${elCard(z)}
+        <div class="rinfo">
+          <div class="rname">${EL[z].name} (${EL[z].sym}) <span class="badge" id="shLv${z}"></span>${SYNTHETIC.has(z) ? ' <span class="badge" style="background:#5f3dc4">🧪 인공</span>' : ''}</div>
+          <div class="rdesc" id="shInfo${z}"></div>
+        </div>
+        <button class="buybtn sell-btn" data-sell="${z}" id="shSell${z}"><span>판매</span><span id="shSellV${z}"></span></button>
+        <button class="buybtn" data-elup="${z}" id="shUp${z}"><span id="shUpA${z}"></span><span id="shUpB${z}"></span></button>
+      </div>`).join('');
+  }
+  for (const z of disc) {
+    const p = sellPrice(z), have = Math.floor(S.counts[z]);
+    const n = R.sellAmt === 'half' ? Math.floor(have / 2) : Math.min(have, R.sellAmt);
+    const lv = S.elv[z] || 0, c = elvCost(z);
+    setText('shLv' + z, 'Lv.' + lv);
+    setText('shInfo' + z, `개당 🪙${fmt(p)} · 보유 ${fmt(have)}개 · 강화 효과 공격·체력 ×${fmt(elvMult(z))} → ×${fmt(elvMult(z) * 1.2)}`);
+    setText('shSellV' + z, n >= 1 ? `×${fmt(n)} = 🪙${fmt(p * n)}` : '보유 없음');
+    $('#shSell' + z).disabled = n < 1;
+    setText('shUpA' + z, `강화 Lv.${lv + 1}`);
+    setText('shUpB' + z, '🪙' + fmt(c));
+    $('#shUp' + z).disabled = S.coins < c;
+  }
+}
 function fusionTax(z) { return z > 26 ? Math.ceil(5 * Math.pow(z - 26, 2) * (S.upg.catalyst ? 0.5 : 1)) : 0; }
 function fusionNeeds(a, b) {
   const need = {};
@@ -1146,9 +1242,37 @@ function bestRecipe(z) {
     const b = z - a;
     if (!S.disc[a] || !S.disc[b]) continue;
     const m = fusionMax(a, b);
-    if (!best || m > best.m) best = { a, b, m };
+    if (!best || m > best.m || (m === best.m && a > best.a)) best = { a, b, m };
   }
   return best;
+}
+/* ---------- 결과물 선택 (목표 원소 → 재료 자동 세팅) ---------- */
+function openTargetPicker() {
+  const cap = fuseCap();
+  let h = '';
+  for (let z = 2; z <= cap; z++) {
+    if (SYNTHETIC.has(z)) continue;
+    const r = bestRecipe(z);
+    const label = !r ? '<small class="pk-no">재료 미발견</small>'
+      : r.m > 0 ? `<small class="pk-ok">${EL[r.a].sym}+${EL[r.b].sym} · ${fmt(r.m)}회</small>`
+      : `<small class="pk-lack">${EL[r.a].sym}+${EL[r.b].sym} · 재료 부족</small>`;
+    h += `<div class="pick-item ${r ? '' : 'dis'}" data-target="${z}">${elCard(z, { cls: S.disc[z] ? '' : 'unknown', count: false })}${label}</div>`;
+  }
+  const nt = RECIPE_TIERS.find(([s]) => s > S.battle.maxStage);
+  $('#pickModal').innerHTML = `<div class="pick-box">
+    <div class="pick-head"><b>🎯 만들 원소 선택</b><span>해금된 원소: 2 ~ ${cap}번${nt ? ` · 스테이지 ${nt[0]} 클리어 시 ${nt[1]}번까지` : ''}</span><button class="btn pick-close">✕ 닫기</button></div>
+    <div class="pick-grid">${h}</div>
+    <div class="pick-foot">✅ 초록색: 지금 만들 수 있음 · 🟧 재료 부족 · 회색: 재료 원소를 아직 발견하지 못함 (🧪 인공 원소는 전투 보상으로만 획득)</div>
+  </div>`;
+  $('#pickModal').classList.add('on');
+}
+function closeTargetPicker() { $('#pickModal').classList.remove('on'); }
+function chooseTarget(z) {
+  const r = bestRecipe(z);
+  if (!r) { toast(`⚠️ ${EL[z].name}을(를) 만들 재료 원소를 아직 발견하지 못했어요.`); return; }
+  R.fuseA = r.a; R.fuseB = r.b; R.activeSlot = 'A';
+  closeTargetPicker();
+  SFX.buy();
 }
 function pickFuse(z) {
   if (R.activeSlot === 'A') { R.fuseA = z; R.activeSlot = 'B'; }
@@ -1165,8 +1289,9 @@ function unitStats(z) {
   const e = EL[z], c = CATS[e.cat], sc = Math.sqrt(Math.floor(S.counts[z]));
   return {
     z, cat: e.cat, speed: c.speed,
-    atk: (2 + Math.pow(z, 1.3)) * c.atk * sc * atkMult(),
-    hp: (10 + 4 * Math.pow(z, 1.2)) * c.hp * sc * hpMult(),
+    atk: (2 + Math.pow(z, 1.3)) * c.atk * sc * atkMult() * elvMult(z),
+    hp: (10 + 4 * Math.pow(z, 1.2)) * c.hp * sc * hpMult() * elvMult(z),
+    lv: S.elv[z] || 0,
   };
 }
 function partySlots() { const m = S.battle.maxStage; return 3 + (m >= 25 ? 1 : 0) + (m >= 50 ? 1 : 0); }
@@ -1505,13 +1630,14 @@ function renderHeader() {
   setText('hMult', '×' + fmt(prodMult()));
   setText('hDisc', discCount() + '/118');
   setText('hStage', S.battle.maxStage);
+  setText('hCoins', '🪙 ' + fmt(S.coins));
   setText('clickVal', `클릭당 +${fmt(clickValue())} H`);
   $('#battleDot').classList.toggle('on', S.battle.active);
 }
 function nextGoal() {
-  if (!S.disc[2]) return S.counts[1] >= 6
-    ? '🎯 <b>융합</b> 탭에서 H ×3 + H ×3 으로 헬륨(He)을 만들어 보세요!'
-    : '🎯 원자핵을 클릭해서 수소 6개를 모아보세요!';
+  if (!S.disc[2]) return S.counts[1] >= FUSE_RATIO * 2
+    ? `🎯 <b>융합</b> 탭에서 H ×${FUSE_RATIO} + H ×${FUSE_RATIO} 으로 헬륨(He)을 만들어 보세요!`
+    : `🎯 수소 ${FUSE_RATIO * 2}개를 모아 헬륨을 만들어 보세요! (클릭 10번 = 수소 1개, 생산 시설도 활용하세요)`;
   if (S.gens[0] === 0) return '🎯 수소 45개로 <b>양성자 포집기</b>를 사서 자동 생산을 시작하세요!';
   if (canRebirth()) return '🌌 <b>주기율표 완성!</b> 주기율표 탭에서 <b>환생(빅뱅)</b>할 수 있어요!';
   if (S.battle.maxStage >= stageCap() && stageCap() < MAX_STAGE) return `🔒 스테이지 상한(${stageCap()}) 도달! 주기율표를 완성하고 환생하면 ${stageCap(S.prestige.count + 1)}까지 열려요.`;
@@ -1689,7 +1815,7 @@ function renderBattle() {
     const u = unitStats(S.party[i]);
     const el = document.getElementById('pst' + i);
     if (!el) continue;
-    const txt = u ? `⚔️ 공격 <b>${fmt(u.atk * lanth)}</b> · ❤️ 체력 <b>${fmt(u.hp)}</b><br>${CATS[u.cat].name} · 공속 ×${u.speed}`
+    const txt = u ? `${u.lv ? `<span style="color:#ffd43b">⬆️ 강화 Lv.${u.lv}</span><br>` : ''}⚔️ 공격 <b>${fmt(u.atk * lanth)}</b> · ❤️ 체력 <b>${fmt(u.hp)}</b><br>${CATS[u.cat].name} · 공속 ×${u.speed}`
       : (S.party[i] ? '<span style="color:#ff8787">보유량이 없어 싸울 수 없음</span>' : '원소를 배치하세요');
     if (el.innerHTML !== txt) el.innerHTML = txt;
     $('#ptm' + i).style.width = (u && B.active ? Math.min(1, R.unitT[i]) * 100 : 0) + '%';
@@ -1821,6 +1947,7 @@ function renderTab() {
   else if (R.tab === 'battle') renderBattle();
   else if (R.tab === 'table') renderTable();
   else if (R.tab === 'ach') renderAch();
+  else if (R.tab === 'shop') renderShop();
   else if (R.tab === 'settings') renderSettings();
 }
 function switchTab(t) {
@@ -1861,6 +1988,17 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-gen]'))) return buyGen(+el.dataset.gen);
   if ((el = t.closest('[data-rep]'))) return buyRep(el.dataset.rep);
   if ((el = t.closest('[data-upg]'))) return buyUpg(el.dataset.upg);
+  if ((el = t.closest('[data-sell]'))) return sellEl(+el.dataset.sell, R.sellAmt);
+  if ((el = t.closest('[data-elup]'))) return upgradeEl(+el.dataset.elup);
+  if ((el = t.closest('[data-sell-amt]'))) {
+    R.sellAmt = el.dataset.sellAmt === 'half' ? 'half' : +el.dataset.sellAmt;
+    $$('[data-sell-amt]').forEach(b => b.classList.toggle('on', b === el));
+    return;
+  }
+  if ((el = t.closest('[data-target]'))) return chooseTarget(+el.dataset.target);
+  if (t.closest('#pickModal .pick-close') || t.id === 'pickModal') return closeTargetPicker();
+  if (t.closest('#pickModal')) return;
+  if (t.closest('#fsR')) return openTargetPicker();
   if ((el = t.closest('[data-slot]'))) { R.activeSlot = el.dataset.slot; return; }
   if ((el = t.closest('[data-pick]'))) return pickFuse(+el.dataset.pick);
   if ((el = t.closest('[data-fuse]'))) return doFusion(el.dataset.fuse === 'max' ? 'max' : +el.dataset.fuse);
