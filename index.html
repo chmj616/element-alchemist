@@ -2860,6 +2860,14 @@ function rng(seed) {
   let s = seed >>> 0;
   return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
 }
+// 약점 계열은 그 층에서 실제로 만들 수 있는 계열만 (조합법 해금에 맞춰 열림)
+// 계열별 가장 가벼운 원소 번호: 이 번호가 해금돼야 그 계열이 약점으로 등장
+const CAT_MIN_Z = {};
+for (let z = 1; z <= 118; z++) if (!(EL[z].cat in CAT_MIN_Z)) CAT_MIN_Z[EL[z].cat] = z;
+function weakPool(stage) {
+  const cap = fuseCap(Math.max(0, stage - 1)); // 이 층에 도전할 때 해금돼 있는 조합법 기준
+  return Object.keys(CATS).filter(k => CAT_MIN_Z[k] <= cap);
+}
 function makeEnemy(stage) {
   const r = rng(stage * 7919 + 13); r(); r();
   const boss = stage % 5 === 0;
@@ -2871,7 +2879,7 @@ function makeEnemy(stage) {
     name = E_PRE[Math.floor(r() * E_PRE.length)] + ' ' + b[0];
     emoji = b[1];
   }
-  const keys = Object.keys(CATS);
+  const keys = weakPool(stage);
   const weak = keys[Math.floor(r() * keys.length)];
   // 일반 몹: 150에서 시작해 스테이지당 ×1.18 / 보스: 일반 몹의 20배 (스테이지는 끝없이 이어짐)
   const hp = 150 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 20 : 1);
