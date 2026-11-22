@@ -2,13 +2,34 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>원소 연금술사 - 주기율표 클릭커 RPG</title>
 <meta name="description" content="수소를 모아 융합하고, 118개 원소를 발견하며 우주의 적과 싸우는 주기율표 클릭커 게임">
-<meta property="og:title" content="⚛️ 원소 연금술사">
-<meta property="og:description" content="클릭하고, 융합하고, 싸워라! 118개 원소를 모두 발견하는 주기율표 클릭커 RPG">
+<!-- 링크 공유 미리보기 (카카오톡·디스코드·트위터 등) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="원소 연금술사">
+<meta property="og:url" content="https://element-alchemist.vercel.app/">
+<meta property="og:title" content="⚛️ 원소 연금술사 - 주기율표 클릭커 RPG">
+<meta property="og:description" content="수소 한 알에서 시작해 118개 원소를 모두 발견하라! 클릭 · 융합 · 전투 · 공허의 행성 · 오락실까지.">
+<meta property="og:image" content="https://element-alchemist.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="원소 연금술사 - 주기율표 클릭커 RPG">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="⚛️ 원소 연금술사 - 주기율표 클릭커 RPG">
+<meta name="twitter:description" content="수소 한 알에서 시작해 118개 원소를 모두 발견하라!">
+<meta name="twitter:image" content="https://element-alchemist.vercel.app/og.png">
+<!-- 홈 화면 설치 (PWA) -->
 <meta name="theme-color" content="#0b0e1a">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="원소 연금술사">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 :root{
   --bg:#0b0e1a; --panel:#141a2e; --panel2:#1b2340; --line:#2a3560; --text:#e6ebff; --dim:#8b95bf;
@@ -223,6 +244,46 @@ button{font-family:inherit}
 .mole{--c:#4dabf7;width:78%;height:78%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;
   background:radial-gradient(circle at 35% 30%,#fff8,var(--c) 45%,#0b0e1a);box-shadow:0 0 18px var(--c);animation:popIn .2s ease-out;pointer-events:none}
 .mole.bomb{background:radial-gradient(circle,#ff8787,#5c0000);box-shadow:0 0 18px #ff6b6b;font-size:34px}
+.arc-opts{display:flex;flex-direction:column;gap:6px;width:100%}
+.arc-opts .big-btn{font-size:13px;padding:8px 10px}
+.mem-grid{max-width:520px;margin:0 auto;gap:8px}
+.mem-grid.mem-normal{max-width:600px;gap:6px}
+.mem-grid.mem-hard{max-width:680px;gap:5px}
+.mem-front{background:color-mix(in srgb,var(--c) 30%,#141a2e);border:2px solid var(--c);flex-direction:column}
+.mem-front b{font-size:clamp(13px,3.2vw,26px);color:var(--c)}
+.mem-front small{font-size:10px;color:var(--dim)}
+.mem-hard .mem-back{font-size:18px}
+.onet-tools{display:flex;gap:8px;justify-content:center;margin-bottom:10px}
+.onet-area{position:relative;max-width:720px;margin:0 auto;padding:4%;background:#0a0e1c;border-radius:14px;border:1px solid var(--line)}
+.onet-grid{display:grid;gap:3px;position:relative}
+.onet-svg{position:absolute;left:4%;top:4%;width:92%;height:92%;pointer-events:none;overflow:visible}
+.onet-tile,.onet-empty{aspect-ratio:1/1.1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.onet-tile{--c:#748ffc;background:linear-gradient(160deg,#fff7e6,#f1dfc0);border:2px solid #3b2f5c;box-shadow:0 3px 0 #3b2f5c;cursor:pointer;transition:transform .08s}
+.onet-tile b{font-size:clamp(11px,2.6vw,20px);color:color-mix(in srgb,var(--c) 70%,#000);line-height:1}
+.onet-tile small{font-size:clamp(7px,1.4vw,10px);color:#6b5d84}
+.onet-tile.sel{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 0 0 3px #ffd43b,0 6px 12px #000a}
+.onet-tile.hint{animation:blink .4s infinite;border-color:#69db7c}
+.order-box,.simon-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}
+.order-tip,.simon-msg{margin-bottom:12px;font-size:16px;min-height:22px}
+.order-grid,.simon-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:440px;margin:0 auto}
+.simon-grid{grid-template-columns:repeat(3,1fr);max-width:360px}
+.order-btn,.simon-btn{--c:#748ffc;position:relative;aspect-ratio:1;border-radius:12px;border:2px solid var(--c);background:color-mix(in srgb,var(--c) 22%,#141a2e);color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.order-btn b,.simon-btn b{font-size:clamp(16px,4vw,26px);color:var(--c)}
+.order-btn small,.simon-btn small{font-size:10px;color:var(--dim)}
+.order-btn.done{opacity:.35;transform:scale(.92)}
+.order-btn i{position:absolute;top:3px;right:6px;font-size:11px;font-style:normal;color:var(--gold)}
+.order-btn.bad{background:#c92a2a88;animation:shake .3s}
+.simon-btn.lit{background:var(--c);transform:scale(1.07);box-shadow:0 0 24px var(--c)}
+.simon-btn.lit b{color:#fff}
+.g2048-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.g2048{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:min(360px,88vw);aspect-ratio:1;padding:8px;background:#0a0e1c;border-radius:14px;border:1px solid var(--line);touch-action:none}
+.g-cell{background:#1b2340;border-radius:10px}
+.g-tile{--c:#748ffc;border-radius:10px;background:color-mix(in srgb,var(--c) 45%,#141a2e);border:2px solid var(--c);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:popIn .15s}
+.g-tile b{font-size:clamp(18px,6vw,30px);color:#fff;text-shadow:0 2px 4px #000}
+.g-tile small{font-size:11px;color:#dbe4ff}
+.g2048-ctrl{display:flex;flex-direction:column;align-items:center;gap:6px}
+.g2048-ctrl>div{display:flex;gap:6px}
+.g2048-ctrl .sbtn{width:48px;height:44px;font-size:18px}
 .link-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
 .link-title{text-align:center;font-size:18px;font-weight:800;margin-bottom:14px;color:var(--gold)}
 .link-area{position:relative;display:grid;grid-template-columns:1fr minmax(60px,160px) 1fr;max-width:640px;margin:0 auto}
@@ -430,6 +491,87 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
 .ach small{color:var(--dim);font-size:12px}
 .ach-sum{background:linear-gradient(90deg,#5f3dc4,#1971c2);border-radius:12px;padding:12px 16px;margin-bottom:12px;font-weight:700}
 .fact-box{margin-top:8px;padding:8px 10px;background:#0a0e1c;border-radius:8px;font-size:13px;color:#c9d6ff}
+/* ---------- 모바일 ---------- */
+main>*,#content,.hstats>*,.row>*,.rinfo{min-width:0}
+html,body{max-width:100%;overflow-x:hidden}
+button,.elcard,.pt-cell,.tabbtn,.fslot,.mem-card,.onet-tile,.order-btn,.simon-btn,.whack-cell,#core,#enemy{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+@media (max-width:700px){
+  header{padding:8px 10px;gap:6px}
+  .logo{font-size:17px}
+  .hstats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;width:100%}
+  .hstat{min-width:0;padding:3px 6px;border-radius:8px}
+  .hstat .lbl{font-size:9px}.hstat .val{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hbtn{width:100%;height:100%;font-size:16px}
+  main{padding:8px;gap:8px}
+  #corePanel{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:6px}
+  #coreWrap{width:132px;height:132px}
+  #core{width:124px;height:124px}
+  .nucleus{width:50px;height:50px;margin:-25px 0 0 -25px;font-size:22px}
+  .orbit .electron{width:8px;height:8px;top:-4px}
+  .core-info{flex:1;min-width:150px;text-align:left;align-self:center}
+  #clickVal{font-size:15px}.core-info .sub{font-size:11px}
+  .mini{font-size:12px;padding:8px 10px}
+  #content{padding:8px;border-radius:12px;min-height:0}
+  #tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:-2px -2px 10px;padding:2px;-webkit-overflow-scrolling:touch}
+  #tabs::-webkit-scrollbar{display:none}
+  .tabbtn{flex-shrink:0;padding:8px 11px;font-size:13px}
+  .tip{font-size:12px;padding:8px 10px}
+  .row{flex-wrap:wrap;gap:8px;padding:8px}
+  .ricon{font-size:24px;width:32px}
+  .buybtn{min-width:0;flex:1 1 120px}
+  .shop-row .buybtn{flex:1 1 40%}
+  .fusion-stage{gap:4px;padding:10px 4px}
+  .fslot{width:66px;height:76px;font-size:11px}
+  .fop{font-size:18px}
+  .elcard{width:62px;height:70px}.elcard .sym{font-size:21px}.elcard .nm{font-size:10px}
+  .elcard.big{width:60px;height:68px}.elcard.big .sym{font-size:22px}.elcard.big .nm{font-size:10px}
+  .fslot.result::after{bottom:-18px;font-size:10px}
+  .fbtns button{padding:9px 14px;font-size:14px}
+  .fbtns button:first-child{padding:9px 18px}
+  .battle-top{gap:6px}
+  .battle-top .big-btn{margin-left:0;flex:1 1 45%;padding:10px;font-size:14px}
+  .stage-lbl{min-width:0;flex:1 0 auto;font-size:16px;white-space:nowrap}
+  .battle-top .chk{font-size:12px}
+  .arena{padding:12px;min-height:200px}
+  .e-emoji{font-size:64px}.enemy.boss .e-emoji{font-size:84px}
+  .e-name{font-size:15px}
+  .party{grid-template-columns:repeat(2,1fr);gap:6px}
+  .pslot{padding:8px}
+  .blog{height:120px;font-size:12px}
+  .catguide{grid-template-columns:1fr}
+  .void-stage{min-width:0;height:240px}
+  .void-panel{min-width:0;padding:12px}
+  .vp-name{font-size:17px}
+  .void-track{grid-template-columns:repeat(auto-fill,minmax(28px,1fr))}
+  .vt{font-size:9px;padding:4px 0}
+  .arc-menu{grid-template-columns:1fr 1fr;gap:8px}
+  .arc-card{padding:10px}.arc-card .arc-icon{font-size:30px}.arc-card b{font-size:14px}.arc-card small{font-size:11px}
+  .arc-card .big-btn,.arc-opts .big-btn{padding:8px;font-size:12px}
+  .quiz-opts{grid-template-columns:1fr}
+  .quiz-q{font-size:17px}
+  .mem-grid.mem-hard{gap:3px}
+  .mem-hard .mem-front small{display:none}
+  .onet-area{padding:3%}
+  .onet-svg{left:3%;top:3%;width:94%;height:94%}
+  .onet-grid{gap:2px}
+  .onet-tile{border-radius:5px;border-width:1px;box-shadow:0 2px 0 #3b2f5c}
+  .onet-tile small{display:none}
+  .ud-row{gap:12px}
+  .pt-detail{padding:10px}
+  .statsbox{grid-template-columns:1fr 1fr}
+  #toasts{left:8px;right:8px;bottom:8px;max-width:none}
+  .toast{font-size:13px;padding:8px 10px}
+  .disc-box{margin:12px;padding:20px}
+  .end-box h1{font-size:24px}.end-box p{font-size:14px}.end-icon{font-size:64px}
+  .end-stats{grid-template-columns:repeat(2,1fr)}
+  .pick-grid{grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px}
+  #golden{width:56px;height:56px;font-size:38px}
+}
+@media (max-width:380px){
+  .arc-menu{grid-template-columns:1fr}
+  .hstats{grid-template-columns:repeat(3,1fr)}
+}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-thumb{background:#2a3560;border-radius:4px}
 </style>
@@ -539,6 +681,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
         <button id="stWarp" class="sbtn warp-btn" style="display:none" title="환생 전 최고 기록의 절반까지 바로 이동">⏩ 워프</button>
         <span id="stageCapLbl" class="cap-lbl"></span>
         <label class="chk"><input type="checkbox" id="autoAdv"> 자동 진행</label>
+        <label class="chk" title="새 적이 나올 때마다 그 적의 약점에 맞춰 최고 덱으로 자동 편성"><input type="checkbox" id="autoDeck"> 🔄 적마다 자동 편성</label>
         <button id="bestDeck" class="big-btn deck-btn" title="보유 원소 중 현재 스테이지에 가장 강한 조합을 자동으로 편성합니다">✨ 최고 덱 편성</button>
         <button id="battleToggle" class="big-btn">⚔️ 전투 시작</button>
       </div>
@@ -572,7 +715,8 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
     <!-- 오락실 -->
     <div class="tab" id="tab-arcade">
       <p class="tip">🎰 미니게임으로 <b>🪙 코인</b>을 벌어 원소 강화에 쓰세요! 보상은 <b>지금까지 발견한 가장 무거운 원소의 가치</b>에 비례해서, 진행할수록 커져요.<br>
-      현재 기본 보상: <b id="arcBase" style="color:#ffd43b"></b> × 성적 배율 · 누적 <span id="arcStat"></span></p>
+      현재 기본 보상: <b id="arcBase" style="color:#ffd43b"></b> × 성적 배율 · 누적 <span id="arcStat"></span><br>
+      😮‍💨 피로도: <b id="arcFat"></b> — 짧은 시간에 몰아서 하면 보상이 줄어들고, 10분이 지나면 회복돼요.</p>
       <div id="arcMenu" class="arc-menu"></div>
       <div id="arcStage" class="arc-stage"></div>
     </div>
@@ -614,7 +758,7 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <li><b>생산</b> 탭에서 시설을 사면 수소가 자동으로 생산됩니다.</li>
           <li><b>융합</b> 탭에서 두 원소를 합치면 <b>원자 번호의 합</b>인 원소가 됩니다. 재료는 각각 <b>30개씩</b> 들어가고 결과물은 1개입니다. 55~80번은 재료 3종(각 100개), 81번 이상은 4종(각 300개)을 합성해야 해요. 결과물 칸을 누르면 만들 원소를 바로 고를 수 있어요. 새 원소를 발견할 때마다 생산량이 <b>+5%</b> 증가합니다.</li>
           <li><b>전투</b> 탭에서 원소로 파티를 꾸려 적과 싸웁니다. 보유 개수가 많고 원자 번호가 클수록 강합니다. 스테이지를 깰수록 생산량이 <b>+3%</b>씩 증가합니다.</li>
-          <li><b>오락실</b>: 카드 맞추기 · 원소 퀴즈 · 원자 잡기 · 짝 잇기 · 원자번호 업다운 미니게임으로 코인 획득. 보상은 발견한 가장 무거운 원소 가치에 비례.</li>
+          <li><b>오락실</b>: 카드 맞추기(3단계) · 원소 퀴즈(4모드) · 원소 사천성 · 원자 잡기 · 순서 터치 · 원소 2048 · 기억 순서 · 업다운 — 8가지 미니게임으로 코인 획득. 최근 10분 판수만큼 보상이 줄어드는 피로도가 있어요.</li>
           <li><b>공허</b>: 주기율표 순서대로 원소를 바치면 행성이 자라요. 원소 하나를 다 채울 때마다 생산량 ×1.02 (영구). 118번까지 채우면 <b>엔딩 2</b>.</li>
           <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허의 행성 완성 = <b>엔딩 2</b>.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
@@ -635,6 +779,14 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
           <button class="btn" id="btnExport">📤 저장 코드 내보내기</button>
           <button class="btn" id="btnImport">📥 저장 코드 불러오기</button>
           <button class="btn danger" id="btnReset">🗑️ 처음부터 다시하기</button>
+        </div>
+        <h3>📲 앱으로 설치</h3>
+        <p>홈 화면에 설치하면 앱처럼 전체 화면으로 즐길 수 있어요.<br>
+        · 안드로이드/PC 크롬: 아래 버튼 또는 주소창의 설치 아이콘<br>
+        · 아이폰(사파리): 공유 버튼 → <b>홈 화면에 추가</b></p>
+        <div class="btnrow">
+          <button class="btn" id="btnInstall" style="display:none">📲 홈 화면에 설치하기</button>
+          <span id="installState" style="color:var(--dim);font-size:13px"></span>
         </div>
         <textarea id="saveCode" placeholder="여기에 저장 코드가 표시되거나, 불러올 코드를 붙여넣으세요"></textarea>
       </div>
@@ -719,6 +871,11 @@ const GENERATORS = [
   { name: '중성자별',       icon: '🌀', base: 3e9,  rate: 1e6,   desc: '각설탕 하나 크기가 수억 톤' },
   { name: '퀘이사',         icon: '🌠', base: 1e11, rate: 1e7,   desc: '우주에서 가장 밝은 천체' },
   { name: '빅뱅 시뮬레이터', icon: '🎆', base: 3e12, rate: 1.2e8, desc: '새로운 우주를 통째로 만들어냅니다' },
+  { name: '화이트홀',        icon: '⚪', base: 1e14, rate: 1.5e9,  desc: '블랙홀의 반대편, 물질을 끝없이 쏟아냅니다' },
+  { name: '우주 끈 공명기',  icon: '🎻', base: 4e15, rate: 2e10,   desc: '우주 끈의 진동으로 입자를 짜냅니다' },
+  { name: '다중우주 엔진',   icon: '🌐', base: 2e17, rate: 2.5e11, desc: '평행 우주들의 수소를 끌어옵니다' },
+  { name: '차원 균열',       icon: '✴️', base: 1e19, rate: 3e12,   desc: '다른 차원과 이어진 틈에서 물질이 새어 나옵니다' },
+  { name: '창세의 용광로',   icon: '🔆', base: 6e20, rate: 4e13,   desc: '우주 창조의 불꽃 그 자체' },
 ];
 const REPEATS = [
   { id: 'clickLv', name: '양성자 가속 장갑', icon: '👆', cost: lv => 30 * Math.pow(1.8, lv),
@@ -850,6 +1007,7 @@ const ACHS = [
   { id: 'gold1',  icon: '🌟', name: '별똥별 사냥꾼',   desc: '초신성 파편 1개 획득',    check: () => S.goldens >= 1 },
   { id: 'gold10', icon: '💫', name: '행운의 천문학자', desc: '초신성 파편 10개 획득',   check: () => S.goldens >= 10 },
   { id: 'bigbang', icon: '🎆', name: '창조주',        desc: '빅뱅 시뮬레이터 보유',    check: () => S.gens[9] >= 1 },
+  { id: 'genesis', icon: '🔆', name: '창세의 주인',   desc: '창세의 용광로 보유',      check: () => S.gens[14] >= 1 },
   { id: 'synth1',  icon: '🧪', name: '인공의 손길',     desc: '인공 원소 첫 획득',       check: () => [...SYNTHETIC].some(z => S.disc[z]) },
   { id: 'unlock92', icon: '🔓', name: '자연의 끝',      desc: '자연 원소 조합법 모두 해금 (스테이지 50)', check: () => fuseCap() >= 92 },
   { id: 'sell1',   icon: '💰', name: '원소 상인',       desc: '코인 누적 1,000 획득',    check: () => S.totalCoins >= 1000 },
@@ -877,10 +1035,14 @@ const ACHS = [
   { id: 'party5',  icon: '👥', name: '완전한 파티',       desc: '파티 5칸을 모두 채우기',    check: () => partySlots() >= 5 && S.party.every(z => z && S.counts[z] >= 1) },
   { id: 'arc1',    icon: '🕹️', name: '첫 동전',           desc: '오락실 미니게임 1판',       check: () => S.arcade.plays >= 1 },
   { id: 'arc50',   icon: '🎰', name: '오락실 단골',       desc: '오락실 미니게임 50판',      check: () => S.arcade.plays >= 50 },
-  { id: 'memo12',  icon: '🃏', name: '기억의 달인',       desc: '카드 맞추기 12번 이내 완성', check: () => S.arcade.best.memory != null && S.arcade.best.memory <= 12 },
-  { id: 'quiz10',  icon: '🎓', name: '원소 박사',         desc: '원소 퀴즈 10문제 전부 정답', check: () => S.arcade.best.quiz >= 10 },
+  { id: 'memo12',  icon: '🃏', name: '기억의 달인',       desc: '카드 맞추기(쉬움) 12번 이내 완성', check: () => (S.arcade.best.memory_easy != null && S.arcade.best.memory_easy <= 12) || (S.arcade.best.memory != null && S.arcade.best.memory <= 12) },
+  { id: 'quiz10',  icon: '🎓', name: '원소 박사',         desc: '원소 퀴즈 20문제 전부 정답', check: () => Object.keys(S.arcade.best).some(k => k.startsWith('quiz_') && S.arcade.best[k] >= 20) },
   { id: 'whack35', icon: '🔨', name: '원자 사냥꾼',       desc: '원자 잡기 35점 이상',       check: () => S.arcade.best.whack >= 35 },
-  { id: 'link0',   icon: '🔗', name: '완벽한 연결',       desc: '짝 잇기를 실수 없이 완료',  check: () => !!S.arcade.linkPerfect },
+  { id: 'link0',   icon: '🀄', name: '사천성 정복',       desc: '원소 사천성 타일을 시간 안에 모두 제거', check: () => !!S.arcade.onetClear },
+  { id: 'memhard', icon: '🧠', name: '기억의 신',         desc: '카드 맞추기(어려움 8×8) 완성', check: () => S.arcade.best.memory_hard != null },
+  { id: 'order25', icon: '🔢', name: '번개 정렬',         desc: '순서 터치 25초 이내',        check: () => S.arcade.best.order != null && S.arcade.best.order <= 25 },
+  { id: 'g2048na', icon: '🧩', name: '원소 진화의 끝',    desc: '원소 2048에서 나트륨(11번) 도달', check: () => S.arcade.best.e2048 >= 11 },
+  { id: 'simon10', icon: '💡', name: '완벽한 기억',       desc: '기억 순서 10라운드 성공',    check: () => S.arcade.best.simon >= 10 },
   { id: 'ud10',    icon: '🔮', name: '촉 좋은 연금술사',  desc: '업다운 10연속 정답',        check: () => S.arcade.best.updown >= 10 },
   { id: 'reb1',    icon: '🌌', name: '새로운 우주',     desc: '첫 환생',                check: () => S.prestige.count >= 1 },
   { id: 'reb3',    icon: '🔁', name: '세 번째 우주',      desc: '환생 3회',                check: () => S.prestige.count >= 3 },
@@ -1363,14 +1525,14 @@ const EL_VALUE = [0, 1];
   }
 }
 /* ---------- 공허: 원소별 필요 개수 ----------
- * 수소 환산 예산(1000억 → 1e13, 완만히 증가)을 그 원소의 가치로 나눈 값.
+ * 수소 환산 예산(1000조 → 1e17, 완만히 증가)을 그 원소의 가치로 나눈 값.
  * 수소는 왕창 필요하고 뒤로 갈수록 줄어들도록 단조 감소로 맞춤. 인공 원소는 1개. */
 const VOID_REQ = [0];
 {
   const nice = r => { if (r < 100) return Math.ceil(r); const p = Math.pow(10, Math.floor(Math.log10(r)) - 1); return Math.ceil(r / p) * p; };
   let prev = Infinity;
   for (let z = 1; z <= 118; z++) {
-    let r = Math.max(1, 1e11 * Math.pow(10, 2 * (z - 1) / 117) / EL_VALUE[z]);
+    let r = Math.max(1, 1e15 * Math.pow(10, 2 * (z - 1) / 117) / EL_VALUE[z]); // 수소 1000조에서 시작
     r = Math.min(r, prev);
     if (SYNTHETIC.has(z)) r = 1; // 인공 원소: 해당 스테이지 첫 클리어 보상 1개로 충분 (랜덤 파밍 강요 X)
     VOID_REQ[z] = nice(r);
@@ -1456,76 +1618,121 @@ function renderVoid() {
 }
 
 /* ---------- 오락실 (미니게임) ---------- */
+const MEM_DIFFS = {
+  easy:   { label: '쉬움',   cols: 4, pairs: 8,  time: 60,  mult: 1 },
+  normal: { label: '보통',   cols: 6, pairs: 18, time: 180, mult: 2 },
+  hard:   { label: '어려움', cols: 8, pairs: 32, time: 300, mult: 3 },
+};
+const QUIZ_N = 20;
+const QUIZ_MODES = { mix: '혼합', sym2name: '기호 → 원소', name2sym: '원소 → 기호', num2el: '번호 → 원소' };
+const ONET_R = 8, ONET_C = 10, ONET_TIME = 240;
 const ARC_GAMES = {
-  memory: { icon: '🃏', name: '원소 카드 맞추기', desc: '같은 원소 카드 8쌍을 찾아라! 적은 시도로 맞출수록 보상↑ (최대 ×2.2)', best: v => `최소 ${v}번`, lower: true },
-  quiz:   { icon: '❓', name: '원소 퀴즈',       desc: '이름·기호·원자번호 퀴즈 10문제. 1문제당 ×0.2 (최대 ×2.0)', best: v => `${v}/10` },
-  whack:  { icon: '🔨', name: '원자 잡기',       desc: '20초 동안 튀어나오는 원자를 잡아라! ☢️를 누르면 -2점 (1점당 ×0.07, 최대 ×2.5)', best: v => `${v}점` },
-  link:   { icon: '🔗', name: '원소 짝 잇기',     desc: '왼쪽과 오른쪽의 짝을 선으로 이어라! 이름↔기호 · 기호↔번호 · 원소↔계열 3라운드. 실수 적고 빠를수록 보상↑ (최대 ×2.4)', best: v => `최단 ${v}초`, lower: true },
-  updown: { icon: '📈', name: '원자번호 업다운', desc: '다음 원소의 원자번호가 클까 작을까? 연속 정답 1개당 ×0.25 (최대 ×3.0)', best: v => `${v}연속` },
+  memory: { icon: '🃏', name: '원소 카드 맞추기', desc: '같은 원소 카드 짝 찾기! 난이도가 오를수록 판이 커지고 보상 배율이 커져요. 시간 안에 못 찾으면 찾은 만큼만.',
+    opts: Object.entries(MEM_DIFFS).map(([k, d]) => [k, `${d.label} ${d.cols}×${d.cols} · ${d.time / 60}분 (×${d.mult})`]),
+    best: b => Object.keys(MEM_DIFFS).filter(k => b['memory_' + k] != null).map(k => `${MEM_DIFFS[k].label} ${b['memory_' + k]}번`).join(' · ') },
+  quiz:   { icon: '❓', name: '원소 퀴즈', desc: `모드를 골라 ${QUIZ_N}문제! 1문제당 ×0.1 (최대 ×2.0). 혼합 모드엔 원자번호·계열 문제도 나와요.`,
+    opts: Object.entries(QUIZ_MODES),
+    best: b => Object.keys(QUIZ_MODES).filter(k => b['quiz_' + k] != null).map(k => `${QUIZ_MODES[k]} ${b['quiz_' + k]}/${QUIZ_N}`).join(' · ') },
+  onet:   { icon: '🀄', name: '원소 사천성', desc: `같은 원소 두 개를 꺾임 2번 이내의 빈 길로 이어서 없애기! ${ONET_C}×${ONET_R}판 · 제한 ${ONET_TIME / 60}분 (최대 ×3.0)`,
+    best: b => b.onet != null ? `최단 ${b.onet}초` : '' },
+  whack:  { icon: '🔨', name: '원자 잡기', desc: '20초 동안 튀어나오는 원자를 잡아라! ☢️를 누르면 -2점 (1점당 ×0.07, 최대 ×2.5)',
+    best: b => b.whack != null ? `${b.whack}점` : '' },
+  order:  { icon: '🔢', name: '원자번호 순서 터치', desc: '16개 원소를 원자 번호가 작은 것부터 차례로 터치! 3라운드, 틀리면 +2초 (최대 ×2.4)',
+    best: b => b.order != null ? `최단 ${b.order}초` : '' },
+  e2048:  { icon: '🧩', name: '원소 2048', desc: '같은 원소 두 개를 밀어서 합치면 다음 번호 원소로 진화! 방향키·스와이프 (도달 번호 ×0.25, 최대 ×3.0)',
+    best: b => b.e2048 != null ? `최고 ${EL[b.e2048].sym}(${b.e2048}번)` : '' },
+  simon:  { icon: '🧠', name: '원소 기억 순서', desc: '빛나는 원소의 순서를 기억해서 그대로 누르기! 라운드마다 1개씩 늘어나요 (1라운드당 ×0.25, 최대 ×2.5)',
+    best: b => b.simon != null ? `최고 ${b.simon}라운드` : '' },
+  updown: { icon: '📈', name: '원자번호 업다운', desc: '다음 원소의 원자 번호가 클까 작을까? 연속 정답 1개당 ×0.25 (최대 ×3.0)',
+    best: b => b.updown != null ? `${b.updown}연속` : '' },
 };
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const randInt = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 function topDisc() { for (let z = 118; z >= 1; z--) if (S.disc[z]) return z; return 1; }
-// 기본 보상 = 가장 무거운 발견 원소 1개 판매가 (최고 성적 ×2~3 → 강화 1레벨에 약 9~10판)
-function arcScale() { return Math.max(5, sellPrice(topDisc())); }
-function arcStop() { clearInterval(R.arcTimer); clearTimeout(R.arcTimeout); R.arcTimer = null; }
+// 발견한 원소 우선, 모자라면 나머지 원소로 채워 n개 (중복 없음)
+function pickElements(n, maxZ = 118) {
+  const disc = [], rest = [];
+  for (let z = 1; z <= maxZ; z++) (S.disc[z] ? disc : rest).push(z);
+  return shuffle(disc).concat(shuffle(rest)).slice(0, n);
+}
+// 기본 보상: 가장 무거운 발견 원소 판매가의 20% (최고 성적 ×2~3)
+function arcScale() { return Math.max(2, sellPrice(topDisc()) * 0.2); }
+// 피로도: 최근 10분 동안 한 판수만큼 보상 ×0.85씩 감소 (최소 ×0.2), 시간이 지나면 회복
+const ARC_FATIGUE_MS = 10 * 60 * 1000;
+function arcRecent() { const now = Date.now(); S.arcade.recent = (S.arcade.recent || []).filter(x => now - x < ARC_FATIGUE_MS); return S.arcade.recent.length; }
+function arcFatigue() { return Math.max(0.2, Math.pow(0.85, arcRecent())); }
+function arcStop() {
+  clearInterval(R.arcTimer); clearTimeout(R.arcTimeout); (R.arcTOs || []).forEach(clearTimeout);
+  R.arcTimer = null; R.arcTOs = [];
+}
+function arcLater(fn, ms) { (R.arcTOs = R.arcTOs || []).push(setTimeout(fn, ms)); }
 function arcExit() { arcStop(); R.arc = null; $('#arcStage').innerHTML = ''; $('#arcMenu').style.display = ''; R.sig.arc = null; }
 function arcBegin(game, html) {
   arcStop();
   $('#arcMenu').style.display = 'none';
   $('#arcStage').innerHTML = `<div class="arc-head"><b>${ARC_GAMES[game].icon} ${ARC_GAMES[game].name}</b><span id="arcInfo"></span><button class="btn" data-arc-exit>✕ 그만두기</button></div>${html}`;
 }
-function arcFinish(game, factor, scoreText, bestVal) {
+function arcFinish(game, factor, scoreText, bestKey, bestVal, lower) {
   arcStop();
-  const coins = arcScale() * Math.max(0, factor);
+  const fat = arcFatigue();
+  const coins = arcScale() * Math.max(0, factor) * fat;
   S.coins += coins; S.totalCoins += coins; S.arcade.plays++; S.arcade.earned += coins;
-  const g = ARC_GAMES[game], b = S.arcade.best[game];
-  const nb = bestVal != null && (b == null || (g.lower ? bestVal < b : bestVal > b));
-  if (nb) S.arcade.best[game] = bestVal;
+  S.arcade.recent.push(Date.now());
+  const g = ARC_GAMES[game], b = bestKey ? S.arcade.best[bestKey] : null;
+  const nb = bestKey && bestVal != null && (b == null || (lower ? bestVal < b : bestVal > b));
+  if (nb) S.arcade.best[bestKey] = bestVal;
   SFX.bonus();
   R.arc = null;
   $('#arcStage').innerHTML = `<div class="arc-result"><div class="arc-big">${g.icon}</div><h2>${scoreText}</h2>
-    ${nb ? '<div class="arc-nb">🏅 최고 기록!</div>' : ''}<div class="arc-coins">+🪙 ${fmt(coins)} <small>(×${factor.toFixed(2)})</small></div>
-    <div class="btnrow" style="justify-content:center"><button class="big-btn" data-arc="${game}">🔁 다시 하기</button><button class="btn" data-arc-exit>목록으로</button></div></div>`;
+    ${nb ? '<div class="arc-nb">🏅 최고 기록!</div>' : ''}<div class="arc-coins">+🪙 ${fmt(coins)} <small>(성적 ×${factor.toFixed(2)}${fat < 1 ? ` · 피로도 ×${fat.toFixed(2)}` : ''})</small></div>
+    <div class="btnrow" style="justify-content:center"><button class="big-btn" data-arc="${game}" data-opt="${R.arcOpt || ''}">🔁 다시 하기</button><button class="btn" data-arc-exit>목록으로</button></div></div>`;
   const [x, y] = centerOf($('#arcStage .arc-coins'));
   particles(x, y, 24, '#ffd43b');
   R.sig.arc = null;
 }
-function startArc(game) {
-  if (game === 'memory') {
-    const pool = [];
-    for (let z = 1; z <= 118; z++) if (S.disc[z]) pool.push(z);
-    while (pool.length < 8) { const z = randInt(1, 36); if (!pool.includes(z)) pool.push(z); }
-    const pick = shuffle(pool).slice(0, 8);
-    R.arc = { game, cards: shuffle(pick.concat(pick)), open: [], done: new Set(), moves: 0, lock: false };
-    arcBegin(game, `<div class="mem-grid">${R.arc.cards.map((z, i) => `<div class="mem-card" data-mem="${i}"><div class="mem-back">⚛️</div><div class="mem-front">${elCard(z, { count: false })}</div></div>`).join('')}</div>`);
-    setText('arcInfo', '시도 0번 · 0/8쌍');
-  } else if (game === 'quiz') {
-    R.arc = { game, q: 0, correct: 0, lock: false };
-    arcBegin(game, '<div id="quizBox" class="quiz-box"></div>');
-    nextQuiz();
-  } else if (game === 'whack') {
+function startArc(game, opt) {
+  R.arcOpt = opt || '';
+  if (game === 'memory') startMemory(opt || 'easy');
+  else if (game === 'quiz') startQuiz(opt || 'mix');
+  else if (game === 'onet') startOnet();
+  else if (game === 'whack') {
     R.arc = { game, score: 0, end: performance.now() + 20000, cells: new Array(9).fill(null), nextSpawn: 0 };
     arcBegin(game, `<div class="whack-grid">${[...Array(9)].map((_, i) => `<div class="whack-cell" data-whack="${i}"></div>`).join('')}</div>`);
     R.arcTimer = setInterval(whackTick, 50);
-  } else if (game === 'link') {
-    R.arc = { game, round: 0, mistakes: 0, t0: performance.now(), sel: null, matched: 0, lock: false };
-    arcBegin(game, '<div id="linkBox" class="link-box"></div>');
-    nextLinkRound();
-    R.arcTimer = setInterval(() => { const A = R.arc; if (A && A.game === 'link') setText('arcInfo', `라운드 ${A.round + 1}/3 · 실수 ${A.mistakes} · ⏱️ ${((performance.now() - A.t0) / 1000).toFixed(1)}초`); }, 100);
-  } else if (game === 'updown') {
+  } else if (game === 'order') startOrder();
+  else if (game === 'e2048') start2048();
+  else if (game === 'simon') startSimon();
+  else if (game === 'updown') {
     R.arc = { game, cur: randInt(1, 118), streak: 0, lock: false };
     arcBegin(game, '<div id="udBox" class="ud-box"></div>');
     renderUpdown();
   }
   SFX.buy();
 }
-// 카드 맞추기
+const tileHtml = z => `<b>${EL[z].sym}</b><small>${z}</small>`;
+
+/* 1) 카드 맞추기 (난이도 + 시간 제한) */
+function startMemory(diff) {
+  const D = MEM_DIFFS[diff] || MEM_DIFFS.easy;
+  const pick = pickElements(D.pairs);
+  R.arc = { game: 'memory', diff, D, cards: shuffle(pick.concat(pick)), open: [], done: new Set(), moves: 0, lock: false, end: performance.now() + D.time * 1000 };
+  arcBegin('memory', `<div class="mem-grid mem-${diff}" style="grid-template-columns:repeat(${D.cols},1fr)">${R.arc.cards.map((z, i) =>
+    `<div class="mem-card" data-mem="${i}"><div class="mem-back">⚛️</div><div class="mem-front" style="--c:${CATS[EL[z].cat].color}">${tileHtml(z)}</div></div>`).join('')}</div>`);
+  R.arcTimer = setInterval(() => {
+    const A = R.arc;
+    if (!A || A.game !== 'memory') return arcStop();
+    const left = Math.max(0, (A.end - performance.now()) / 1000);
+    setText('arcInfo', `${D.label} · ⏱️ ${left.toFixed(1)}초 · 시도 ${A.moves}번 · ${A.done.size / 2}/${D.pairs}쌍`);
+    if (left <= 0) {
+      const found = A.done.size / 2;
+      arcFinish('memory', D.mult * 0.8 * found / D.pairs, `⏰ 시간 초과! ${found}/${D.pairs}쌍`);
+    }
+  }, 100);
+}
 function clickMem(i) {
   const A = R.arc;
   if (!A || A.game !== 'memory' || A.lock || A.done.has(i) || A.open.includes(i)) return;
-  const card = document.querySelector(`[data-mem="${i}"]`);
-  card.classList.add('flip');
+  document.querySelector(`[data-mem="${i}"]`).classList.add('flip');
   SFX.tone(600, 0.05, 'triangle', 0.04);
   A.open.push(i);
   if (A.open.length < 2) return;
@@ -1535,45 +1742,191 @@ function clickMem(i) {
     A.done.add(a); A.done.add(b); A.open = [];
     for (const k of [a, b]) document.querySelector(`[data-mem="${k}"]`).classList.add('done');
     SFX.tone(900, 0.12, 'triangle', 0.05, 1.3);
-    if (A.done.size === 16) {
-      const f = Math.min(2.2, Math.max(0.3, 2.2 - (A.moves - 8) * 0.1));
-      return setTimeout(() => arcFinish('memory', f, `${A.moves}번 만에 완성!`, A.moves), 500);
+    if (A.done.size === A.cards.length) {
+      const D = A.D, left = Math.max(0, (A.end - performance.now()) / 1000);
+      const eff = Math.min(1.1, Math.max(0.3, 1.1 - (A.moves - D.pairs) / (D.pairs * 2)));
+      clearInterval(R.arcTimer);
+      arcLater(() => arcFinish('memory', D.mult * (eff + left / D.time * 0.3), `${A.moves}번 만에 완성! (${D.label})`, 'memory_' + A.diff, A.moves, true), 500);
     }
   } else {
     A.lock = true;
-    R.arcTimeout = setTimeout(() => {
+    arcLater(() => {
       for (const k of [a, b]) document.querySelector(`[data-mem="${k}"]`)?.classList.remove('flip');
       A.open = []; A.lock = false;
-    }, 750);
+    }, 700);
   }
-  setText('arcInfo', `시도 ${A.moves}번 · ${A.done.size / 2}/8쌍`);
 }
-// 원소 퀴즈
+
+/* 2) 원소 퀴즈 (모드 선택, 20문제) */
+function startQuiz(mode) {
+  R.arc = { game: 'quiz', mode, q: 0, correct: 0, lock: false };
+  arcBegin('quiz', '<div id="quizBox" class="quiz-box"></div>');
+  nextQuiz();
+}
 function nextQuiz() {
   const A = R.arc;
-  if (A.q >= 10) return arcFinish('quiz', A.correct * 0.2, `10문제 중 ${A.correct}개 정답!`, A.correct);
+  if (A.q >= QUIZ_N) return arcFinish('quiz', A.correct * 0.1, `${QUIZ_MODES[A.mode]} · ${QUIZ_N}문제 중 ${A.correct}개 정답!`, 'quiz_' + A.mode, A.correct);
   const maxZ = Math.max(36, topDisc());
-  const ans = randInt(1, maxZ), opts = new Set([ans]);
-  while (opts.size < 4) opts.add(randInt(1, maxZ));
-  const type = randInt(0, 2), e = EL[ans];
-  const q = type === 0 ? `'<b>${e.name}</b>'의 원소 기호는?` : type === 1 ? `원소 기호 <b>${e.sym}</b>는 어떤 원소일까요?` : `원자 번호 <b>${ans}번</b> 원소는?`;
-  const label = z => type === 0 ? EL[z].sym : type === 1 ? EL[z].name : `${EL[z].sym} (${EL[z].name})`;
-  A.ans = ans; A.lock = false;
-  $('#quizBox').innerHTML = `<div class="quiz-q">Q${A.q + 1}. ${q}</div><div class="quiz-opts">${shuffle([...opts]).map(z => `<button class="quiz-opt" data-quiz="${z}">${label(z)}</button>`).join('')}</div>`;
-  setText('arcInfo', `${A.q + 1}/10 · 정답 ${A.correct}`);
+  const type = { sym2name: 1, name2sym: 0, num2el: 2 }[A.mode] ?? randInt(0, 4);
+  const ans = randInt(1, maxZ), e = EL[ans];
+  let q, opts, label;
+  if (type === 4) { // 계열
+    const keys = Object.keys(CATS).filter(k => k !== e.cat);
+    opts = [e.cat, ...shuffle(keys).slice(0, 3)];
+    A.ans = e.cat; label = k => CATS[k].name;
+    q = `<b>${e.sym} ${e.name}</b>은(는) 어떤 계열일까요?`;
+  } else {
+    const set = new Set([ans]);
+    while (set.size < 4) set.add(randInt(1, maxZ));
+    opts = [...set]; A.ans = ans;
+    label = [z => EL[z].sym, z => EL[z].name, z => `${EL[z].sym} (${EL[z].name})`, z => `${z}번`][type];
+    q = [`'<b>${e.name}</b>'의 원소 기호는?`, `원소 기호 <b>${e.sym}</b>은(는) 어떤 원소일까요?`, `원자 번호 <b>${ans}번</b> 원소는?`, `<b>${e.name}(${e.sym})</b>의 원자 번호는?`][type];
+  }
+  A.lock = false;
+  $('#quizBox').innerHTML = `<div class="quiz-q">Q${A.q + 1}. ${q}</div><div class="quiz-opts">${shuffle(opts).map(v => `<button class="quiz-opt" data-quiz="${v}">${label(v)}</button>`).join('')}</div>`;
+  setText('arcInfo', `${QUIZ_MODES[A.mode]} · ${A.q + 1}/${QUIZ_N} · 정답 ${A.correct}`);
 }
-function answerQuiz(z, btn) {
+function answerQuiz(v, btn) {
   const A = R.arc;
   if (!A || A.game !== 'quiz' || A.lock) return;
   A.lock = true;
-  const ok = z === A.ans;
+  const ok = String(v) === String(A.ans);
   if (ok) { A.correct++; SFX.tone(880, 0.1, 'triangle', 0.05, 1.3); } else SFX.hurt();
   btn.classList.add(ok ? 'right' : 'wrong');
   if (!ok) document.querySelector(`[data-quiz="${A.ans}"]`)?.classList.add('right');
   A.q++;
-  R.arcTimeout = setTimeout(nextQuiz, ok ? 500 : 1100);
+  arcLater(nextQuiz, ok ? 450 : 1100);
 }
-// 원자 잡기
+
+/* 3) 원소 사천성 */
+function startOnet() {
+  const kinds = pickElements(ONET_R * ONET_C / 4);
+  const tiles = shuffle(kinds.flatMap(z => [z, z, z, z]));
+  const board = [];
+  for (let r = 0; r < ONET_R + 2; r++) { board.push(new Array(ONET_C + 2).fill(0)); }
+  let k = 0;
+  for (let r = 1; r <= ONET_R; r++) for (let c = 1; c <= ONET_C; c++) board[r][c] = tiles[k++];
+  R.arc = { game: 'onet', board, sel: null, left: ONET_R * ONET_C, t0: performance.now(), end: performance.now() + ONET_TIME * 1000 };
+  arcBegin('onet', `<div class="onet-tools"><button class="btn" data-onet-hint>💡 힌트 (-10초)</button><button class="btn" data-onet-shuffle>🔀 섞기 (-15초)</button></div>
+    <div class="onet-area"><div class="onet-grid" id="onetGrid" style="grid-template-columns:repeat(${ONET_C},1fr)"></div><svg class="onet-svg" id="onetSvg"></svg></div>`);
+  renderOnet();
+  onetEnsureMoves();
+  R.arcTimer = setInterval(() => {
+    const A = R.arc;
+    if (!A || A.game !== 'onet') return arcStop();
+    const left = Math.max(0, (A.end - performance.now()) / 1000);
+    setText('arcInfo', `⏱️ ${left.toFixed(1)}초 · 남은 타일 ${A.left}개`);
+    if (left <= 0) {
+      const cleared = ONET_R * ONET_C - A.left;
+      arcFinish('onet', 2.5 * cleared / (ONET_R * ONET_C), `⏰ 시간 초과! ${cleared}/${ONET_R * ONET_C}개 제거`);
+    }
+  }, 100);
+}
+function renderOnet() {
+  const A = R.arc;
+  let h = '';
+  for (let r = 1; r <= ONET_R; r++) for (let c = 1; c <= ONET_C; c++) {
+    const z = A.board[r][c];
+    const sel = A.sel && A.sel[0] === r && A.sel[1] === c;
+    h += z ? `<div class="onet-tile ${sel ? 'sel' : ''}" data-onet="${r},${c}" style="--c:${CATS[EL[z].cat].color}">${tileHtml(z)}</div>`
+      : `<div class="onet-empty"></div>`;
+  }
+  $('#onetGrid').innerHTML = h;
+}
+// 꺾임 2번 이내로 빈 칸(바깥 테두리 포함)을 따라 a→b 경로 찾기. 꺾이는 점 목록을 반환
+function onetPath(a, b) {
+  const B = R.arc.board, H = ONET_R + 2, W = ONET_C + 2;
+  const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+  const seen = new Map();
+  let frontier = [{ r: a[0], c: a[1], path: [a] }];
+  for (let turn = 0; turn <= 2; turn++) {
+    const next = [];
+    for (const f of frontier) for (const [dr, dc] of dirs) {
+      let r = f.r + dr, c = f.c + dc;
+      while (r >= 0 && r < H && c >= 0 && c < W) {
+        if (r === b[0] && c === b[1]) return f.path.concat([b]);
+        if (B[r][c]) break;
+        const key = r * W + c;
+        if (!(seen.get(key) <= turn)) { seen.set(key, turn); next.push({ r, c, path: f.path.concat([[r, c]]) }); }
+        r += dr; c += dc;
+      }
+    }
+    frontier = next;
+  }
+  return null;
+}
+function onetFindPair() {
+  const B = R.arc.board, pos = {};
+  for (let r = 1; r <= ONET_R; r++) for (let c = 1; c <= ONET_C; c++) if (B[r][c]) (pos[B[r][c]] = pos[B[r][c]] || []).push([r, c]);
+  for (const z in pos) {
+    const p = pos[z];
+    for (let i = 0; i < p.length; i++) for (let j = i + 1; j < p.length; j++) if (onetPath(p[i], p[j])) return [p[i], p[j]];
+  }
+  return null;
+}
+function onetShuffle(paid) {
+  const A = R.arc;
+  if (!A || A.game !== 'onet') return;
+  const cells = [], vals = [];
+  for (let r = 1; r <= ONET_R; r++) for (let c = 1; c <= ONET_C; c++) if (A.board[r][c]) { cells.push([r, c]); vals.push(A.board[r][c]); }
+  shuffle(vals);
+  cells.forEach(([r, c], i) => { A.board[r][c] = vals[i]; });
+  A.sel = null;
+  if (paid) { A.end -= 15000; floatText(innerWidth / 2, 200, '-15초', 'hurt'); }
+  renderOnet();
+  if (paid) onetEnsureMoves();
+}
+function onetEnsureMoves() {
+  const A = R.arc;
+  for (let i = 0; i < 30 && A.left > 0 && !onetFindPair(); i++) {
+    onetShuffle(false);
+    if (i === 0) toast('🔀 더 이을 수 있는 짝이 없어서 자동으로 섞었어요');
+  }
+}
+function onetHint() {
+  const A = R.arc;
+  if (!A || A.game !== 'onet') return;
+  const p = onetFindPair();
+  if (!p) return;
+  A.end -= 10000;
+  for (const [r, c] of p) {
+    const el = document.querySelector(`[data-onet="${r},${c}"]`);
+    el?.classList.add('hint');
+    arcLater(() => el?.classList.remove('hint'), 1500);
+  }
+}
+function onetDraw(path, color) {
+  const grid = $('#onetGrid'), svg = $('#onetSvg');
+  const first = grid.querySelector('[data-onet],.onet-empty');
+  if (!first) return;
+  const g = grid.getBoundingClientRect(), cw = g.width / ONET_C, ch = g.height / ONET_R;
+  const pts = path.map(([r, c]) => `${(c - 0.5) * cw},${(r - 0.5) * ch}`).join(' ');
+  svg.innerHTML = `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  arcLater(() => { if (svg) svg.innerHTML = ''; }, 350);
+}
+function clickOnet(r, c) {
+  const A = R.arc;
+  if (!A || A.game !== 'onet' || !A.board[r][c]) return;
+  if (!A.sel) { A.sel = [r, c]; SFX.tone(520, 0.04, 'triangle', 0.03); return renderOnet(); }
+  const [sr, sc] = A.sel;
+  if (sr === r && sc === c) { A.sel = null; return renderOnet(); }
+  const z = A.board[r][c];
+  const path = A.board[sr][sc] === z ? onetPath([sr, sc], [r, c]) : null;
+  if (!path) { A.sel = [r, c]; SFX.tone(260, 0.06, 'square', 0.02); return renderOnet(); }
+  onetDraw(path, CATS[EL[z].cat].color);
+  A.board[sr][sc] = 0; A.board[r][c] = 0; A.sel = null; A.left -= 2;
+  SFX.tone(880, 0.1, 'triangle', 0.05, 1.3);
+  renderOnet();
+  if (A.left === 0) {
+    const time = (performance.now() - A.t0) / 1000, remain = Math.max(0, (A.end - performance.now()) / 1000);
+    S.arcade.onetClear = true;
+    clearInterval(R.arcTimer);
+    return arcLater(() => arcFinish('onet', Math.min(3, 2.5 + remain / ONET_TIME * 0.5), `🀄 전부 제거! ${time.toFixed(1)}초`, 'onet', Math.round(time * 10) / 10, true), 400);
+  }
+  onetEnsureMoves();
+}
+
+/* 4) 원자 잡기 */
 function whackTick() {
   const A = R.arc;
   if (!A || A.game !== 'whack') return arcStop();
@@ -1582,7 +1935,7 @@ function whackTick() {
     const c = A.cells[i];
     if (c && now > c.until) { A.cells[i] = null; document.querySelector(`[data-whack="${i}"]`).innerHTML = ''; }
   }
-  if (left <= 0) return arcFinish('whack', Math.min(2.5, A.score * 0.07), `원자 ${A.score}개 잡기!`, A.score);
+  if (left <= 0) return arcFinish('whack', Math.min(2.5, A.score * 0.07), `원자 ${A.score}개 잡기!`, 'whack', A.score);
   if (now >= A.nextSpawn) {
     const empty = A.cells.map((c, i) => c ? -1 : i).filter(i => i >= 0);
     if (empty.length) {
@@ -1607,70 +1960,146 @@ function hitWhack(i, x, y) {
   if (c.bomb) { A.score = Math.max(0, A.score - 2); SFX.hurt(); floatText(x, y, '-2 ☢️', 'hurt'); }
   else { A.score++; SFX.hit(); floatText(x, y, '+1', 'fuse'); particles(x, y, 6, CATS[EL[c.z].cat].color); }
 }
-// 원소 짝 잇기
-const LINK_ROUNDS = [
-  { title: '이름 ↔ 원소 기호', L: z => EL[z].name, Rt: z => EL[z].sym },
-  { title: '원소 기호 ↔ 원자 번호', L: z => EL[z].sym, Rt: z => `${z}번` },
-  { title: '원소 ↔ 계열', L: z => `${EL[z].sym} ${EL[z].name}`, Rt: z => CATS[EL[z].cat].name },
-];
-function nextLinkRound() {
-  const A = R.arc;
-  if (A.round >= LINK_ROUNDS.length) {
-    const time = (performance.now() - A.t0) / 1000;
-    const f = Math.min(2.4, Math.max(0.3, 2.4 - A.mistakes * 0.12 - Math.max(0, time - 40) * 0.01));
-    if (A.mistakes === 0) S.arcade.linkPerfect = true;
-    return arcFinish('link', f, `${time.toFixed(1)}초 · 실수 ${A.mistakes}번`, Math.round(time * 10) / 10);
-  }
-  const maxZ = Math.max(36, topDisc()), picks = [];
-  const usedCat = new Set();
-  let guard = 0;
-  while (picks.length < 6 && guard++ < 500) {
-    const z = randInt(1, maxZ);
-    if (picks.includes(z)) continue;
-    if (A.round === 2 && usedCat.has(EL[z].cat)) continue; // 계열 라운드는 계열이 겹치지 않게
-    picks.push(z); usedCat.add(EL[z].cat);
-  }
-  const RD = LINK_ROUNDS[A.round];
-  A.pairs = picks; A.sel = null; A.matched = 0; A.lock = false;
-  const right = shuffle(picks.slice());
-  $('#linkBox').innerHTML = `<div class="link-title">라운드 ${A.round + 1} · ${RD.title}</div>
-    <div class="link-area" id="linkArea"><svg class="link-svg" id="linkSvg"></svg>
-      <div class="link-col">${shuffle(picks.slice()).map(z => `<button class="link-item" data-link-l="${z}" style="--c:${CATS[EL[z].cat].color}">${RD.L(z)}</button>`).join('')}</div>
-      <div></div>
-      <div class="link-col">${right.map(z => `<button class="link-item" data-link-r="${z}">${RD.Rt(z)}</button>`).join('')}</div>
-    </div>`;
+
+/* 5) 원자번호 순서 터치 */
+function startOrder() {
+  R.arc = { game: 'order', round: 0, t0: performance.now(), pen: 0 };
+  arcBegin('order', '<div id="orderBox" class="order-box"></div>');
+  nextOrderRound();
+  R.arcTimer = setInterval(() => {
+    const A = R.arc;
+    if (A && A.game === 'order') setText('arcInfo', `라운드 ${A.round + 1}/3 · ⏱️ ${((performance.now() - A.t0) / 1000 + A.pen).toFixed(1)}초${A.pen ? ` (벌점 +${A.pen}초)` : ''}`);
+  }, 100);
 }
-function clickLink(side, z, btn) {
+function nextOrderRound() {
   const A = R.arc;
-  if (!A || A.game !== 'link' || A.lock || btn.classList.contains('ok')) return;
-  if (!A.sel || A.sel.side === side) {
-    if (A.sel) A.sel.btn.classList.remove('sel');
-    A.sel = { side, z, btn };
-    btn.classList.add('sel');
-    SFX.tone(500, 0.04, 'triangle', 0.03);
-    return;
+  if (A.round >= 3) {
+    const time = (performance.now() - A.t0) / 1000 + A.pen;
+    return arcFinish('order', Math.min(2.4, Math.max(0.3, 2.4 - Math.max(0, time - 20) * 0.04)), `3라운드 ${time.toFixed(1)}초`, 'order', Math.round(time * 10) / 10, true);
   }
-  const a = A.sel, l = side === 'l' ? btn : a.btn, r = side === 'r' ? btn : a.btn;
-  A.sel = null;
-  a.btn.classList.remove('sel');
-  if (a.z === z) {
-    for (const b of [l, r]) b.classList.add('ok');
-    const color = CATS[EL[z].cat].color;
-    l.style.setProperty('--c', color); r.style.setProperty('--c', color);
-    const area = $('#linkArea').getBoundingClientRect(), lr = l.getBoundingClientRect(), rr = r.getBoundingClientRect();
-    $('#linkSvg').insertAdjacentHTML('beforeend', `<line x1="${lr.right - area.left}" y1="${lr.top + lr.height / 2 - area.top}" x2="${rr.left - area.left}" y2="${rr.top + rr.height / 2 - area.top}" stroke="${color}" stroke-width="4" stroke-linecap="round"/>`);
-    SFX.tone(880, 0.1, 'triangle', 0.05, 1.3);
-    if (++A.matched === A.pairs.length) {
-      A.lock = true; A.round++;
-      R.arcTimeout = setTimeout(nextLinkRound, 600);
-    }
+  const maxZ = A.round === 2 ? 118 : Math.max(36, topDisc());
+  const set = new Set();
+  while (set.size < 16) set.add(randInt(1, maxZ));
+  A.sorted = [...set].sort((x, y) => x - y); A.next = 0;
+  $('#orderBox').innerHTML = `<div class="order-tip">원자 번호가 <b>작은 것부터</b> 차례로 누르세요 ${A.round === 2 ? '(마지막 라운드: 1~118번 전체)' : ''}</div>
+    <div class="order-grid">${shuffle([...set]).map(z => `<button class="order-btn" data-order="${z}" style="--c:${CATS[EL[z].cat].color}"><b>${EL[z].sym}</b><small>${EL[z].name}</small></button>`).join('')}</div>`;
+}
+function clickOrder(z, btn) {
+  const A = R.arc;
+  if (!A || A.game !== 'order' || btn.classList.contains('done')) return;
+  if (z === A.sorted[A.next]) {
+    btn.classList.add('done');
+    btn.insertAdjacentHTML('beforeend', `<i>${z}</i>`);
+    SFX.tone(500 + A.next * 30, 0.06, 'triangle', 0.04);
+    if (++A.next === A.sorted.length) { A.round++; arcLater(nextOrderRound, 400); }
   } else {
-    A.mistakes++;
-    SFX.hurt();
-    for (const b of [l, r]) { b.classList.add('bad'); setTimeout(() => b.classList.remove('bad'), 400); }
+    A.pen += 2; SFX.hurt();
+    btn.classList.add('bad'); arcLater(() => btn.classList.remove('bad'), 350);
   }
 }
-// 원자번호 업다운
+
+/* 6) 원소 2048 (같은 원소끼리 합치면 다음 번호로 진화) */
+function start2048() {
+  R.arc = { game: 'e2048', g: new Array(16).fill(0), max: 1 };
+  arcBegin('e2048', `<div class="g2048-wrap"><div class="g2048" id="g2048"></div>
+    <div class="g2048-ctrl"><button class="sbtn" data-g2048="up">▲</button><div><button class="sbtn" data-g2048="left">◀</button><button class="sbtn" data-g2048="down">▼</button><button class="sbtn" data-g2048="right">▶</button></div>
+    <button class="btn" data-g2048-end>🏁 여기서 끝내고 보상 받기</button></div></div>`);
+  add2048(); add2048(); render2048();
+}
+function add2048() {
+  const A = R.arc, empty = A.g.map((v, i) => v ? -1 : i).filter(i => i >= 0);
+  if (empty.length) A.g[empty[Math.floor(Math.random() * empty.length)]] = Math.random() < 0.9 ? 1 : 2;
+}
+function render2048() {
+  const A = R.arc;
+  $('#g2048').innerHTML = A.g.map(z => z ? `<div class="g-tile" style="--c:${CATS[EL[z].cat].color}">${tileHtml(z)}</div>` : '<div class="g-cell"></div>').join('');
+  setText('arcInfo', `최고 원소: ${EL[A.max].name}(${EL[A.max].sym}) · ${A.max}번`);
+}
+function slide2048(line) {
+  const v = line.filter(Boolean), out = [];
+  for (let i = 0; i < v.length; i++) {
+    if (v[i] === v[i + 1] && v[i] < 118) { out.push(v[i] + 1); i++; } else out.push(v[i]);
+  }
+  while (out.length < 4) out.push(0);
+  return out;
+}
+function canMove2048(g) {
+  for (let i = 0; i < 16; i++) {
+    if (!g[i]) return true;
+    if (i % 4 < 3 && g[i] === g[i + 1]) return true;
+    if (i < 12 && g[i] === g[i + 4]) return true;
+  }
+  return false;
+}
+function move2048(dir) {
+  const A = R.arc;
+  if (!A || A.game !== 'e2048') return;
+  const idx = [];
+  for (let k = 0; k < 4; k++) {
+    const row = [];
+    for (let j = 0; j < 4; j++) row.push(dir === 'left' ? k * 4 + j : dir === 'right' ? k * 4 + 3 - j : dir === 'up' ? j * 4 + k : (3 - j) * 4 + k);
+    idx.push(row);
+  }
+  let moved = false;
+  for (const row of idx) {
+    const res = slide2048(row.map(i => A.g[i]));
+    row.forEach((i, j) => { if (A.g[i] !== res[j]) moved = true; A.g[i] = res[j]; });
+  }
+  if (!moved) return;
+  const before = A.max;
+  A.max = Math.max(...A.g);
+  if (A.max > before) SFX.tone(400 + A.max * 40, 0.12, 'triangle', 0.05, 1.3); else SFX.tone(300, 0.03, 'sine', 0.02);
+  add2048(); render2048();
+  if (!canMove2048(A.g)) arcLater(end2048, 500);
+}
+function end2048() {
+  const A = R.arc;
+  if (!A || A.game !== 'e2048') return;
+  arcFinish('e2048', Math.min(3, A.max * 0.25), `최고 원소 ${EL[A.max].name}(${EL[A.max].sym}) 도달!`, 'e2048', A.max);
+}
+
+/* 7) 원소 기억 순서 (사이먼) */
+function startSimon() {
+  const els = pickElements(9, 36);
+  R.arc = { game: 'simon', els, seq: [], idx: 0, lock: true, round: 0 };
+  arcBegin('simon', `<div class="simon-box"><div class="simon-msg" id="simonMsg"></div>
+    <div class="simon-grid">${els.map((z, i) => `<button class="simon-btn" data-simon="${i}" style="--c:${CATS[EL[z].cat].color}">${tileHtml(z)}</button>`).join('')}</div></div>`);
+  arcLater(simonNext, 600);
+}
+function simonFlash(i, ms) {
+  const b = document.querySelector(`[data-simon="${i}"]`);
+  if (!b) return;
+  b.classList.add('lit');
+  SFX.tone(330 + i * 60, ms / 1000, 'triangle', 0.05);
+  arcLater(() => b.classList.remove('lit'), ms);
+}
+function simonNext() {
+  const A = R.arc;
+  if (!A || A.game !== 'simon') return;
+  A.round++;
+  if (!A.seq.length) for (let i = 0; i < 3; i++) A.seq.push(randInt(0, 8)); else A.seq.push(randInt(0, 8));
+  A.idx = 0; A.lock = true;
+  setText('simonMsg', `👀 잘 보세요... (${A.seq.length}개)`);
+  setText('arcInfo', `라운드 ${A.round}`);
+  const step = Math.max(350, 700 - A.round * 25);
+  A.seq.forEach((v, k) => arcLater(() => simonFlash(v, step * 0.7), 500 + k * step));
+  arcLater(() => { A.lock = false; setText('simonMsg', `👆 순서대로 누르세요! (${A.seq.length}개)`); }, 500 + A.seq.length * step);
+}
+function clickSimon(i) {
+  const A = R.arc;
+  if (!A || A.game !== 'simon' || A.lock) return;
+  simonFlash(i, 200);
+  if (i === A.seq[A.idx]) {
+    if (++A.idx === A.seq.length) { A.lock = true; setText('simonMsg', '✅ 정답!'); arcLater(simonNext, 800); }
+  } else {
+    A.lock = true; SFX.hurt();
+    const cleared = A.round - 1;
+    setText('simonMsg', '❌ 틀렸어요!');
+    arcLater(() => arcFinish('simon', Math.min(2.5, cleared * 0.25), `${cleared}라운드 성공!`, 'simon', cleared), 900);
+  }
+}
+
+/* 8) 원자번호 업다운 */
 function renderUpdown(reveal) {
   const A = R.arc;
   $('#udBox').innerHTML = `<div class="ud-row"><div>${elCard(A.cur, { cls: 'big', count: false })}<div class="ud-z">원자 번호 <b>${A.cur}</b></div></div>
@@ -1688,23 +2117,29 @@ function guessUpdown(dir) {
   renderUpdown(n);
   if (ok) {
     A.streak++; SFX.tone(700 + A.streak * 40, 0.1, 'triangle', 0.05, 1.3);
-    R.arcTimeout = setTimeout(() => { A.cur = n; A.lock = false; renderUpdown(); }, 800);
+    arcLater(() => { A.cur = n; A.lock = false; renderUpdown(); }, 800);
   } else {
     SFX.hurt();
-    R.arcTimeout = setTimeout(() => arcFinish('updown', Math.min(3, A.streak * 0.25), `${A.streak}연속 정답!`, A.streak), 1000);
+    arcLater(() => arcFinish('updown', Math.min(3, A.streak * 0.25), `${A.streak}연속 정답!`, 'updown', A.streak), 1000);
   }
 }
+
 function renderArcade() {
   setText('arcBase', '🪙 ' + fmt(arcScale()));
   setText('arcStat', `${S.arcade.plays}판 · 🪙 ${fmt(S.arcade.earned)} 획득`);
+  const n = arcRecent(), f = arcFatigue();
+  setText('arcFat', n ? `최근 10분 ${n}판 → 보상 ×${f.toFixed(2)}` : '없음 (보상 ×1.00)');
   const sig = JSON.stringify(S.arcade.best) + '|' + !!R.arc;
   if (R.sig.arc === sig) return;
   R.sig.arc = sig;
   $('#arcMenu').style.display = R.arc ? 'none' : '';
-  $('#arcMenu').innerHTML = Object.entries(ARC_GAMES).map(([k, g]) => `<div class="arc-card">
-    <div class="arc-icon">${g.icon}</div><b>${g.name}</b><small>${g.desc}</small>
-    <div class="arc-best">🏅 최고 기록: ${S.arcade.best[k] != null ? g.best(S.arcade.best[k]) : '-'}</div>
-    <button class="big-btn" data-arc="${k}">▶ 시작</button></div>`).join('');
+  $('#arcMenu').innerHTML = Object.entries(ARC_GAMES).map(([k, g]) => {
+    const best = g.best(S.arcade.best);
+    const btns = g.opts ? `<div class="arc-opts">${g.opts.map(([o, l]) => `<button class="big-btn" data-arc="${k}" data-opt="${o}">${l}</button>`).join('')}</div>`
+      : `<button class="big-btn" data-arc="${k}">▶ 시작</button>`;
+    return `<div class="arc-card"><div class="arc-icon">${g.icon}</div><b>${g.name}</b><small>${g.desc}</small>
+      <div class="arc-best">🏅 최고 기록: ${best || '-'}</div>${btns}</div>`;
+  }).join('');
 }
 
 /* ---------- 엔딩 ---------- */
@@ -1917,11 +2352,12 @@ function atkMult() { return Math.pow(1.5, S.atkLv) * prestigeCombat(); }
 function hpMult() { return Math.pow(1.5, S.hpLv) * prestigeCombat(); }
 function unitStats(z) {
   if (!z || S.counts[z] < 1) return null;
-  const e = EL[z], c = CATS[e.cat], sc = Math.sqrt(Math.floor(S.counts[z]));
+  // 개수 효과: 1개 ×1, 10개 ×2, 100개 ×3 … (자릿수만큼) — 흔한 원소를 대량으로 모아도 무거운 원소를 못 이김
+  const e = EL[z], c = CATS[e.cat], sc = 1 + Math.log10(Math.max(1, Math.floor(S.counts[z])));
   return {
     z, cat: e.cat, speed: c.speed,
-    atk: (2 + Math.pow(z, 1.3)) * c.atk * sc * atkMult() * elvMult(z),
-    hp: (10 + 4 * Math.pow(z, 1.2)) * c.hp * sc * hpMult() * elvMult(z),
+    atk: (2 + Math.pow(z, 1.6)) * c.atk * sc * atkMult() * elvMult(z),
+    hp: (10 + 4 * Math.pow(z, 1.4)) * c.hp * sc * hpMult() * elvMult(z),
     lv: S.elv[z] || 0,
   };
 }
@@ -1966,8 +2402,8 @@ function betterTeam(a, b) {
   const rb = b.dps > 0 ? Math.min(b.ttd, b.limit) / b.ttk : -1;
   return ra !== rb ? ra > rb : a.dps > b.dps;
 }
-function bestDeck(stage) {
-  const E = makeEnemy(stage);
+function bestDeck(stage, enemy) {
+  const E = enemy || makeEnemy(stage);
   const owned = [];
   for (let z = 1; z <= 118; z++) if (S.disc[z] && S.counts[z] >= 1) owned.push(unitStats(z));
   if (!owned.length) return null;
@@ -1976,38 +2412,46 @@ function bestDeck(stage) {
   const pick = new Set();
   const top = (arr, key, n) => arr.slice().sort((a, b) => key(b) - key(a)).slice(0, n).forEach(u => pick.add(u));
   top(owned, solo, 10);
+  top(owned.filter(u => u.cat === E.weak), solo, 5); // 현재 몬스터 약점 계열
   top(owned, u => u.hp, 4);
   top(owned.filter(u => u.cat === 'noble'), u => u.hp, 2);
   top(owned.filter(u => u.cat === 'lanthanide'), u => u.atk, 2);
   top(owned.filter(u => u.cat === 'nonmetal'), solo, 2);
   const cand = [...pick];
   const k = Math.min(partySlots(), cand.length);
-  let best = null, bestTeam = null;
+  let best = null, bestTeam = null, bestW = null, bestWTeam = null;
   const combo = [];
   (function rec(start) {
     if (combo.length === k) {
       const r = evalTeam(combo, E);
       if (betterTeam(r, best)) { best = r; bestTeam = combo.slice(); }
+      // 약점 계열이 1명 이상 들어간 조합 중 최고
+      if (combo.some(u => u.cat === E.weak) && betterTeam(r, bestW)) { bestW = r; bestWTeam = combo.slice(); }
       return;
     }
     for (let i = start; i <= cand.length - (k - combo.length); i++) {
       combo.push(cand[i]); rec(i + 1); combo.pop();
     }
   })(0);
+  // 약점 계열 원소를 보유하고 있으면 반드시 넣기 (단, 그 때문에 이길 싸움을 지게 되면 제외)
+  if (bestWTeam && (bestW.win || !best.win)) { best = bestW; bestTeam = bestWTeam; }
   // 공격력 높은 원소가 앞 슬롯에 오도록 정렬
   bestTeam.sort((a, b) => solo(b) - solo(a) || b.hp - a.hp);
   return { team: bestTeam, result: best, E };
 }
-function applyBestDeck() {
-  const B = S.battle;
-  const r = bestDeck(B.stage);
-  if (!r) { toast('⚠️ 보유 중인 원소가 없어요. 먼저 원소를 모으세요!'); return; }
+function currentFoe() { const B = S.battle; return B.active && R.enemy && R.enemy.stage === B.stage ? R.enemy : makeEnemy(B.stage); }
+function applyBestDeck(quiet) {
+  const B = S.battle, foe = currentFoe();
+  const r = bestDeck(B.stage, foe);
+  if (!r) { if (!quiet) toast('⚠️ 보유 중인 원소가 없어요. 먼저 원소를 모으세요!'); return; }
+  const prev = S.party.join();
   S.party = r.team.map(u => u.z).concat([0, 0, 0, 0, 0]).slice(0, 5);
+  const res = r.result, wc = CATS[foe.weak], nWeak = r.team.filter(u => u.cat === foe.weak).length;
+  if (quiet) { if (prev !== S.party.join()) blog(`🔄 자동 편성: ${r.team.map(u => EL[u.z].sym).join('·')} (약점 ${wc.name} ${nWeak}명)`, 'info'); return; }
   R.unitT = [0, 0, 0, 0, 0];
   SFX.ach();
-  const res = r.result;
-  toast(`✨ <b>최고 덱 편성 완료!</b> (스테이지 ${B.stage} 기준)<br>${r.team.map(u => EL[u.z].sym).join(' · ')}<br>` +
-    `<small>초당 피해 ${fmt(res.dps)} · 예상 처치 ${fmtSec(res.ttk)} · ${res.win ? '✅ 승리 예상' : '⚠️ 아직 힘들어요'}</small>`, 'disc', 5000);
+  toast(`✨ <b>최고 덱 편성 완료!</b> (${foe.emoji} ${foe.name} 기준)<br>${r.team.map(u => EL[u.z].sym).join(' · ')}<br>` +
+    `<small>🎯 약점 <span style="color:${wc.color}">${wc.name}</span> ${nWeak ? nWeak + '명 배치' : '보유 원소 없음'} · 초당 피해 ${fmt(res.dps)} · 예상 처치 ${fmtSec(res.ttk)} · ${res.win ? '✅ 승리 예상' : '⚠️ 아직 힘들어요'}</small>`, 'disc', 5000);
 }
 function fmtSec(s) { return isFinite(s) ? s < 0.1 ? '0.1초 미만' : (s < 100 ? s.toFixed(1) : fmt(s)) + '초' : '∞'; }
 function rng(seed) {
@@ -2050,6 +2494,7 @@ function spawnEnemy() {
       toast(`✨ <b>희귀 출현!</b> ${EL[E0.synth].name} 원자핵 보스가 나타났습니다! 처치 시 ${EL[E0.synth].sym} 1개`, 'disc', 4500);
     }
   }
+  if (S.battle.autoDeck) applyBestDeck(true);
   if (R.enemy.synth) {
     blog(`🧪 인공 원소 보스 등장: ${R.enemy.name}! 30초 안에 처치하면 ${EL[R.enemy.synth].sym} 1개 확정!`, 'boss');
     SFX.boss();
@@ -2187,13 +2632,15 @@ function victory() {
   const cap = fuseCap();
   const natural = z => { while (z > 1 && SYNTHETIC.has(z)) z--; return z; };
   if (E.boss) {
-    // 보스: 현재 해금된 조합법 상위권의 자연 원소
-    const z = natural(cap - Math.floor(Math.random() * 3)), n = 1 + Math.floor(E.stage / 20);
+    // 보스: 해금 범위의 30~70% 구간 (제곱 분포라 낮은 쪽이 더 자주) — 최상위 원소는 직접 융합해야 함
+    const z = natural(Math.max(1, Math.round(cap * (0.3 + 0.4 * Math.pow(Math.random(), 2))))), n = 1 + Math.floor(E.stage / 25);
     addEl(z, n);
     msg += ` · 🎁 ${EL[z].name}(${EL[z].sym}) ×${n}`;
-  } else if (Math.random() < 0.3) {
-    const z = natural(1 + Math.floor(Math.random() * Math.min(cap, Math.floor(E.stage / 2) + 2)));
-    const n = Math.max(1, Math.floor(E.stage * 2 / z));
+  } else if (Math.random() < 0.2) {
+    // 일반: 20% 확률, 세제곱 분포라 낮은 번호가 대부분
+    const top = Math.min(cap, Math.floor(E.stage / 2) + 2);
+    const z = natural(1 + Math.floor(top * Math.pow(Math.random(), 3)));
+    const n = Math.max(1, Math.floor(E.stage / z));
     addEl(z, n);
     msg += ` · 🎁 ${EL[z].name}(${EL[z].sym}) ×${n}`;
   }
@@ -2474,7 +2921,7 @@ function renderBattle() {
   const E = R.enemy || makeEnemy(B.stage);
   if (R.slowTick || !R.sig.deck) {
     R.sig.deck = 1;
-    const ev = evalTeam(units, makeEnemy(B.stage));
+    const ev = evalTeam(units, currentFoe());
     const di = units.length
       ? `📊 현재 덱 예상 (스테이지 ${B.stage}): 초당 피해 <b>${fmt(ev.dps)}</b> · 처치 <b>${fmtSec(ev.ttk)}</b>${E.boss ? ' (제한 30초)' : ''} · 버티는 시간 <b>${fmtSec(ev.ttd)}</b> → ` +
         (ev.dps <= 0 ? '<span style="color:#ff8787">공격 가능한 원소 없음</span>' : ev.win ? '<span style="color:#8ce99a">✅ 승리 예상</span>' : '<span style="color:#ff8787">⚠️ 패배 위험</span>')
@@ -2519,6 +2966,7 @@ function renderBattle() {
   const capTxt = B.stage >= stageCap() && stageCap() < MAX_STAGE ? `🔒 다음 스테이지는 환생 ${S.prestige.count + 1}회 필요` : (B.stage >= MAX_STAGE ? '🏁 최종 스테이지' : '');
   setText('stageCapLbl', capTxt);
   $('#autoAdv').checked = B.auto;
+  $('#autoDeck').checked = !!B.autoDeck;
   const tb = $('#battleToggle');
   setText('battleToggle', B.active ? '⏸️ 전투 중단' : '⚔️ 전투 시작');
   tb.classList.toggle('stop', B.active);
@@ -2680,13 +3128,18 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-gen]'))) return buyGen(+el.dataset.gen);
   if ((el = t.closest('[data-rep]'))) return buyRep(el.dataset.rep);
   if ((el = t.closest('[data-upg]'))) return buyUpg(el.dataset.upg);
-  if ((el = t.closest('[data-arc]'))) return startArc(el.dataset.arc);
+  if ((el = t.closest('[data-arc]'))) return startArc(el.dataset.arc, el.dataset.opt);
   if (t.closest('[data-arc-exit]')) return arcExit();
   if ((el = t.closest('[data-mem]'))) return clickMem(+el.dataset.mem);
-  if ((el = t.closest('[data-quiz]'))) return answerQuiz(+el.dataset.quiz, el);
+  if ((el = t.closest('[data-quiz]'))) return answerQuiz(el.dataset.quiz, el);
   if ((el = t.closest('[data-ud]'))) return guessUpdown(el.dataset.ud);
-  if ((el = t.closest('[data-link-l]'))) return clickLink('l', +el.dataset.linkL, el);
-  if ((el = t.closest('[data-link-r]'))) return clickLink('r', +el.dataset.linkR, el);
+  if ((el = t.closest('[data-onet]'))) { const [r, c] = el.dataset.onet.split(',').map(Number); return clickOnet(r, c); }
+  if (t.closest('[data-onet-hint]')) return onetHint();
+  if (t.closest('[data-onet-shuffle]')) return onetShuffle(true);
+  if ((el = t.closest('[data-order]'))) return clickOrder(+el.dataset.order, el);
+  if ((el = t.closest('[data-g2048]'))) return move2048(el.dataset.g2048);
+  if (t.closest('[data-g2048-end]')) return end2048();
+  if ((el = t.closest('[data-simon]'))) return clickSimon(+el.dataset.simon);
   if ((el = t.closest('[data-sell]'))) { if (e.detail === 0) sellEl(+el.dataset.sell, R.sellAmt); return; }
   if ((el = t.closest('[data-void]'))) { if (e.detail === 0) feedVoid(el.dataset.void); return; }
   if ((el = t.closest('[data-ending]'))) return showEnding(+el.dataset.ending);
@@ -2719,6 +3172,21 @@ document.addEventListener('change', e => {
     R.unitT[+t.dataset.party] = 0;
   }
   if (t.id === 'autoAdv') S.battle.auto = t.checked;
+  if (t.id === 'autoDeck') { S.battle.autoDeck = t.checked; if (t.checked) applyBestDeck(); }
+});
+document.addEventListener('keydown', e => {
+  if (!R.arc || R.arc.game !== 'e2048') return;
+  const dir = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', KeyW: 'up', KeyS: 'down', KeyA: 'left', KeyD: 'right' }[e.code];
+  if (dir) { e.preventDefault(); move2048(dir); }
+});
+let swipe0 = null;
+document.addEventListener('pointerdown', e => { if (e.target.closest && e.target.closest('#g2048')) swipe0 = [e.clientX, e.clientY]; });
+document.addEventListener('pointerup', e => {
+  if (!swipe0) return;
+  const dx = e.clientX - swipe0[0], dy = e.clientY - swipe0[1];
+  swipe0 = null;
+  if (Math.max(Math.abs(dx), Math.abs(dy)) < 30) return;
+  move2048(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
 });
 document.addEventListener('pointerdown', e => {
   const el = e.target.closest && e.target.closest('[data-whack]');
@@ -2760,6 +3228,19 @@ $('#stWarp').onclick = () => {
 $('#battleToggle').onclick = () => S.battle.active ? stopBattle() : startBattle();
 $('#bestDeck').onclick = applyBestDeck;
 document.addEventListener('click', e => { if (e.target.closest('#btnRebirth')) rebirth(); });
+/* ---------- PWA: 서비스 워커 + 설치 ---------- */
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; $('#btnInstall').style.display = ''; });
+window.addEventListener('appinstalled', () => { $('#btnInstall').style.display = 'none'; setText('installState', '✅ 설치되었어요!'); });
+$('#btnInstall').onclick = async () => {
+  if (!deferredInstall) return;
+  deferredInstall.prompt();
+  await deferredInstall.userChoice;
+  deferredInstall = null;
+  $('#btnInstall').style.display = 'none';
+};
+if (matchMedia('(display-mode: standalone)').matches) setText('installState', '✅ 앱으로 실행 중');
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 $('#btnSave').onclick = () => { save(); toast('💾 저장되었습니다'); };
 $('#btnExport').onclick = () => {
   save();
