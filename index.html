@@ -630,6 +630,10 @@ body.pv-lock{overflow:hidden}
 #planetView.world .pv-surface{opacity:0;transform:translate(-50%,-56%) scale(1.6);pointer-events:none}
 .pv-world canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges;border:4px solid #2b2b2b;outline:2px solid #6b6b6b;cursor:crosshair;touch-action:none}
 .pv-world .pv-surf-info{top:auto;bottom:8px;max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-world canvas{cursor:grab}
+.pv-world canvas.dragging{cursor:grabbing}
+.pv-cam{position:absolute;right:8px;bottom:38px;background:#000a;padding:3px 8px;font:12px monospace;border-radius:4px;pointer-events:none}
+.pv-world .pv-surf-hint{left:8px;right:8px;top:8px;bottom:auto;margin:0;transform:none;text-align:center;color:#fff;text-shadow:0 1px 3px #000;pointer-events:none}
 .pv-evo{position:absolute;left:0;right:0;top:-46px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
 .evo-era{font-size:13px;font-weight:800;color:#ffd43b;text-shadow:0 2px 4px #000}
 .evo-line{display:flex;align-items:center;gap:1px;font-size:15px;background:#000a;padding:2px 8px;border-radius:12px}
@@ -2578,7 +2582,9 @@ function surfFx(kind, clientX) {
   if (kind === 'volcano') { R.surf.weather = 'ash'; R.surf.wT = 12; }
 }
 /* ---------- 2단계 확대: 월드 지도 (위에서 내려다보는 도트 타일 지도) ---------- */
-const WW = 240, WH = 150;
+const WW = 480, WH = 300;        // 월드 전체 (타일)
+const VW = 240, VH = 150;        // 확대 ×1일 때 화면에 보이는 범위
+const CAM_MIN = VW / WW, CAM_MAX = 10;
 // 지질 시대: 가장 최근에 등장한 생물 기준
 const ERAS = {
   none: '불모의 시대 · 아직 생명 없음', microbe: '시생대 · 최초의 생명', algae: '원생대 · 산소의 탄생', shell: '캄브리아기 · 생명 대폭발',
@@ -2586,7 +2592,7 @@ const ERAS = {
   insect: '페름기 · 곤충의 시대', dino: '쥐라기 · 공룡의 시대', bird: '백악기 · 하늘의 지배자', mammal: '신생대 · 포유류의 시대', human: '인류세 · 문명의 시작',
 };
 // 종류별 최대 개체 수 (생명 수치에 비례해 차례로 번식)
-const WORLD_POP = { microbe: 200, algae: 120, shell: 70, trilo: 80, fish: 140, insect: 120, dino: 30, bird: 45, mammal: 70, human: 90 };
+const WORLD_POP = { microbe: 800, algae: 480, shell: 280, trilo: 320, fish: 560, insect: 480, dino: 120, bird: 180, mammal: 280, human: 360 };
 const T = { DEEP: 0, SHALLOW: 1, BEACH: 2, GRASS: 3, HILL: 4, MOUNT: 5, SNOW: 6, LAVA: 7, ROCK: 8, DESERT: 9, ICE: 10, SOIL: 11 };
 function worldInit() {
   const M = pxMaps((S.god.level || 2) * 101 + 7);
@@ -2596,18 +2602,18 @@ function worldInit() {
   for (let o = 0; o < 16; o++) {
     let land = 0;
     for (let i = 0; i < 400; i++) {
-      const x = (i * 37) % WW, y = (i * 53) % WH;
+      const x = WW / 4 + (i * 37) % VW, y = WH / 4 + (i * 53) % VH; // 처음 보이는 가운데 범위로 평가
       if (M.h[worldK(M, x, y, o / 16)] > sea) land++;
     }
     const sc = Math.abs(land / 400 - 0.5);
     if (sc < bestScore) { bestScore = sc; best = o / 16; }
   }
-  R.world = { t: 0, off: best, tiles: new Uint8Array(WW * WH), key: '', img: null, trees: [], ents: [], villages: [], fx: [], clouds: [], spot: [], seenSpecies: {} };
-  for (let i = 0; i < 7; i++) R.world.clouds.push({ x: Math.random() * WW, y: Math.random() * WH, r: 10 + Math.random() * 16 });
+  R.world = { t: 0, off: best, cam: { x: WW / 2, y: WH / 2, z: 1 }, tiles: new Uint8Array(WW * WH), key: '', img: null, trees: [], ents: [], villages: [], fx: [], clouds: [], spot: [], seenSpecies: {} };
+  for (let i = 0; i < 22; i++) R.world.clouds.push({ x: Math.random() * WW, y: Math.random() * WH, r: 10 + Math.random() * 16 });
   Object.keys(S.god.species).forEach(k => R.world.seenSpecies[k] = true);
 }
 function worldK(M, x, y, off) {
-  const u = (off + x / WW * 0.42) % 1, v = 0.27 + y / WH * 0.46;
+  const u = (off + x / WW * 0.84) % 1, v = 0.04 + y / WH * 0.92;
   return Math.min(PX.H - 1, (v * PX.H) | 0) * PX.W + ((u * PX.W) | 0);
 }
 function worldTerrain() {
@@ -2645,6 +2651,8 @@ function worldTerrain() {
     D[i4] = Math.max(0, Math.min(255, c[0] * (1 + n))); D[i4 + 1] = Math.max(0, Math.min(255, c[1] * (1 + n))); D[i4 + 2] = Math.max(0, Math.min(255, c[2] * (1 + n))); D[i4 + 3] = 255;
   }
   W.img = img;
+  if (!W.ground) { W.ground = document.createElement('canvas'); W.ground.width = WW; W.ground.height = WH; }
+  W.ground.getContext('2d').putImageData(img, 0, 0);
   // 조건이 바뀌어 살 수 없게 된 나무·마을 정리
   W.trees = W.trees.filter(tr => W.tiles[(tr.y | 0) * WW + (tr.x | 0)] === T.GRASS);
 }
@@ -2668,11 +2676,12 @@ function worldUpdate(dt) {
   }
   if (W.newest) W.newest.t += dt;
   // 나무 (고사리 이후 숲)
-  const treeWant = g.species.fern ? Math.floor(L * 520) : g.species.moss ? Math.floor(L * 80) : 0;
-  if (W.trees.length < treeWant) for (let i = 0; i < Math.min(12, treeWant - W.trees.length) && Math.random() < dt * 20; i++) {
+  const treeWant = g.species.fern ? Math.floor(L * 2080) : g.species.moss ? Math.floor(L * 320) : 0;
+  const treeAdd = W.trees.length < treeWant ? Math.ceil((treeWant - W.trees.length) * dt * 0.25) : 0;
+  for (let i = 0; i < treeAdd; i++) {
     const p = worldRandTile(t => t === T.GRASS); if (p) W.trees.push({ x: p[0], y: p[1], g: 0, big: Math.random() < 0.3 });
   }
-  if (W.trees.length > treeWant + 10) W.trees.splice(0, 8);
+  if (W.trees.length > treeWant + 10) W.trees.splice(0, 32);
   for (const tr of W.trees) tr.g = Math.min(1, tr.g + dt * 0.5);
   // 생물: 종류별로 차례로 번식
   const want = {};
@@ -2710,7 +2719,7 @@ function worldUpdate(dt) {
   }
   // 마을 (지적 생명체): 해안 근처 초원에 생겨나 집이 늘어남
   if (g.species.human) {
-    if (W.villages.length < 5 && Math.random() < dt * 0.25) {
+    if (W.villages.length < 14 && Math.random() < dt * 0.6) {
       const p = worldRandTile(t => t === T.GRASS, 200);
       if (p && !W.villages.some(v => Math.hypot(v.x - p[0], v.y - p[1]) < 30)) W.villages.push({ x: p[0], y: p[1], houses: [], t: 0 });
     }
@@ -2730,7 +2739,14 @@ function worldUpdate(dt) {
 function worldDraw(cv) {
   const ctx = cv.getContext('2d'), g = S.god, W = R.world;
   worldTerrain();
-  ctx.putImageData(W.img, 0, 0);
+  // 캔버스 해상도 = 실제 표시 크기: 확대해도 도트가 선명
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const pw = Math.max(VW, Math.round(cv.clientWidth * dpr)), ph = Math.max(VH, Math.round(cv.clientHeight * dpr));
+  if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
+  const C = W.cam, kx = pw / (VW / C.z), ky = ph / (VH / C.z);
+  ctx.setTransform(kx, 0, 0, ky, Math.round(pw / 2 - C.x * kx), Math.round(ph / 2 - C.y * ky));
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(W.ground, 0, 0);
   const day = 0.5 + 0.5 * Math.cos(W.t * 0.06);
   // 밭 (마을 주변)
   for (const v of W.villages) for (let i = 0; i < Math.min(v.houses.length, 6); i++) {
@@ -2799,12 +2815,14 @@ function worldDraw(cv) {
     $('#pvEvo').innerHTML = `<div class="evo-era">⏳ ${era}</div><div class="evo-line">${SPECIES.map(sp => `<span class="evo-sp ${g.species[sp.id] ? 'on' : ''} ${latest && latest.id === sp.id ? 'new' : ''}" title="${sp.name}">${g.species[sp.id] ? sp.icon : '·'}</span>`).join('<i>›</i>')}</div>`;
   }
   const houses = W.villages.reduce((s, v) => s + v.houses.length, 0);
+  setText('pvCamInfo', `×${C.z.toFixed(1)}`);
   setText('pvWorldInfo', `🐾 개체 ${W.ents.length + W.trees.length}  ·  🌳 나무 ${W.trees.length}  ·  🐟 ${counts.fish || 0}  🦕 ${counts.dino || 0}  🐦 ${counts.bird || 0}  🐘 ${counts.mammal || 0}  🧑 ${counts.human || 0}${houses ? `  ·  🏘️ 마을 ${W.villages.length}곳 (집 ${houses}채)` : ''}  ·  ${day > 0.5 ? '☀️ 낮' : '🌙 밤'}`);
 }
 function worldFx(kind, clientX, clientY) {
   if (!R.world) return;
   const cv = $('#pvWorld'), r = cv ? cv.getBoundingClientRect() : null;
-  const x = r && clientX != null ? (clientX - r.left) / r.width * WW : WW / 2, y = r && clientY != null ? (clientY - r.top) / r.height * WH : WH / 2;
+  const C = R.world.cam;
+  const [x, y] = r && clientX != null ? camToWorld(clientX, clientY, r) : [C.x, C.y];
   R.world.fx.push({ type: kind, x, y, t: 0 });
   if (kind === 'meteor' || kind === 'volcano') { // 충돌 지점 주변 생명 피해
     R.world.ents = R.world.ents.filter(e => Math.hypot(e.x - x, e.y - y) > 8);
@@ -2824,7 +2842,35 @@ function setZoomLevel(n) {
   SFX.tone(n ? 260 + n * 120 : 600, 0.3, 'sine', 0.04, n ? 2 : 0.5);
   pvBanner(`${ZOOM_NAMES[n]} 보기`, '');
 }
-function setZoom(on) { setZoomLevel((R.pvZoom | 0) + (on ? 1 : -1)); }
+function setZoom(on) {
+  if (R.pvZoom === 2 && R.world) { if (!on && camAtMin()) return setZoomLevel(1); return camZoom(on ? 1.35 : 1 / 1.35); }
+  setZoomLevel((R.pvZoom | 0) + (on ? 1 : -1));
+}
+/* ---------- 월드 카메라: 끌기 · 휠 · Ctrl+휠 · 두 손가락 ---------- */
+function camToWorld(cx, cy, r) {
+  const C = R.world.cam;
+  return [C.x + ((cx - r.left) / r.width - 0.5) * VW / C.z, C.y + ((cy - r.top) / r.height - 0.5) * VH / C.z];
+}
+function camClamp() {
+  const C = R.world.cam, hw = VW / C.z / 2, hh = VH / C.z / 2;
+  C.x = Math.max(hw, Math.min(WW - hw, C.x));
+  C.y = Math.max(hh, Math.min(WH - hh, C.y));
+}
+const camAtMin = () => R.world.cam.z <= CAM_MIN * 1.001;
+// at: 그 화면 좌표 아래의 땅이 제자리에 있도록 확대 (없으면 화면 중앙 기준)
+function camZoom(factor, at) {
+  const C = R.world.cam, r = $('#pvWorld').getBoundingClientRect();
+  const before = at ? camToWorld(at[0], at[1], r) : null;
+  C.z = Math.max(CAM_MIN, Math.min(CAM_MAX, C.z * factor));
+  if (at) { const after = camToWorld(at[0], at[1], r); C.x += before[0] - after[0]; C.y += before[1] - after[1]; }
+  camClamp();
+}
+function camPan(dx, dy) {
+  const C = R.world.cam, r = $('#pvWorld').getBoundingClientRect();
+  C.x -= dx / r.width * VW / C.z;
+  C.y -= dy / r.height * VH / C.z;
+  camClamp();
+}
 
 /* ---------- 사건 ---------- */
 const shielded = () => (S.god.shieldUntil || 0) > Date.now();
@@ -3094,7 +3140,7 @@ function openPlanetView() {
     </div>
     <div class="pv-center"><div class="pv-orbit"><div id="godPlanet" class="god-planet pv-planet"><canvas id="pvPlanetCv" width="104" height="104"></canvas></div><div id="godMoon" class="god-moon pv-moon">🌕</div></div></div>
     <div class="pv-surface"><canvas id="pvSurf" width="${SW}" height="${SH}"></canvas><div class="pv-surf-info" id="pvSurfInfo"></div><div class="pv-surf-hint">🔍 한 번 더 확대하면 🗺️ 월드 지도 · 휠을 내리면 행성으로</div></div>
-    <div class="pv-world"><div class="pv-evo" id="pvEvo"></div><canvas id="pvWorld" width="${WW}" height="${WH}"></canvas><div class="pv-surf-info" id="pvWorldInfo"></div><div class="pv-surf-hint">🔍 휠을 내리면 지상 화면으로</div></div>
+    <div class="pv-world"><div class="pv-evo" id="pvEvo"></div><canvas id="pvWorld" width="${VW}" height="${VH}"></canvas><div class="pv-cam" id="pvCamInfo"></div><div class="pv-surf-info" id="pvWorldInfo"></div><div class="pv-surf-hint">✋ 끌기 이동 · 휠 확대 · Ctrl+휠 커서 쪽 확대 · 📱 두 손가락</div></div>
     <div class="pv-banner" id="pvBanner"></div>
     <div class="pv-log" id="pvLog"></div>
     <div class="pv-dex" id="pvDex"></div>
@@ -3207,7 +3253,7 @@ function renderPlanetView() {
 function pvPhoto() {
   const src = R.pvZoom === 2 ? $('#pvWorld') : R.pvZoom ? $('#pvSurf') : $('#pvPlanetCv');
   if (!src) return;
-  const k = R.pvZoom ? 6 : 6, c = document.createElement('canvas');
+  const k = R.pvZoom === 2 ? 1 : 6, c = document.createElement('canvas'); // 월드는 이미 표시 해상도
   c.width = src.width * k; c.height = src.height * k;
   const ctx = c.getContext('2d');
   ctx.imageSmoothingEnabled = false;
@@ -4962,22 +5008,81 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 $('#btnAdmin').onclick = openAdmin;
 // 행성 모드: 행성을 누르면 고른 권능을 그 자리에 사용
 document.addEventListener('pointerdown', e => {
-  if (!R.pvOpen || !e.target.closest || !e.target.closest('#planetView #godPlanet, #planetView #pvSurf, #planetView #pvWorld')) return;
+  if (!R.pvOpen || !e.target.closest || !e.target.closest('#planetView #godPlanet, #planetView #pvSurf')) return;
   if (clickAllowed(e, 'planet', e.clientX, e.clientY)) pvCast([e.clientX, e.clientY]);
 });
+// 월드 지도: 끌면 이동, 끌지 않고 떼면 권능
+const camPts = new Map();
+let camGesture = null; // { x0, y0, moved }
+document.addEventListener('pointerdown', e => {
+  if (!R.pvOpen || R.pvZoom !== 2 || !R.world || e.button !== 0 || e.target.id !== 'pvWorld') return;
+  e.preventDefault();
+  try { e.target.setPointerCapture(e.pointerId); } catch (err) { /* 합성 포인터 */ }
+  if (!camPts.size) camGesture = { x0: e.clientX, y0: e.clientY, moved: false };
+  else camGesture.moved = true; // 두 손가락은 권능을 쓰지 않음
+  camPts.set(e.pointerId, [e.clientX, e.clientY]);
+});
+document.addEventListener('pointermove', e => {
+  const prev = camPts.get(e.pointerId);
+  if (!prev) return;
+  if (!R.pvOpen || R.pvZoom !== 2) { camPts.clear(); return; }
+  const cur = [e.clientX, e.clientY];
+  if (camPts.size === 2) {
+    const other = [...camPts].find(([id]) => id !== e.pointerId)[1];
+    const d0 = Math.hypot(prev[0] - other[0], prev[1] - other[1]), d1 = Math.hypot(cur[0] - other[0], cur[1] - other[1]);
+    camPts.set(e.pointerId, cur);
+    camPan((cur[0] - prev[0]) / 2, (cur[1] - prev[1]) / 2);
+    if (d0 > 10 && d1 > 10) {
+      if (camAtMin() && d1 < d0) {
+        camGesture.out = (camGesture.out || 1) * d1 / d0;
+        if (camGesture.out < 0.72) { camPts.clear(); setZoomLevel(1); }
+      } else { camGesture.out = 1; camZoom(d1 / d0, [(cur[0] + other[0]) / 2, (cur[1] + other[1]) / 2]); }
+    }
+    return;
+  }
+  if (!camGesture.moved) {
+    if (Math.hypot(cur[0] - camGesture.x0, cur[1] - camGesture.y0) < (e.pointerType === 'mouse' ? 5 : 10)) return;
+    camGesture.moved = true;
+    $('#pvWorld').classList.add('dragging');
+  }
+  camPan(cur[0] - prev[0], cur[1] - prev[1]);
+  camPts.set(e.pointerId, cur);
+});
+['pointerup', 'pointercancel'].forEach(ev => document.addEventListener(ev, e => {
+  if (!camPts.delete(e.pointerId) || camPts.size) return;
+  $('#pvWorld')?.classList.remove('dragging');
+  if (ev === 'pointerup' && R.pvOpen && R.pvZoom === 2 && !camGesture.moved && clickAllowed(e, 'planet', e.clientX, e.clientY)) pvCast([e.clientX, e.clientY]);
+}));
 // 확대/축소: 마우스 휠 · 두 손가락
 let pvWheelT = 0;
 document.addEventListener('wheel', e => {
   if (!R.pvOpen || !e.target.closest || !e.target.closest('#planetView')) return;
-  e.preventDefault();
+  e.preventDefault(); // Ctrl+휠의 브라우저 확대도 막음
+  if (!e.deltaY) return;
   const now = performance.now();
+  if (R.pvZoom === 2 && R.world) {
+    if (now - pvWheelT < 350) return; // 단계가 바뀐 직후 남은 휠 관성은 무시
+    const fresh = now - pvWheelLast > 300;
+    pvWheelLast = now;
+    if (e.deltaY > 0 && camAtMin()) {
+      // 전체 지도에서 새로 휠을 내리면 지상으로
+      if (fresh) { pvWheelT = now; setZoomLevel(1); }
+      return;
+    }
+    const px = Math.max(-240, Math.min(240, e.deltaY * (e.deltaMode ? 33 : 1)));
+    const r = $('#pvWorld').getBoundingClientRect();
+    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    camZoom(Math.exp(-px * 0.002), e.ctrlKey && inside ? [e.clientX, e.clientY] : null);
+    return;
+  }
   if (now - pvWheelT < 350) return;
   pvWheelT = now;
   setZoom(e.deltaY < 0);
 }, { passive: false });
+let pvWheelLast = 0;
 const pinch = new Map();
 let pinch0 = 0;
-document.addEventListener('pointerdown', e => { if (R.pvOpen && e.pointerType === 'touch') { pinch.set(e.pointerId, [e.clientX, e.clientY]); if (pinch.size === 2) { const [a, b] = [...pinch.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); } } });
+document.addEventListener('pointerdown', e => { if (R.pvOpen && e.pointerType === 'touch' && e.target.id !== 'pvWorld') { pinch.set(e.pointerId, [e.clientX, e.clientY]); if (pinch.size === 2) { const [a, b] = [...pinch.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); } } });
 document.addEventListener('pointermove', e => {
   if (!pinch.has(e.pointerId)) return;
   pinch.set(e.pointerId, [e.clientX, e.clientY]);
