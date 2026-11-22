@@ -554,7 +554,7 @@ body.pv-lock{overflow:hidden}
 .pv-planet{cursor:crosshair;transition:width .4s,height .4s,background .8s,box-shadow .8s;touch-action:none}
 .pv-planet.molten{animation:lavaPulse 3s ease-in-out infinite}
 @keyframes lavaPulse{50%{filter:brightness(1.15) saturate(1.2)}}
-.pv-shade{position:absolute;inset:0;border-radius:50%;background:linear-gradient(105deg,transparent 48%,rgba(0,0,0,.55) 78%);pointer-events:none}
+
 .pv-moon{font-size:42px;animation:orbitMoonPv 14s linear infinite}
 @keyframes orbitMoonPv{from{transform:rotate(0) translateX(var(--r,200px)) rotate(0)}to{transform:rotate(360deg) translateX(var(--r,200px)) rotate(-360deg)}}
 .pv-top-left{position:absolute;left:14px;top:14px;width:min(340px,46vw);display:flex;flex-direction:column;gap:6px;z-index:2}
@@ -606,6 +606,63 @@ body.pv-lock{overflow:hidden}
   .pv-slot{width:44px;height:44px}.pv-slot .pv-icon{font-size:22px}
   .pv-tip{font-size:12px}
   .pv-dex{inset:50px 4% 130px}
+}
+/* ---------- 도트 행성 · 지상 시뮬레이션 · 레벨 ---------- */
+.pv-planet canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:50%}
+.pv-planet::before{display:none!important}
+.pv-planet{border-radius:50%;transition:transform .5s ease-in,opacity .5s,width .4s,height .4s,box-shadow .8s}
+#planetView.zoomed .pv-orbit{transform:scale(3.2);opacity:0;pointer-events:none;transition:transform .6s ease-in,opacity .6s}
+.pv-orbit{transition:transform .6s ease-out,opacity .6s}
+.pv-surface{position:absolute;left:50%;top:50%;transform:translate(-50%,-56%) scale(.6);opacity:0;pointer-events:none;transition:transform .6s ease-out,opacity .6s;width:min(94vw,calc((100vh - 250px) * 1.786));aspect-ratio:200/112;z-index:1}
+#planetView.zoomed .pv-surface{opacity:1;transform:translate(-50%,-56%) scale(1);pointer-events:auto}
+.pv-surface canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges;border:4px solid #2b2b2b;outline:2px solid #6b6b6b;cursor:crosshair;touch-action:none}
+.pv-surf-info{position:absolute;left:8px;top:8px;background:#000a;padding:3px 8px;font-size:12px;border-radius:4px;font-family:monospace}
+.pv-surf-hint{position:absolute;right:8px;bottom:-22px;font-size:11px;color:var(--dim)}
+.pv-lvbadge{display:inline-block;font-size:12px;font-weight:900;letter-spacing:2px;color:#ffd43b;font-family:monospace}
+.pv-mis{background:#0b0e1acc;border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:11px;line-height:1.55;color:#8b95bf;max-height:180px;overflow:auto}
+.pv-mis b{color:var(--text);display:block;margin-bottom:2px}
+.pv-mis .ok{color:#8ce99a}
+.pv-ring{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border:3px solid #fff;border-radius:50%;pointer-events:none;z-index:7;animation:pvRing .85s ease-out forwards}
+@keyframes pvRing{from{transform:scale(.2);opacity:1}to{transform:scale(var(--s,4));opacity:0}}
+.pv-flash{position:absolute;inset:0;pointer-events:none;z-index:8;animation:pvFlash .55s ease-out forwards}
+@keyframes pvFlash{from{opacity:.75}to{opacity:0}}
+#planetView.pv-shake{animation:shake .3s}
+#planetView.pv-shake-big{animation:bigShake .6s}
+@keyframes bigShake{10%{transform:translate(-14px,8px)}20%{transform:translate(12px,-10px)}35%{transform:translate(-10px,6px)}50%{transform:translate(8px,-6px)}65%{transform:translate(-5px,3px)}80%{transform:translate(3px,-2px)}}
+.pv-cine{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle,#000a,transparent 70%);animation:pvCine 3.2s ease-in-out forwards;text-align:center}
+.pv-cine.clear{animation-duration:4s}
+@keyframes pvCine{0%{opacity:0;transform:scale(1.6)}12%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(.95)}}
+.pv-cine-lv{font-family:monospace;font-weight:900;font-size:clamp(28px,7vw,64px);letter-spacing:8px;color:#ffd43b;text-shadow:4px 4px 0 #8b2c00,0 0 30px #ff6a00}
+.pv-cine.clear .pv-cine-lv{color:#8ce99a;text-shadow:4px 4px 0 #1b5e20,0 0 30px #69db7c}
+.pv-cine-name{font-size:clamp(20px,4.5vw,40px);font-weight:900;margin-top:6px;text-shadow:0 3px 10px #000}
+.pv-cine-stars{color:#ffd43b;font-size:24px;letter-spacing:4px}
+.pv-cine-desc{color:#dbe4ff;margin-top:8px;font-size:15px;max-width:80vw}
+#lvModal{position:fixed;inset:0;z-index:2550;display:none;align-items:center;justify-content:center;background:#05081add;backdrop-filter:blur(4px)}
+#lvModal.on{display:flex}
+.lv-box{background:var(--panel);border:1px solid #5f3dc4;border-radius:16px;padding:18px;width:min(720px,94vw);max-height:90vh;overflow:auto;text-align:center}
+.lv-box h2{margin:0 0 6px}.lv-box>p{color:#c9d6ff;font-size:14px;margin:0 0 12px}
+.lv-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;text-align:left}
+.lv-card{display:flex;align-items:center;gap:12px;background:#0b0e1a;border:2px solid #3b2f5c;border-radius:12px;padding:10px}
+.lv-card.locked{opacity:.45;filter:grayscale(.7)}
+.lv-card.done{border-color:#2f9e44}
+.lv-planet{flex-shrink:0;width:56px;height:56px;border-radius:50%;image-rendering:pixelated}
+.lv-planet.lv1{background:radial-gradient(circle at 35% 30%,#fff5,transparent 40%),radial-gradient(circle,#c0662a,#6d2e12 75%);box-shadow:0 0 12px #ff8c42}
+.lv-planet.lv2{background:radial-gradient(ellipse 30% 10% at 40% 40%,#ffe066,transparent),radial-gradient(circle,#ff5722,#8b0000 80%);box-shadow:0 0 18px #ff6b00}
+.lv-planet.lv3{background:radial-gradient(circle at 35% 30%,#fff7,transparent 40%),radial-gradient(circle,#e8d36a,#9c7a1a 80%);box-shadow:0 0 18px #ffd43b}
+.lv-planet.lv4{background:radial-gradient(circle at 30% 30%,#fff,transparent 30%),radial-gradient(circle,#ff2d00,#5c0000 80%);box-shadow:0 0 24px #ff3b3b,0 0 40px #ffd43b55}
+.lv-planet.lv5{background:radial-gradient(circle at 60% 40%,#2228 0 12%,transparent 13%),radial-gradient(circle at 35% 65%,#2228 0 9%,transparent 10%),radial-gradient(circle,#7a2a1a,#1a0505 80%);box-shadow:0 0 20px #c92a2a}
+.lv-info{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.lv-info b{font-size:15px}.lv-info small{color:#c9d6ff;font-size:12px}
+.lv-meta{color:#8b95bf!important;font-size:11px!important}
+.lv-stars{color:#ffd43b;letter-spacing:2px;font-size:13px}
+.lv-act{display:flex;flex-direction:column;align-items:center;gap:4px}
+.lv-act .big-btn{margin:0;padding:8px 14px;font-size:13px;background:linear-gradient(135deg,#2f9e44,#1971c2)}
+.lv-ok{font-size:11px;color:#8ce99a}
+@media (max-width:700px){
+  .pv-mis{max-height:90px;font-size:10px}
+  .pv-surface{width:96vw;transform:translate(-50%,-50%) scale(.6)}
+  #planetView.zoomed .pv-surface{transform:translate(-50%,-50%) scale(1)}
+  .lv-card{flex-wrap:wrap}.lv-planet{width:44px;height:44px}
 }
 /* ---------- 관리자 ---------- */
 #adminModal{position:fixed;inset:0;z-index:3500;display:none;align-items:center;justify-content:center;background:#05081acc;backdrop-filter:blur(4px)}
@@ -720,6 +777,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
 <div id="pickModal"></div>
 <div id="adminModal"></div>
 <div id="planetView"></div>
+<div id="lvModal"></div>
 <div id="endModal"></div>
 
 <header>
@@ -901,7 +959,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
           <li><b>오락실</b>: 카드 맞추기(3단계) · 원소 퀴즈(4모드) · 원소 사천성 · 원자 잡기 · 순서 터치 · 원소 2048 · 기억 순서 · 업다운 — 8가지 미니게임으로 코인 획득. 최근 10분 판수만큼 보상이 줄어드는 피로도가 있어요.</li>
           <li><b>공허</b>: 주기율표 순서대로 원소를 바치면 우주가 태어나요. 원소 하나를 다 채울 때마다 생산량 ×1.02 (영구). 118번까지 채우면 <b>엔딩 2</b>.</li>
           <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허에서 우주 창조 = <b>엔딩 2</b> · 불타는 행성을 생명의 행성으로 = <b>엔딩 3</b>.</li>
-          <li><b>생명의 행성</b>: 우주를 완성하면 공허 탭이 '🌍 행성'이 되고, '🌱 생명의 행성으로' 버튼(신의 권능 해금 1조 코인)으로 전체 화면 모드에 들어가요. 아래 인벤토리 바에서 권능을 골라(숫자키 1~0) 행성을 누르면 사용돼요. 용암을 식혀 지각을 만들고, 바다·대기·자기장·산소를 지구처럼 맞추고 생명을 100까지 키우면 엔딩 3. 소행성(눌러서 격추)·태양 플레어·초화산·유성우 같은 사건, 생물 도감 12종, 시간 배속, 행성 이름 짓기도 있어요.</li>
+          <li><b>생명의 행성</b>: 우주를 완성하면 공허 탭이 '🌍 행성'이 되고, '🌱 생명의 행성으로' 버튼(신의 권능 해금 1조 코인)에서 레벨 1~5 행성을 순서대로 골라 전체 화면 모드에 들어가요. 레벨 5를 깨면 엔딩 3. 아래 인벤토리 바에서 권능을 골라(숫자키 1~0) 행성을 누르면 사용돼요. 용암을 식혀 지각을 만들고, 바다·대기·자기장·산소를 지구처럼 맞추고 생명을 100까지 키우면 레벨 클리어. 🔍 확대(휠·두 손가락)하면 도트 그림의 지상에서 나무가 자라고 생물이 움직이고 비·눈·폭풍이 내리는 모습을 볼 수 있어요. 미션 체크리스트, 📸 사진 저장, 소행성(눌러서 격추)·태양 플레어·초화산·유성우 같은 사건, 생물 도감 12종, 시간 배속, 행성 이름 짓기도 있어요.</li>
           <li><b>업적 난이도</b>: ★쉬움 생산 +1% · ★★보통 +3%(전투 +1%) · ★★★어려움 +6%(+3%) · ★★★★매우 어려움 +12%(+6%) · ★★★★★전설 +25%(+12%).</li>
           <li><b>클릭</b>: 원자핵뿐 아니라 화면 빈 배경을 눌러도 수소를 얻어요.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
@@ -1186,9 +1244,12 @@ const ACHS = [
   { id: 'meteor100', icon: '☄️', name: '운석 폭격',        desc: '운석 100개 낙하',         check: () => S.god.meteors >= 100 },
   { id: 'seedlife', icon: '🦠', name: '첫 번째 생명',      desc: '생명의 씨앗 심기',        check: () => S.god.seeded },
   { id: 'pname',    icon: '✏️', name: '이름을 지어주다',    desc: '행성에 이름 붙이기',       check: () => !!S.god.named },
-  { id: 'ast10',    icon: '💥', name: '행성 수호자',        desc: '소행성 10개 격추',         check: () => (S.god.asteroids || 0) >= 10 },
+  { id: 'ast10',    icon: '💥', name: '행성 수호자',        desc: '소행성 10개 격추',         check: () => (S.godAst || 0) >= 10 },
+  { id: 'glv1',     icon: '🌱', name: '첫 번째 생명의 별',  desc: '생명의 행성 레벨 1 클리어', check: () => (S.godCleared || 0) >= 1 },
+  { id: 'glv3',     icon: '🌿', name: '유황을 걷어내다',    desc: '생명의 행성 레벨 3 클리어', check: () => (S.godCleared || 0) >= 3 },
+  { id: 'glv4',     icon: '☀️', name: '쌍성 아래의 생명',   desc: '생명의 행성 레벨 4 클리어', check: () => (S.godCleared || 0) >= 4 },
   { id: 'dex12',    icon: '📖', name: '생명의 도감',        desc: '생물 도감 12종 완성',      check: () => Object.keys(S.god.species || {}).length >= 12 },
-  { id: 'terra',    icon: '🌍', name: '생명의 요람',        desc: '생명의 행성 완성 (엔딩 3)', check: () => S.god.done },
+  { id: 'terra',    icon: '🌍', name: '생명의 요람',        desc: '생명의 행성 레벨 5 클리어 (엔딩 3)', check: () => S.endings.e3 },
   { id: 'void92',  icon: '🌊', name: '자연의 봉헌',       desc: '공허에 원소 92종 봉헌',    check: () => voidDone() >= 92 },
   { id: 'gold50',  icon: '🌠', name: '별똥별 수집가',     desc: '초신성 파편 50개 획득',     check: () => S.goldens >= 50 },
   { id: 'fus1m',   icon: '🏭', name: '거대 융합로',       desc: '융합 1,000,000회',         check: () => S.totalFusions >= 1e6 },
@@ -1221,7 +1282,7 @@ const ACH_TIER = {
   h1b: 3, d79: 3, d60: 3, d92: 3, s50: 3, s100: 3, s300: 3, f10k: 3, bigbang: 3, unlock92: 3, c100k: 3, k1000: 3, syn5: 3, rare1: 3, elvwide: 3, void54: 3,
   quiz10: 3, link0: 3, order25: 3, g2048na: 3, simon10: 3, arc50: 3, reb1: 3, party5: 3, nat92: 3, coin1e8: 3, coin1b: 3,
   h1t: 4, d118: 4, s1000: 4, genesis: 4, h1q: 4, s2000: 4, k10000: 4, syn28: 4, elv25: 4, void92: 4, gold50: 4, fus1m: 4, memhard: 4, reb3: 4, reb5: 4, end2: 4,
-  coin1e10: 4, coin1e11: 4, godpow: 4, pname: 1, ast10: 3, dex12: 4,
+  coin1e10: 4, coin1e11: 4, godpow: 4, pname: 1, ast10: 3, dex12: 4, glv1: 2, glv3: 3, glv4: 4,
   s5000: 5, end1: 5, reb7: 5, terra: 5,
 };
 const achTier = a => ACH_TIER[a.id] || 2;
@@ -1350,7 +1411,7 @@ function defaultState() {
     totalH: 0, goldens: 0, ach: {}, sound: true,
     prestige: { count: 0, seeds: 0, best: 0 },
     coins: 0, totalCoins: 0, elv: new Array(119).fill(0),
-    void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false, e3: false }, god: godDefault(),
+    void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false, e3: false }, god: godDefault(), godCleared: 0, godAst: 0,
     arcade: { plays: 0, earned: 0, best: {} }, synthKills: 0, rareKills: 0,
   };
 }
@@ -1371,6 +1432,9 @@ function load() {
     S.god = Object.assign(godDefault(), d.god || {});
     S.god.cd = S.god.cd || {};
     S.god.species = S.god.species || {};
+    S.god.mis = S.god.mis || {};
+    // 레벨 도입 이전 세이브: 진행 중이던 행성은 레벨 2(용암 행성)로 이어감
+    if (S.god.unlocked && !S.god.level) { S.god.level = 2; S.godCleared = Math.max(S.godCleared || 0, S.god.done ? 2 : 1); }
     S.arcade = Object.assign({ plays: 0, earned: 0, best: {} }, d.arcade || {});
     S.arcade.best = S.arcade.best || {};
     if (!Array.isArray(S.counts) || S.counts.length < 119) S.counts = defaultState().counts;
@@ -1592,7 +1656,7 @@ function rebirth() {
   const gain = seedsGain();
   if (!confirm(`🌌 빅뱅을 일으켜 새로운 우주에서 다시 시작할까요?\n\n받는 것: 별의 씨앗 +${gain}개 (영구)\n유지: 업적, 통계, 별의 씨앗\n초기화: 원소, 수소, 시설, 강화, 스테이지`)) return;
   const keep = {
-    ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, god: S.god, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills,
+    ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, god: S.god, godCleared: S.godCleared, godAst: S.godAst, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
     prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
@@ -1774,7 +1838,7 @@ function renderVoid() {
     radial-gradient(circle, ${c2}33 0%, transparent 70%)`;
   pl.style.boxShadow = `0 0 ${30 + frac / 2}px ${c2}66`;
   setText('planetName', `${st[2]} ${st[1]}`);
-  const sig = V.idx + '|' + V.fed + '|' + Math.floor(S.counts[z]) + '|' + S.endings.e1 + S.endings.e2 + '|' + S.god.unlocked + Math.floor(S.god.life) + S.god.done + S.god.name;
+  const sig = V.idx + '|' + V.fed + '|' + Math.floor(S.counts[z]) + '|' + S.endings.e1 + S.endings.e2 + '|' + S.god.unlocked + Math.floor(S.god.life) + S.god.done + S.god.name + S.god.level + S.godCleared;
   if (R.sig.void !== sig) {
     R.sig.void = sig;
     const need = VOID_REQ[z], have = Math.floor(S.counts[z]);
@@ -1782,7 +1846,7 @@ function renderVoid() {
       ? `<h2>🌠 새로운 우주</h2><p>118개의 원소로 우주를 창조했어요. 생산량 보너스 <b>×${fmt(voidMult())}</b></p>
         <div class="vp-planet"><div class="mini-planet ${S.god.unlocked && S.god.crust >= 50 ? '' : 'lava'}"></div><div>
           <b>${S.god.unlocked ? S.god.name : '끝없이 불타는 행성'}</b><br>
-          <small>${!S.god.unlocked ? '물도, 나무도, 돌도, 흙도 없는 용암의 행성. 신의 권능으로 생명을 깃들게 할 수 있어요.' : S.god.done ? '🌍 생명이 숨 쉬는 행성이 되었어요!' : `${godStage()[2]} ${godStage()[1]} · 생명 ${S.god.life.toFixed(0)}/100`}</small></div></div>
+          <small>${!S.god.unlocked ? '물도, 나무도, 돌도, 흙도 없는 용암의 행성들. 신의 권능으로 생명을 깃들게 할 수 있어요.' : `🗺️ 레벨 ${S.godCleared || 0} / 5 클리어${S.god.level && !S.god.done ? ` · 진행 중: Lv${S.god.level} ${godStage()[2]} 생명 ${S.god.life.toFixed(0)}/100` : ''}`}</small></div></div>
         <button class="big-btn pv-open" data-planet-open>🌱 생명의 행성으로${S.god.unlocked ? '' : ` <small>(신의 권능 해금 🪙 ${fmt(GOD_UNLOCK_COST)})</small>`}</button>
         <button class="btn" data-ending="2">🎬 엔딩 2 다시 보기</button>`
       : `<div class="vp-head">다음 봉헌: <b>${z}번</b> ${SYNTHETIC.has(z) ? '<span class="badge" style="background:#5f3dc4">🧪 인공</span>' : ''}</div>
@@ -1821,7 +1885,7 @@ function renderVoid() {
 const GOD_UNLOCK_COST = 1e12; // 1조 코인
 // 시작: 우주 속 끝없이 불타는 행성 — 물도, 나무도, 돌도, 흙도 없음
 const godDefault = () => ({ unlocked: false, temp: 180, atm: 0.05, o2: 0, water: 0, mag: 10, crust: 0, life: 0, seeded: false, moon: false, done: false,
-  meteors: 0, cd: {}, species: {}, asteroids: 0, name: '이름 없는 불꽃 행성', named: false, shieldUntil: 0 });
+  meteors: 0, cd: {}, species: {}, asteroids: 0, name: '이름 없는 불꽃 행성', named: false, shieldUntil: 0, level: 0, mis: {} });
 // 지구형 목표 범위
 const GOD_TARGET = { crust: [70, 100], temp: [5, 30], atm: [0.7, 1.5], water: [50, 85], mag: [60, 100], o2: [15, 25] };
 const GOD_STATS = [
@@ -1887,26 +1951,24 @@ function godClamp(g) {
 function godLog(msg) { R.godLog = (R.godLog || []).concat(msg).slice(-8); R.sig.godlog = null; }
 function godTick(dt) {
   const g = S.god;
-  if (!g || !g.unlocked) return;
-  // 자연 변화: 기온은 대기 두께 + 아직 식지 않은 용암의 열로 정해지는 평형 온도로 천천히 수렴
-  const eq = -45 + 55 * Math.min(g.atm, 2.5) + (100 - g.crust) * 1.6 + (g.moon ? 3 : 0);
+  if (!g || !g.unlocked || !g.level) return;
+  const L = godLevel();
+  // 기온은 대기 두께 + 아직 식지 않은 용암의 열(레벨마다 다름)로 정해지는 평형 온도로 천천히 수렴
+  const eq = -45 + 55 * Math.min(g.atm, 2.5) + (100 - g.crust) * L.heat + (g.moon ? 3 : 0);
   g.temp += (eq - g.temp) * Math.min(1, 0.01 * dt);
-  if (g.temp < 150) g.crust += 0.03 * dt;                                         // 서서히 굳어가는 지각
-  if (g.mag < 40) g.atm = Math.max(0, g.atm - 0.0015 * dt * (1 - g.mag / 40)); // 자기장이 약하면 태양풍에 대기 유출
-  if (g.temp > 60) g.water = Math.max(0, g.water - 0.1 * dt);                  // 너무 뜨거우면 바다 증발
+  if (g.temp < 150) g.crust += 0.03 * dt;
+  if (g.mag < 40) g.atm = Math.max(0, g.atm - 0.0015 * dt * (1 - g.mag / 40));
+  if (g.temp > 60) g.water = Math.max(0, g.water - 0.1 * dt);
   const H = habitability();
   if (g.seeded) {
-    if (H > 0.5) g.life = Math.min(g.o2 >= 15 ? 100 : 40, g.life + 0.25 * H * (g.moon ? 1.5 : 1) * dt);
+    if (H > 0.5) g.life = Math.min(g.o2 >= 15 ? 100 : 40, g.life + 0.25 * H * (g.moon ? 1.5 : 1) * L.growth * dt);
     else if (H < 0.3) g.life = Math.max(0, g.life - 0.3 * dt);
   }
-  if (g.life >= 20 && g.o2 < 21) g.o2 = Math.min(21, g.o2 + 0.01 * g.life / 20 * dt); // 자연 광합성
+  if (g.life >= 20 && g.o2 < 21) g.o2 = Math.min(21, g.o2 + 0.01 * g.life / 20 * dt);
   godClamp(g);
   checkSpecies();
-  if (!g.done && g.life >= 100 && H >= 0.8) {
-    g.done = true; S.endings.e3 = true;
-    godLog('🌍 생명의 행성이 완성되었습니다!');
-    setTimeout(() => showEnding(3), 900);
-  }
+  checkMissions();
+  if (!g.done && g.life >= 100 && H >= L.hab) levelClear();
 }
 function unlockGod() {
   const g = S.god;
@@ -1920,7 +1982,7 @@ function unlockGod() {
   toast('✨ <b>신의 권능이 해금되었습니다!</b><br>공허의 행성을 생명이 숨 쉬는 행성으로 만들어 보세요.', 'disc', 6000);
   godLog('✨ 신의 권능 해금! 불타는 행성을 식혀 생명을 키워보세요.');
   R.sig.god = null; R.sig.void = null;
-  setTimeout(openPlanetView, 400);
+  setTimeout(openLevelSelect, 400);
 }
 function usePower(id, pt) {
   const g = S.god, p = GOD_POWERS.find(x => x.id === id);
@@ -2048,7 +2110,15 @@ function renderGod() {
   }
 }
 
-/* ---------- 생명의 행성: 전체 화면 모드 (가운데 행성 + 아래 인벤토리 바) ---------- */
+/* ---------- 생명의 행성: 레벨 1~5 · 도트 행성 · 확대 지상 시뮬레이션 ---------- */
+const GOD_LEVELS = [null,
+  { name: '작은 불씨 행성', stars: 1, desc: '아직 덜 식은 작은 행성. 처음 연습하기 좋아요.', start: { temp: 120, crust: 30, atm: 0.3, mag: 30, water: 0 }, growth: 1.5, events: 0.6, heat: 1.2, hab: 0.75, reward: 1e12 },
+  { name: '용암 행성', stars: 2, desc: '물도, 나무도, 돌도, 흙도 없이 끝없이 불타는 행성.', start: { temp: 180, crust: 0, atm: 0.05, mag: 10, water: 0 }, growth: 1.0, events: 1, heat: 1.6, hab: 0.8, reward: 3e12 },
+  { name: '유황 구름 행성', stars: 3, desc: '두꺼운 독성 대기에 갇힌 행성. 먼저 대기를 걷어내야 식어요.', start: { temp: 200, crust: 20, atm: 2.8, mag: 5, water: 0 }, growth: 0.8, events: 1.2, heat: 1.6, hab: 0.8, reward: 1e13 },
+  { name: '쌍성의 불지옥', stars: 4, desc: '두 개의 태양 아래 타오르는 행성. 태양 플레어가 자주 몰아쳐요.', start: { temp: 200, crust: 0, atm: 0, mag: 0, water: 0 }, growth: 0.65, events: 1.6, heat: 1.9, hab: 0.85, reward: 3e13, flare: true },
+  { name: '종말의 행성', stars: 5, desc: '소행성이 쏟아지는 마지막 시련. 이 행성을 살리면 진정한 창조자.', start: { temp: 200, crust: 0, atm: 0, mag: 0, water: 0 }, growth: 0.5, events: 2.2, heat: 2.2, hab: 0.9, reward: 1e14, asteroid: true },
+];
+function godLevel() { return GOD_LEVELS[S.god.level || 2] || GOD_LEVELS[2]; }
 const SPECIES = [
   { id: 'microbe', icon: '🦠', name: '미생물', life: 5, desc: '최초의 생명. 뜨거운 바닷속 화학 반응에서 태어났어요.' },
   { id: 'algae', icon: '🌿', name: '남조류', life: 12, cond: g => g.water >= 30, condText: '바다 30% 이상', desc: '광합성으로 처음 산소를 만들어낸 생물이에요.' },
@@ -2073,9 +2143,392 @@ function checkSpecies() {
     SFX.discover();
   }
 }
-const PV_EVENTS = [
-  { id: 'asteroid', w: 40 }, { id: 'flare', w: 25 }, { id: 'supervolcano', w: 20 }, { id: 'shower', w: 15 },
+const MISSIONS = [
+  { id: 'crust', icon: '🪨', text: '용암을 식혀 지각 70% 이상', ok: g => g.crust >= 70 },
+  { id: 'temp', icon: '🌡️', text: '기온 5~30℃ 맞추기', ok: g => g.temp >= 5 && g.temp <= 30 },
+  { id: 'atm', icon: '🌫️', text: '대기압 0.7~1.5', ok: g => g.atm >= 0.7 && g.atm <= 1.5 },
+  { id: 'water', icon: '🌊', text: '바다 50% 이상', ok: g => g.water >= 50 },
+  { id: 'mag', icon: '🧲', text: '자기장 60 이상', ok: g => g.mag >= 60 },
+  { id: 'seed', icon: '🌱', text: '생명의 씨앗 심기', ok: g => g.seeded },
+  { id: 'o2', icon: '🫁', text: '산소 15% 이상', ok: g => g.o2 >= 15 },
+  { id: 'forest', icon: '🌳', text: '숲 만들기 (생명 50)', ok: g => g.life >= 50 },
+  { id: 'life', icon: '🧬', text: '생명 100 + 거주 가능성 목표', ok: g => g.life >= 100 && habitability() >= godLevel().hab },
 ];
+function checkMissions() {
+  const g = S.god;
+  g.mis = g.mis || {};
+  for (const m of MISSIONS) {
+    if (g.mis[m.id] || !m.ok(g)) continue;
+    g.mis[m.id] = true;
+    const c = godLevel().reward * 0.02;
+    S.coins += c; S.totalCoins += c;
+    godLog(`✅ 미션 완료: ${m.icon} ${m.text} 🪙+${fmt(c)}`);
+    pvImpact('mission');
+  }
+}
+function levelClear() {
+  const g = S.god, lv = g.level, L = godLevel();
+  g.done = true;
+  const first = (S.godCleared || 0) < lv;
+  S.godCleared = Math.max(S.godCleared || 0, lv);
+  if (first) { S.coins += L.reward; S.totalCoins += L.reward; }
+  godLog(`🏆 레벨 ${lv} 「${L.name}」 클리어!${first ? ` 🪙+${fmt(L.reward)}` : ''}`);
+  pvImpact('clear', lv);
+  if (lv >= 5 && !S.endings.e3) { S.endings.e3 = true; setTimeout(() => showEnding(3), 3200); }
+  else if (lv < 5 && first) setTimeout(() => toast(`🔓 레벨 ${lv + 1} 「${GOD_LEVELS[lv + 1].name}」 해금!`, 'disc', 5000), 2500);
+}
+
+/* ---------- 레벨 선택 ---------- */
+function openLevelSelect() {
+  if (!S.god.unlocked) return unlockGod();
+  const cleared = S.godCleared || 0, g = S.god;
+  $('#lvModal').innerHTML = `<div class="lv-box"><h2>🌱 생명의 행성으로</h2>
+    <p>우주 속 불타는 행성들을 순서대로 생명의 행성으로 바꿔요. 레벨 5를 깨면 마지막 엔딩!</p>
+    <div class="lv-list">${GOD_LEVELS.slice(1).map((L, i) => {
+      const lv = i + 1, open = lv <= cleared + 1, done = lv <= cleared, cur = g.level === lv && !g.done && (g.crust > (L.start.crust || 0) + 1 || g.seeded);
+      return `<div class="lv-card ${open ? '' : 'locked'} ${done ? 'done' : ''}">
+        <div class="lv-planet lv${lv}"></div>
+        <div class="lv-info"><b>LEVEL ${lv} · ${L.name}</b><span class="lv-stars">${'★'.repeat(L.stars)}${'☆'.repeat(5 - L.stars)}</span>
+          <small>${L.desc}</small><small class="lv-meta">생명 성장 ×${L.growth} · 사건 ×${L.events} · 목표 거주 가능성 ${L.hab * 100}% · 첫 클리어 🪙 ${fmt(L.reward)}</small></div>
+        <div class="lv-act">${!open ? '<span>🔒</span>' : `<button class="big-btn" data-lv-start="${lv}">${cur ? '▶ 이어하기' : done ? '🔁 다시 하기' : '🚀 시작'}</button>`}${done ? '<span class="lv-ok">✅ 클리어</span>' : ''}</div></div>`;
+    }).join('')}</div>
+    <button class="btn" data-lv-close>닫기</button></div>`;
+  $('#lvModal').classList.add('on');
+}
+function startLevel(lv) {
+  if (lv > (S.godCleared || 0) + 1) return;
+  const g = S.god, L = GOD_LEVELS[lv];
+  $('#lvModal').classList.remove('on');
+  const inProgress = g.level === lv && !g.done && (g.crust > (L.start.crust || 0) + 1 || g.seeded);
+  if (!inProgress) {
+    if (g.level && g.level !== lv && !g.done && g.seeded && !confirm(`진행 중인 레벨 ${g.level}은(는) 처음부터 다시 해야 해요. 레벨 ${lv}을(를) 시작할까요?`)) return;
+    S.god = Object.assign(godDefault(), L.start, { unlocked: true, level: lv, name: L.name, named: g.named });
+    R.godLog = []; R.surf = null;
+  }
+  openPlanetView();
+  if (!inProgress) pvImpact('start', lv);
+}
+
+/* ---------- 임팩트 연출 ---------- */
+function pvImpact(kind, lv, pt) {
+  const v = $('#planetView');
+  if (!v || !R.pvOpen) return;
+  const shake = s => { v.classList.remove('pv-shake', 'pv-shake-big'); void v.offsetWidth; v.classList.add(s); };
+  const ring = (x, y, color, size) => {
+    const r = document.createElement('div');
+    r.className = 'pv-ring'; r.style.left = x + 'px'; r.style.top = y + 'px'; r.style.borderColor = color; r.style.setProperty('--s', size);
+    v.appendChild(r); setTimeout(() => r.remove(), 900);
+  };
+  const flash = color => {
+    const f = document.createElement('div');
+    f.className = 'pv-flash'; f.style.background = color;
+    v.appendChild(f); setTimeout(() => f.remove(), 600);
+  };
+  const [cx, cy] = $('#godPlanet') ? centerOf($('#godPlanet')) : [innerWidth / 2, innerHeight / 2];
+  const [x, y] = pt || [cx, cy];
+  if (kind === 'cast') { ring(x, y, '#ffffffcc', 3); shake('pv-shake'); }
+  if (kind === 'big') { ring(x, y, '#ffb347', 6); ring(x, y, '#ffffff', 4); flash('#ffffff'); shake('pv-shake-big'); }
+  if (kind === 'bad') { flash('#ff2020'); shake('pv-shake-big'); ring(cx, cy, '#ff6b6b', 7); }
+  if (kind === 'mission') { ring(cx, cy, '#ffd43b', 5); SFX.ach(); }
+  if (kind === 'start') {
+    const L = GOD_LEVELS[lv];
+    const c = document.createElement('div');
+    c.className = 'pv-cine';
+    c.innerHTML = `<div class="pv-cine-lv">LEVEL ${lv}</div><div class="pv-cine-name">${L.name}</div><div class="pv-cine-stars">${'★'.repeat(L.stars)}${'☆'.repeat(5 - L.stars)}</div><div class="pv-cine-desc">${L.desc}</div>`;
+    v.appendChild(c); setTimeout(() => c.remove(), 3200);
+    [0, 300, 600].forEach((d, i) => setTimeout(() => SFX.tone(220 * (i + 1), 0.5, 'sawtooth', 0.04, 1.5), d));
+    flash('#ff6a00'); shake('pv-shake-big');
+  }
+  if (kind === 'clear') {
+    const c = document.createElement('div');
+    c.className = 'pv-cine clear';
+    c.innerHTML = `<div class="pv-cine-lv">LEVEL ${lv} CLEAR!</div><div class="pv-cine-name">🌍 ${S.god.name}</div><div class="pv-cine-desc">생명이 숨 쉬는 행성이 되었어요!</div>`;
+    v.appendChild(c); setTimeout(() => c.remove(), 4000);
+    flash('#ffffff'); SFX.discover(); setTimeout(() => SFX.bonus(), 500);
+    for (let i = 0; i < 10; i++) setTimeout(() => {
+      const fx = innerWidth * (0.15 + Math.random() * 0.7), fy = innerHeight * (0.15 + Math.random() * 0.5);
+      particles(fx, fy, 30, ['#ffd43b', '#69db7c', '#74c0fc', '#f783ac', '#c77dff'][i % 5]); ring(fx, fy, '#ffd43b', 2.5);
+      SFX.tone(500 + Math.random() * 600, 0.15, 'triangle', 0.04, 1.6);
+    }, i * 260);
+  }
+}
+
+/* ---------- 도트 행성 (캔버스, 자전) ---------- */
+const PX = { W: 256, H: 128, maps: null };
+function fractalMap(W, H, seed) {
+  const out = new Float32Array(W * H), R2 = rng(seed);
+  let amp = 1, tot = 0;
+  const sm = t => t * t * (3 - 2 * t);
+  for (let o = 0; o < 5; o++) {
+    const gw = 4 << o, gh = 2 << o, grid = new Float32Array(gw * (gh + 1));
+    for (let i = 0; i < grid.length; i++) grid[i] = R2();
+    for (let y = 0; y < H; y++) {
+      const fy = y / H * gh, y0 = Math.floor(fy), ty = sm(fy - y0);
+      for (let x = 0; x < W; x++) {
+        const fx = x / W * gw, x0 = Math.floor(fx), tx = sm(fx - x0), x1 = (x0 + 1) % gw;
+        const a = grid[y0 * gw + x0], b = grid[y0 * gw + x1], c = grid[(y0 + 1) * gw + x0], d = grid[(y0 + 1) * gw + x1];
+        out[y * W + x] += amp * ((a + (b - a) * tx) + ((c + (d - c) * tx) - (a + (b - a) * tx)) * ty);
+      }
+    }
+    tot += amp; amp *= 0.5;
+  }
+  for (let i = 0; i < out.length; i++) out[i] /= tot;
+  return out;
+}
+function pxMaps(seed) {
+  if (PX.maps && PX.maps.seed === seed) return PX.maps;
+  const h = fractalMap(PX.W, PX.H, seed), d = fractalMap(PX.W, PX.H, seed + 7), c = fractalMap(PX.W, PX.H, seed + 13);
+  PX.maps = { seed, h, d, c, sorted: Float32Array.from(h).sort() };
+  return PX.maps;
+}
+function drawPixelPlanet(cv, t) {
+  const N = cv.width, ctx = cv.getContext('2d'), img = ctx.createImageData(N, N), D = img.data, g = S.god;
+  const M = pxMaps((g.level || 2) * 101 + 7);
+  const R0 = N / 2 - 5, cx = N / 2, cy = N / 2, rot = R.pvRot || 0;
+  const sea = g.water > 0.5 ? M.sorted[Math.min(M.sorted.length - 1, Math.floor(g.water / 100 * M.sorted.length))] : -1;
+  const molten = Math.max(0, 1 - g.crust / 70), veg = g.seeded ? g.life / 100 : 0, forest = g.species.fern && g.life > 45;
+  const cloudTh = g.atm > 0.3 && g.temp < 110 ? 1 - Math.min(0.5, g.water / 200 + g.atm * 0.1) * 0.6 - 0.25 : 9;
+  const cshift = (t * 0.008) % 1, Ld = [-0.55, -0.45, 0.7];
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const dx = (x + 0.5 - cx) / R0, dy = (y + 0.5 - cy) / R0, r2 = dx * dx + dy * dy, k4 = (y * N + x) * 4;
+    if (r2 > 1) { // 대기 테두리
+      const dd = Math.sqrt(r2);
+      if (dd < 1.1) {
+        const a = (1.1 - dd) / 0.1, hot = molten > 0.4 || g.temp > 90;
+        const strength = hot ? Math.max(molten, 0.5) : Math.min(1, g.atm / 1.2);
+        D[k4] = hot ? 255 : 120; D[k4 + 1] = hot ? 90 : 190; D[k4 + 2] = hot ? 20 : 255; D[k4 + 3] = Math.round(a * strength * 210 / 64) * 64;
+      }
+      continue;
+    }
+    const dz = Math.sqrt(1 - r2), lon = Math.atan2(dx, dz) + rot, lat = Math.asin(dy);
+    const u = ((lon / (2 * Math.PI)) % 1 + 1) % 1, vi = Math.min(PX.H - 1, ((lat / Math.PI + 0.5) * PX.H) | 0), ui = (u * PX.W) | 0, k = vi * PX.W + ui;
+    const h = M.h[k], d = M.d[k];
+    let c;
+    if (h <= sea) c = g.temp < -5 ? [200, 225, 245] : h < sea - 0.06 ? [24, 72, 160] : [44, 122, 204];
+    else if (d < molten * 1.05) { const fl = Math.sin(t * 3 + d * 40) > 0.2; c = d < molten * 0.55 ? (fl ? [255, 220, 70] : [255, 160, 30]) : [214, 64, 18]; }
+    else {
+      const e = (h - Math.max(0, sea)) / (1 - Math.max(0, sea));
+      if (g.temp < -5 || (e > 0.78 && g.temp < 25)) c = [236, 240, 246];
+      else if (veg > 0.1 && d > 1 - veg * 1.05) c = forest && d > 1 - veg * 0.5 ? [30, 104, 42] : [80, 166, 70];
+      else if (g.temp > 45) c = [206, 174, 104];
+      else if (g.species.moss) c = e > 0.5 ? [116, 96, 80] : [128, 94, 62];
+      else c = e > 0.5 ? [92, 86, 84] : [116, 106, 98];
+      if (molten > 0 && d < molten * 1.35) c = [64, 40, 36];
+    }
+    const cl = M.c[vi * PX.W + ((((u + cshift) % 1) * PX.W) | 0)];
+    if (cl > cloudTh) c = [c[0] * 0.25 + 190, c[1] * 0.25 + 190, c[2] * 0.25 + 190];
+    let b = 0.14 + 0.95 * Math.max(0, dx * Ld[0] + dy * Ld[1] + dz * Ld[2]);
+    if (g.species.human && b < 0.3 && h > sea && d > 0.86) { c = [255, 214, 110]; b = 1; }
+    b = Math.round(b * 6) / 6; // 도트 느낌: 명암 단계 줄이기
+    D[k4] = Math.min(255, c[0] * b); D[k4 + 1] = Math.min(255, c[1] * b); D[k4 + 2] = Math.min(255, c[2] * b); D[k4 + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+/* ---------- 확대: 지상 시뮬레이션 (도트) ---------- */
+const SW = 200, SH = 112;
+const SPR = {
+  tree: ['..gg..', '.gggg.', 'gggggg', '.gggg.', '..tt..', '..tt..'],
+  pine: ['..g..', '.ggg.', '..g..', '.ggg.', 'ggggg', '..t..'],
+  dino: ['...gg', '...gG', 'gggg.', 'gggg.', 'g..g.'],
+  mammal: ['.bb.', 'bbbb', 'b..b'],
+  human: ['.s.', 'ccc', '.c.', 'p.p'],
+  hut: ['..r..', '.rrr.', 'rrrrr', 'wwyww', 'wwdww'],
+  fish: ['.oo.o', 'ooooo', '.oo.o'],
+  bird: ['k.k', '.k.'],
+  shell: ['.p.', 'ppp'],
+};
+const SPR_PAL = { g: '#3fa34d', G: '#1f1f1f', t: '#6d4c2f', b: '#8d6e63', s: '#f1c27d', c: '#4dabf7', p: '#f783ac', r: '#b23a2a', w: '#c8a27a', y: '#ffd43b', d: '#5a3b22', o: '#ff922b', k: '#222831' };
+function drawSpr(ctx, spr, x, y, flip, tint) {
+  for (let r = 0; r < spr.length; r++) for (let c = 0; c < spr[r].length; c++) {
+    const ch = spr[r][flip ? spr[r].length - 1 - c : c];
+    if (ch === '.') continue;
+    ctx.fillStyle = tint && ch === 'g' ? tint : SPR_PAL[ch];
+    ctx.fillRect(Math.round(x) + c, Math.round(y) + r, 1, 1);
+  }
+}
+function surfElev(x) { const s = (S.god.level || 2) * 1.7; return 22 + 34 * (x / SW) + 8 * Math.sin(x * 0.07 + s) + 4 * Math.sin(x * 0.19 + s * 2); }
+function seaElev() { return S.god.water > 1 ? 18 + 42 * (S.god.water / 100) : 0; }
+function surfInit() { R.surf = { t: 0, trees: [], ents: [], drops: [], fx: [], weather: 'clear', wT: 3, flash: 0, bolt: null }; }
+function surfWeatherPick() {
+  const g = S.god, W = R.surf, opts = ['clear'];
+  if (g.crust < 45) opts.push('ash', 'ash');
+  if (g.atm >= 0.4 && g.water >= 25 && g.temp > 0 && g.temp < 45) opts.push('rain', 'rain');
+  if (g.atm >= 0.8 && g.water >= 40 && g.temp > 0 && g.temp < 45) opts.push('storm');
+  if (g.temp < 0 && g.water >= 10) opts.push('snow', 'snow');
+  W.weather = opts[Math.floor(Math.random() * opts.length)];
+  W.wT = 15 + Math.random() * 20;
+}
+const WEATHER_NAME = { clear: '☀️ 맑음', rain: '🌧️ 비', storm: '⛈️ 폭풍우', snow: '❄️ 눈', ash: '🌋 화산재' };
+function surfUpdate(dt) {
+  const g = S.god, W = R.surf;
+  W.t += dt;
+  if ((W.wT -= dt) <= 0) surfWeatherPick();
+  const sl = seaElev(), land = x => surfElev(x) > sl + 2;
+  // 나무: 생명·지각·기온 조건이 맞으면 점점 늘고 자라고, 너무 뜨거우면 불타 사라짐
+  const okTree = g.seeded && g.crust >= 50 && g.temp > -5 && g.temp < 45 && g.life > 12;
+  const want = okTree ? Math.floor(g.life / 100 * 42 * (g.species.fern ? 1 : 0.35)) : 0;
+  // 행성 상태보다 많이 모자라면(처음 확대했을 때 등) 바로 채우고, 그 뒤로는 하나씩 자라남
+  const addTree = grown => { for (let k = 0; k < 20; k++) { const x = 4 + Math.random() * (SW - 8); if (land(x)) { W.trees.push({ x, g: grown ? 0.5 + Math.random() * 0.5 : 0.05, pine: Math.random() < 0.35 }); return; } } };
+  if (W.trees.length < want * 0.6) while (W.trees.length < want) { const n = W.trees.length; addTree(true); if (W.trees.length === n) break; }
+  else if (W.trees.length < want && Math.random() < dt * 3) addTree(false);
+  if (W.trees.length > want && Math.random() < dt * 2) W.trees.splice(Math.floor(Math.random() * W.trees.length), 1);
+  for (const tr of W.trees) tr.g = Math.min(1, tr.g + dt * 0.12);
+  // 생물
+  const desire = {
+    fish: g.species.fish && sl > 0 ? Math.min(10, Math.floor(g.life / 9)) : 0,
+    shell: g.species.shell && sl > 0 ? 4 : 0,
+    dino: g.species.dino ? 3 : 0, bird: g.species.bird ? 6 : 0, mammal: g.species.mammal ? 4 : 0, human: g.species.human ? 5 : 0,
+    insect: g.species.insect ? 10 : 0,
+  };
+  for (const type in desire) {
+    const have = W.ents.filter(e => e.type === type);
+    const missing = desire[type] - have.length;
+    for (let s = 0; s < (missing > desire[type] * 0.5 ? missing : missing > 0 && Math.random() < dt * 2 ? 1 : 0); s++) {
+      let x = Math.random() * SW, tries = 0;
+      const wantWater = type === 'fish' || type === 'shell';
+      while (tries++ < 20 && (wantWater ? surfElev(x) > sl - 3 : !land(x))) x = Math.random() * SW;
+      W.ents.push({ type, x, y: type === 'bird' ? 10 + Math.random() * 25 : 0, vx: (Math.random() < 0.5 ? -1 : 1) * (type === 'bird' ? 14 : type === 'fish' ? 8 : type === 'insect' ? 10 : 4), ph: Math.random() * 6 });
+    }
+    if (have.length > desire[type]) W.ents.splice(W.ents.indexOf(have[0]), 1);
+  }
+  for (const e of W.ents) {
+    e.ph += dt * 6; e.x += e.vx * dt;
+    const wantWater = e.type === 'fish' || e.type === 'shell';
+    const bad = wantWater ? surfElev(e.x) > sl - 3 : (e.type !== 'bird' && e.type !== 'insect' && !land(e.x));
+    if (e.x < 2 || e.x > SW - 6 || bad) { e.vx *= -1; e.x += e.vx * dt * 2; }
+    if (e.type === 'shell') e.vx = 0;
+    if (Math.random() < dt * 0.3) e.vx *= -1;
+  }
+  if (!g.human) W.huts = null;
+  // 날씨 입자
+  const spawn = { rain: 8, storm: 14, snow: 3, ash: 4 }[W.weather] || 0;
+  for (let i = 0; i < spawn * dt * 30; i++) W.drops.push({ x: Math.random() * (SW + 40) - 20, y: -2, kind: W.weather });
+  for (const d of W.drops) {
+    if (d.kind === 'rain' || d.kind === 'storm') { d.y += dt * 120; d.x -= dt * (d.kind === 'storm' ? 40 : 15); }
+    else if (d.kind === 'snow') { d.y += dt * 14; d.x += Math.sin(W.t * 2 + d.y) * dt * 6; }
+    else { d.y += dt * 10; d.x += dt * 5; }
+  }
+  W.drops = W.drops.filter(d => d.y < SH - surfElev(Math.max(0, Math.min(SW - 1, d.x))) && d.x > -25 && d.x < SW + 25).slice(-900);
+  if (W.weather === 'storm' && Math.random() < dt * 0.4) { W.flash = 1; W.bolt = { x: 20 + Math.random() * (SW - 40), t: 0.25 }; SFX.tone(60, 0.5, 'sawtooth', 0.05, 0.5); }
+  W.flash = Math.min(1, Math.max(0, W.flash - dt * 4));
+  if (W.bolt && (W.bolt.t -= dt) <= 0) W.bolt = null;
+  for (const f of W.fx) f.t += dt;
+  W.fx = W.fx.filter(f => f.t < 1.6);
+}
+function surfDraw(cv) {
+  const ctx = cv.getContext('2d'), g = S.god, W = R.surf;
+  const day = 0.5 + 0.5 * Math.cos(W.t * 0.06), molten = Math.max(0, 1 - g.crust / 70);
+  const overcast = W.weather === 'rain' || W.weather === 'storm' || W.weather === 'ash' ? 0.55 : W.weather === 'snow' ? 0.35 : 0;
+  // 하늘 (도트 느낌의 단계 그라데이션)
+  for (let y = 0; y < SH; y += 4) {
+    const f = y / SH;
+    let col;
+    if (g.atm < 0.15) col = [6, 8, 20];
+    else if (molten > 0.4 || g.temp > 90) col = [90 + 80 * f, 25 + 30 * f, 12];
+    else {
+      const dayC = [96 + 40 * f, 160 + 30 * f, 235], nightC = [10, 14, 40 + 20 * f];
+      col = dayC.map((v, i) => v * day + nightC[i] * (1 - day));
+    }
+    if (overcast) col = col.map(v => v * (1 - overcast) + 110 * overcast * (0.4 + day * 0.6));
+    ctx.fillStyle = `rgb(${col.map(v => Math.round(v / 16) * 16).join(',')})`;
+    ctx.fillRect(0, y, SW, 4);
+  }
+  if (g.atm < 0.15 || day < 0.35) { ctx.fillStyle = '#fff'; for (let i = 0; i < 40; i++) ctx.fillRect((i * 53) % SW, (i * 29) % 50, 1, 1); }
+  // 해 / 달
+  const sx = SW * (1 - ((W.t * 0.06 / (2 * Math.PI)) % 1));
+  if (day > 0.2 && !overcast) { ctx.fillStyle = '#ffe066'; ctx.fillRect(sx - 3, 12 - day * 6, 6, 6); ctx.fillStyle = '#fff3bf'; ctx.fillRect(sx - 2, 13 - day * 6, 4, 4); }
+  if (g.moon && day < 0.5) { ctx.fillStyle = '#e9ecef'; ctx.fillRect((sx + SW / 2) % SW, 14, 5, 5); }
+  // 먼 산
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  for (let x = 0; x < SW; x++) { const e = 40 + 10 * Math.sin(x * 0.05) + 6 * Math.sin(x * 0.13); ctx.fillRect(x, SH - e, 1, e); }
+  // 땅·바다·용암
+  const sl = seaElev(), veg = g.seeded ? g.life / 100 : 0;
+  for (let x = 0; x < SW; x++) {
+    const e = Math.round(surfElev(x)), top = SH - e;
+    const n = (Math.sin(x * 12.9898) * 43758.5453) % 1, nn = Math.abs(n);
+    const lava = molten > 0 && nn < molten;
+    ctx.fillStyle = lava ? (Math.sin(W.t * 4 + x) > 0 ? '#ffb020' : '#ff6a00') : g.temp < -2 ? '#eef2f6' : veg > 0.1 && nn < veg * 1.1 ? '#4caf50' : g.species.moss ? '#8d6e4f' : '#7a6f68';
+    ctx.fillRect(x, top, 1, 2);
+    ctx.fillStyle = lava ? '#8a1c00' : g.species.moss ? '#6d4c35' : '#5f5752';
+    ctx.fillRect(x, top + 2, 1, 6);
+    ctx.fillStyle = lava ? '#4a0d00' : '#3e3a38';
+    ctx.fillRect(x, top + 8, 1, e);
+    if (veg > 0.15 && !lava && e > sl + 2 && nn < veg && x % 3 === 0) { ctx.fillStyle = '#69db7c'; ctx.fillRect(x, top - 1, 1, 1); }
+    if (sl > 0 && e < sl) {
+      const wy = SH - sl;
+      ctx.fillStyle = g.temp < -5 ? '#d0ebff' : '#1c6fc4';
+      ctx.fillRect(x, wy, 1, top - wy);
+      if (g.temp >= -5) { ctx.fillStyle = '#74c0fc'; ctx.fillRect(x, wy + (Math.sin(W.t * 3 + x * 0.4) > 0.5 ? 0 : 1), 1, 1); }
+    }
+  }
+  // 나무
+  for (const tr of W.trees) {
+    const top = SH - surfElev(tr.x), spr = tr.pine ? SPR.pine : SPR.tree, h = Math.max(2, Math.round(spr.length * tr.g));
+    const tint = W.weather === 'snow' ? '#dfe7ef' : g.temp > 38 ? '#9c8b3c' : null;
+    drawSpr(ctx, spr.slice(spr.length - h), tr.x - 3, top - h, false, tint);
+  }
+  // 오두막 (지적 생명체)
+  if (g.species.human) {
+    for (let i = 0; i < 3; i++) {
+      const x = SW * (0.55 + i * 0.13), top = SH - surfElev(x);
+      drawSpr(ctx, SPR.hut, x, top - 5);
+      if (day < 0.45) { ctx.fillStyle = '#ffd43b'; ctx.fillRect(Math.round(x) + 2, top - 2, 1, 1); }
+    }
+  }
+  // 생물
+  for (const e of W.ents) {
+    const ground = SH - surfElev(e.x), flip = e.vx < 0;
+    if (e.type === 'fish') drawSpr(ctx, SPR.fish, e.x, SH - sl + 4 + ((e.ph * 3) % 10) * 0.6, flip);
+    else if (e.type === 'shell') drawSpr(ctx, SPR.shell, e.x, ground - 2);
+    else if (e.type === 'bird') drawSpr(ctx, Math.sin(e.ph) > 0 ? SPR.bird : [SPR.bird[1], SPR.bird[0]], e.x, e.y + Math.sin(e.ph * 0.5) * 2, flip);
+    else if (e.type === 'insect') { ctx.fillStyle = '#ffd43b'; ctx.fillRect(Math.round(e.x), Math.round(ground - 6 + Math.sin(e.ph) * 3), 1, 1); }
+    else if (e.type === 'dino') drawSpr(ctx, SPR.dino, e.x, ground - 5 - (Math.sin(e.ph) > 0.8 ? 1 : 0), flip);
+    else if (e.type === 'mammal') drawSpr(ctx, SPR.mammal, e.x, ground - 3, flip);
+    else if (e.type === 'human') drawSpr(ctx, SPR.human, e.x, ground - 4 - (Math.sin(e.ph * 2) > 0.7 ? 1 : 0), flip);
+  }
+  // 날씨
+  for (const d of W.drops) {
+    ctx.fillStyle = d.kind === 'snow' ? '#ffffff' : d.kind === 'ash' ? '#6c6c6c' : '#a5d8ff';
+    ctx.fillRect(Math.round(d.x), Math.round(d.y), 1, d.kind === 'rain' || d.kind === 'storm' ? 2 : 1);
+  }
+  if (W.bolt) { ctx.fillStyle = '#fffbe0'; let bx = W.bolt.x; for (let y = 0; y < SH - surfElev(W.bolt.x); y += 2) { bx += (Math.random() - 0.5) * 3; ctx.fillRect(Math.round(bx), y, 1, 2); } }
+  // 권능 효과
+  for (const f of W.fx) {
+    const p = Math.min(1, f.t / 0.6);
+    if (f.type === 'meteor' || f.type === 'comet') {
+      const gx = f.x, gy = SH - surfElev(f.x);
+      if (p < 1) { ctx.fillStyle = f.type === 'meteor' ? '#ff922b' : '#a5d8ff'; const x = gx + 60 * (1 - p), y = gy - 80 * (1 - p); for (let i = 0; i < 8; i++) ctx.fillRect(Math.round(x + i * 1.5), Math.round(y - i * 2), 2, 2); }
+      else { const r = (f.t - 0.6) * 30; ctx.fillStyle = f.type === 'meteor' ? 'rgba(255,170,60,.7)' : 'rgba(170,220,255,.7)'; ctx.fillRect(gx - r, gy - r / 2, r * 2, r / 2); }
+    } else if (f.type === 'volcano') {
+      for (let i = 0; i < 14; i++) { ctx.fillStyle = i % 2 ? '#ff6a00' : '#ffd43b'; ctx.fillRect(Math.round(f.x + Math.sin(i * 7) * f.t * 25), Math.round(SH - surfElev(f.x) - f.t * 50 * Math.abs(Math.cos(i)) + f.t * f.t * 30), 2, 2); }
+    } else {
+      ctx.fillStyle = { sun: 'rgba(255,240,150,', ice: 'rgba(220,240,255,', storm: 'rgba(255,255,220,', seed: 'rgba(140,255,140,', rain: 'rgba(160,210,255,' }[f.type] || 'rgba(255,255,255,';
+      ctx.fillStyle += (0.5 * (1 - f.t / 1.6)) + ')'; ctx.fillRect(0, 0, SW, SH);
+    }
+  }
+  if (W.flash > 0) { ctx.fillStyle = `rgba(255,255,255,${W.flash * 0.7})`; ctx.fillRect(0, 0, SW, SH); }
+  setText('pvSurfInfo', `${WEATHER_NAME[W.weather]} · ${day > 0.5 ? '☀️ 낮' : '🌙 밤'} · 🌳 나무 ${W.trees.length}그루 · 🐾 생물 ${W.ents.length}마리`);
+}
+function surfFx(kind, clientX) {
+  if (!R.surf) return;
+  const cv = $('#pvSurf'), r = cv ? cv.getBoundingClientRect() : null;
+  const x = r && clientX != null ? Math.max(5, Math.min(SW - 5, (clientX - r.left) / r.width * SW)) : SW * (0.3 + Math.random() * 0.4);
+  R.surf.fx.push({ type: kind, x, t: 0 });
+  if (kind === 'rain') { R.surf.weather = 'rain'; R.surf.wT = 20; }
+  if (kind === 'storm') { R.surf.weather = 'storm'; R.surf.wT = 15; }
+  if (kind === 'ice') { R.surf.weather = 'snow'; R.surf.wT = 15; }
+  if (kind === 'volcano') { R.surf.weather = 'ash'; R.surf.wT = 12; }
+}
+function setZoom(on) {
+  if (!!R.pvZoom === on) return;
+  R.pvZoom = on;
+  if (on && !R.surf) surfInit();
+  $('#planetView').classList.toggle('zoomed', on);
+  SFX.tone(on ? 300 : 600, 0.3, 'sine', 0.04, on ? 2 : 0.5);
+}
+
+/* ---------- 사건 ---------- */
 const shielded = () => (S.god.shieldUntil || 0) > Date.now();
 function pvBanner(html, cls = '') {
   const b = $('#pvBanner');
@@ -2084,17 +2537,19 @@ function pvBanner(html, cls = '') {
   clearTimeout(R.pvBannerT);
   R.pvBannerT = setTimeout(() => b.classList.remove('on'), 3800);
 }
-function pvScheduleEvent() { R.pvNextEvent = performance.now() + (45000 + Math.random() * 45000) / (R.pvSpeed || 1); }
+function pvScheduleEvent() { R.pvNextEvent = performance.now() + (45000 + Math.random() * 45000) / ((R.pvSpeed || 1) * godLevel().events); }
 function pvEvent() {
-  const g = S.god;
-  let r = Math.random() * 100, ev = PV_EVENTS[0].id;
-  for (const e of PV_EVENTS) { if (r < e.w) { ev = e.id; break; } r -= e.w; }
+  const g = S.god, L = godLevel();
+  const w = { asteroid: L.asteroid ? 65 : 40, flare: L.flare ? 55 : 25, supervolcano: 20, shower: 15 };
+  let r = Math.random() * Object.values(w).reduce((a, b) => a + b, 0), ev = 'asteroid';
+  for (const k in w) { if (r < w[k]) { ev = k; break; } r -= w[k]; }
   if (ev === 'asteroid') return pvAsteroid();
   if (ev === 'flare') {
     if (shielded()) { pvBanner('☀️ 태양 플레어! 🛡️ 보호막이 막아냈어요'); return godLog('☀️ 태양 플레어 → 🛡️ 보호막이 막음'); }
     if (g.mag >= 60) { pvBanner('☀️ 태양 플레어! 🧲 자기장이 막아내 오로라가 춤춰요'); return godLog('☀️ 태양 플레어 → 🧲 자기장이 막음 (오로라)'); }
     const loss = 0.2 * (1 - g.mag / 60);
     g.atm = Math.max(0, g.atm - loss);
+    pvImpact('bad');
     pvBanner(`☀️ 태양 플레어! 자기장이 약해 대기가 날아갔어요 (대기 -${loss.toFixed(2)})`, 'bad');
     return godLog(`☀️ 태양 플레어 🌫️-${loss.toFixed(2)}`);
   }
@@ -2102,21 +2557,19 @@ function pvEvent() {
     if (shielded()) { pvBanner('🌋 초화산 폭발 징조! 🛡️ 보호막이 진정시켰어요'); return godLog('🌋 초화산 → 🛡️ 보호막이 막음'); }
     g.atm += 0.25; g.temp += 6; g.life *= 0.9; g.crust = Math.max(0, g.crust - 4); godClamp(g);
     pvBanner('🌋 초화산 폭발! 대기↑ 기온↑ 생명 -10%', 'bad');
-    godFx('volcano');
+    godFx('volcano'); pvImpact('bad'); surfFx('volcano');
     return godLog('🌋 초화산 폭발 🌫️+0.25 🌡️+6 🧬-10%');
   }
-  if (ev === 'shower') {
-    const coins = Math.max(1e9, arcScale() * 5);
-    S.coins += coins; S.totalCoins += coins;
-    pvBanner(`🌠 유성우! 희귀 광물이 쏟아져 🪙 +${fmt(coins)}`, 'good');
-    particles(innerWidth / 2, innerHeight / 3, 40, '#ffd43b');
-    return godLog(`🌠 유성우 🪙+${fmt(coins)}`);
-  }
+  const coins = Math.max(1e9, arcScale() * 5);
+  S.coins += coins; S.totalCoins += coins;
+  pvBanner(`🌠 유성우! 희귀 광물이 쏟아져 🪙 +${fmt(coins)}`, 'good');
+  particles(innerWidth / 2, innerHeight / 3, 40, '#ffd43b');
+  godLog(`🌠 유성우 🪙+${fmt(coins)}`);
 }
 function pvAsteroid() {
   const view = $('#planetView'), pl = $('#godPlanet');
   if (!view || !pl) return;
-  const [cx, cy] = centerOf(pl);
+  const [cx, cy] = R.pvZoom ? [innerWidth / 2, innerHeight / 2] : centerOf(pl);
   const ang = Math.random() * Math.PI * 2, dist = Math.max(innerWidth, innerHeight) * 0.6;
   const sx = cx + Math.cos(ang) * dist, sy = cy + Math.sin(ang) * dist;
   const a = document.createElement('div');
@@ -2127,7 +2580,7 @@ function pvAsteroid() {
   const anim = a.animate([{ transform: 'translate(-50%,-50%) scale(1.6) rotate(0)' }, { transform: `translate(calc(-50% + ${cx - sx}px), calc(-50% + ${cy - sy}px)) scale(.7) rotate(720deg)` }], { duration: dur, easing: 'linear', fill: 'forwards' });
   pvBanner('☄️ <b>거대 소행성 접근!</b> 눌러서 부수세요!', 'bad');
   SFX.boss();
-  const destroy = e => {
+  a.addEventListener('pointerdown', e => {
     e.stopPropagation();
     if (a.dataset.dead) return;
     a.dataset.dead = 1; anim.cancel();
@@ -2135,12 +2588,13 @@ function pvAsteroid() {
     particles(x, y, 30, '#ff922b'); SFX.hit(true);
     a.remove();
     S.god.asteroids = (S.god.asteroids || 0) + 1;
+    S.godAst = (S.godAst || 0) + 1;
     const coins = Math.max(1e9, arcScale() * 3);
     S.coins += coins; S.totalCoins += coins;
+    pvImpact('cast', null, [x, y]);
     pvBanner(`💥 소행성 격추! 🪙 +${fmt(coins)}`, 'good');
     godLog(`💥 소행성 격추 🪙+${fmt(coins)}`);
-  };
-  a.addEventListener('pointerdown', destroy);
+  });
   anim.onfinish = () => {
     if (a.dataset.dead) return;
     a.remove();
@@ -2148,32 +2602,40 @@ function pvAsteroid() {
     if (shielded()) { pvBanner('🛡️ 보호막이 소행성을 막아냈어요!', 'good'); return godLog('☄️ 소행성 충돌 → 🛡️ 보호막이 막음'); }
     g.life *= 0.7; g.temp += 8; g.water += 2; g.crust = Math.max(0, g.crust - 5); godClamp(g);
     particles(cx, cy, 50, '#ff6b6b'); SFX.lose();
-    pl.classList.remove('hit'); void pl.offsetWidth; pl.classList.add('hit');
+    pvImpact('bad'); surfFx('meteor');
     pvBanner('💥 소행성 충돌! 생명 -30% · 기온↑', 'bad');
     godLog('💥 소행성 충돌 🧬-30% 🌡️+8');
   };
 }
+
+/* ---------- 화면 ---------- */
 function openPlanetView() {
   if (!S.god.unlocked) return unlockGod();
-  R.pvOpen = true; R.pvSel = R.pvSel || 0; R.pvSpeed = R.pvSpeed || 1;
+  if (!S.god.level) return openLevelSelect();
+  R.pvOpen = true; R.pvSel = R.pvSel || 0; R.pvSpeed = R.pvSpeed || 1; R.pvZoom = false; R.pvRot = R.pvRot || 0;
   pvScheduleEvent();
-  const v = $('#planetView');
+  const g = S.god, L = godLevel(), v = $('#planetView');
+  v.className = '';
   v.innerHTML = `<div class="pv-space"></div>
     <div class="pv-top-left">
-      <button class="btn" data-pv="close">✕ 나가기</button>
+      <div class="btnrow"><button class="btn" data-pv="close">✕ 나가기</button><button class="btn" data-pv="levels">🗺️ 레벨</button></div>
+      <div class="pv-lvbadge">LEVEL ${g.level} · ${'★'.repeat(L.stars)}${'☆'.repeat(5 - L.stars)}</div>
       <div class="pv-name" data-pv="rename" title="눌러서 이름 바꾸기"><span id="pvName"></span> ✏️</div>
       <div class="pv-stage" id="godStageName"></div>
       <div class="pv-life"><span>🧬</span><div class="bar"><div class="fill green" id="pvLifeFill"></div><span id="pvLifeText"></span></div></div>
       <div class="pv-hab" id="pvHab"></div>
+      <div class="pv-mis" id="pvMis"></div>
     </div>
     <div class="pv-top-right">
       <div class="pv-tools"><span>⏩</span>${[1, 5, 20].map(s => `<button class="pv-speed" data-pv-speed="${s}">×${s}</button>`).join('')}
+        <button class="pv-speed" data-pv="zoom" id="pvZoomBtn">🔍 확대</button><button class="pv-speed" data-pv="photo">📸</button>
         <button class="pv-speed" data-pv="dex">📖 도감</button><button class="pv-speed" data-pv="stats">📊</button></div>
       <div class="pv-stats" id="pvStats">${GOD_STATS.map(s => `<div class="pv-stat"><span>${s.icon}</span>
         <div class="gs-bar"><div class="gs-target" style="left:${(GOD_TARGET[s.k][0] - s.min) / (s.max - s.min) * 100}%;width:${(GOD_TARGET[s.k][1] - GOD_TARGET[s.k][0]) / (s.max - s.min) * 100}%"></div><div class="gs-mark" id="pvMark_${s.k}"></div></div>
         <b id="pvVal_${s.k}"></b></div>`).join('')}<div class="pv-shield" id="pvShield"></div></div>
     </div>
-    <div class="pv-center"><div class="pv-orbit"><div id="godPlanet" class="god-planet pv-planet"><div class="pv-shade"></div></div><div id="godMoon" class="god-moon pv-moon">🌕</div></div></div>
+    <div class="pv-center"><div class="pv-orbit"><div id="godPlanet" class="god-planet pv-planet"><canvas id="pvPlanetCv" width="104" height="104"></canvas></div><div id="godMoon" class="god-moon pv-moon">🌕</div></div></div>
+    <div class="pv-surface"><canvas id="pvSurf" width="${SW}" height="${SH}"></canvas><div class="pv-surf-info" id="pvSurfInfo"></div><div class="pv-surf-hint">🔍 휠을 내리거나 두 손가락을 오므리면 행성으로 돌아가요</div></div>
     <div class="pv-banner" id="pvBanner"></div>
     <div class="pv-log" id="pvLog"></div>
     <div class="pv-dex" id="pvDex"></div>
@@ -2182,12 +2644,26 @@ function openPlanetView() {
         <span class="pv-key">${i < 9 ? i + 1 : i === 9 ? 0 : ''}</span><span class="pv-icon">${p.icon}</span><i class="pv-cd" id="pvCd${i}"></i></button>`).join('')}</div></div>`;
   v.classList.add('on');
   document.body.classList.add('pv-lock');
-  R.sig.pv = null;
+  R.sig.pv = null; R.sig.pvmis = null;
   renderPlanetView();
+  cancelAnimationFrame(R.pvRAF);
+  let last = performance.now();
+  const loop = now => {
+    if (!R.pvOpen) return;
+    const dt = Math.max(0, Math.min(0.1, (now - last) / 1000)); last = Math.max(last, now); // 음수 시간 방지
+    R.pvRot = (R.pvRot || 0) + dt * 0.12 * Math.min(R.pvSpeed, 5);
+    const pc = $('#pvPlanetCv');
+    if (pc && !R.pvZoom && (R.pvFrame = (R.pvFrame || 0) + 1) % 2 === 0) drawPixelPlanet(pc, now / 1000);
+    if (R.pvZoom) { if (!R.surf) surfInit(); surfUpdate(dt * R.pvSpeed); surfDraw($('#pvSurf')); }
+    R.pvRAF = requestAnimationFrame(loop);
+  };
+  R.pvRAF = requestAnimationFrame(loop);
+  drawPixelPlanet($('#pvPlanetCv'), performance.now() / 1000);
 }
 function closePlanetView() {
-  R.pvOpen = false;
-  $('#planetView').classList.remove('on');
+  R.pvOpen = false; R.pvZoom = false;
+  cancelAnimationFrame(R.pvRAF);
+  $('#planetView').className = '';
   $('#planetView').innerHTML = '';
   document.body.classList.remove('pv-lock');
   R.sig.void = null;
@@ -2195,7 +2671,11 @@ function closePlanetView() {
 function pvCast(pt) {
   const p = GOD_POWERS[R.pvSel];
   if (!p) return;
-  usePower(p.id, pt);
+  if (usePower(p.id, pt)) {
+    if (R.pvZoom) surfFx(p.fx, pt ? pt[0] : null);
+    pvImpact(['meteor', 'comet', 'volcano'].includes(p.fx) ? 'cast' : 'cast', null, pt);
+    if (['meteor', 'comet', 'volcano'].includes(p.fx) || p.id === 'tectonic') setTimeout(() => pvImpact('big', null, pt), p.fx === 'volcano' ? 50 : 650);
+  }
 }
 function pvPowerState(p) {
   const g = S.god, now = Date.now();
@@ -2209,27 +2689,34 @@ function pvPowerState(p) {
   return { left, why, ok: !why };
 }
 function renderPlanetView() {
-  const g = S.god;
+  const g = S.god, L = godLevel();
   if (!$('#godPlanet')) return;
   renderGodPlanet();
+  const pl = $('#godPlanet');
+  pl.style.background = 'transparent';
   const size = Math.min(innerWidth * 0.62, innerHeight * 0.5, 520);
-  $('#godPlanet').style.width = $('#godPlanet').style.height = size + 'px';
+  pl.style.width = pl.style.height = size + 'px';
   $('.pv-orbit').style.setProperty('--r', (size / 2 + 50) + 'px');
   setText('pvName', g.name);
   const H = habitability();
   $('#pvLifeFill').style.width = g.life + '%';
   setText('pvLifeText', `생명 ${g.life.toFixed(1)} / 100`);
-  const hab = `🌎 거주 가능성 <b style="color:${H >= 0.8 ? '#8ce99a' : H >= 0.5 ? '#ffd43b' : '#ff8787'}">${(H * 100).toFixed(0)}%</b> · ${g.done ? '🏆 생명의 행성 완성!' : !g.seeded ? (g.crust < 50 ? '🔥 먼저 용암을 식혀 지각(돌)을 만드세요' : g.water < 30 ? '🌊 혜성과 비로 바다를 채우세요' : '🌱 생명의 씨앗을 심을 수 있어요') : g.o2 < 15 && g.life >= 39.9 ? '🫁 산소 15% 이상이 필요해요' : H > 0.5 ? '생명이 자라는 중' : '⚠️ 환경이 나빠 생명이 위험해요'}`;
+  const hab = `🌎 거주 가능성 <b style="color:${H >= L.hab ? '#8ce99a' : H >= 0.5 ? '#ffd43b' : '#ff8787'}">${(H * 100).toFixed(0)}%</b> <small>(목표 ${L.hab * 100}%)</small> · ${g.done ? '🏆 레벨 클리어!' : !g.seeded ? (g.crust < 50 ? '🔥 먼저 용암을 식혀 지각(돌)을 만드세요' : g.water < 30 ? '🌊 혜성과 비로 바다를 채우세요' : '🌱 생명의 씨앗을 심을 수 있어요') : g.o2 < 15 && g.life >= 39.9 ? '🫁 산소 15% 이상이 필요해요' : H > 0.5 ? '생명이 자라는 중' : '⚠️ 환경이 나빠 생명이 위험해요'}`;
   if ($('#pvHab').innerHTML !== hab) $('#pvHab').innerHTML = hab;
+  const misSig = JSON.stringify(g.mis || {});
+  if (R.sig.pvmis !== misSig) {
+    R.sig.pvmis = misSig;
+    $('#pvMis').innerHTML = `<b>📋 미션</b>${MISSIONS.map(m => `<div class="${(g.mis || {})[m.id] ? 'ok' : ''}">${(g.mis || {})[m.id] ? '✅' : '⬜'} ${m.icon} ${m.text}</div>`).join('')}`;
+  }
   for (const s of GOD_STATS) {
-    const v = g[s.k], pct = Math.max(0, Math.min(100, (v - s.min) / (s.max - s.min) * 100));
+    const val = g[s.k], pct = Math.max(0, Math.min(100, (val - s.min) / (s.max - s.min) * 100));
     const m = $('#pvMark_' + s.k);
-    m.style.left = pct + '%'; m.classList.toggle('ok', v >= GOD_TARGET[s.k][0] && v <= GOD_TARGET[s.k][1]);
-    setText('pvVal_' + s.k, s.fmt(v) + s.unit);
+    m.style.left = pct + '%'; m.classList.toggle('ok', val >= GOD_TARGET[s.k][0] && val <= GOD_TARGET[s.k][1]);
+    setText('pvVal_' + s.k, s.fmt(val) + s.unit);
   }
   setText('pvShield', shielded() ? `🛡️ 보호막 ${Math.ceil((g.shieldUntil - Date.now()) / 1000)}초` : '');
   $$('[data-pv-speed]').forEach(b => b.classList.toggle('on', +b.dataset.pvSpeed === R.pvSpeed));
-  // 인벤토리 바
+  setText('pvZoomBtn', R.pvZoom ? '🪐 행성 보기' : '🔍 확대');
   GOD_POWERS.forEach((p, i) => {
     const st = pvPowerState(p), slot = $('#pvSlot' + i);
     slot.classList.toggle('sel', i === R.pvSel);
@@ -2237,7 +2724,7 @@ function renderPlanetView() {
     $('#pvCd' + i).style.height = st.left > 0 && p.cd ? (st.left / (p.cd * 1000) * 100) + '%' : '0';
   });
   const p = GOD_POWERS[R.pvSel], st = pvPowerState(p);
-  const tip = `<b>${p.icon} ${p.name}</b> · 🪙 ${fmt(p.cost)}${p.need ? ' + ' + Object.entries(p.need).map(([z, n]) => `${EL[z].sym}×${fmt(n)}`).join(' ') : ''}<br><small>${p.desc}</small><br>${st.ok ? '<span class="ok">👆 행성을 눌러 사용 (Space)</span>' : `<span class="no">${st.why}</span>`}`;
+  const tip = `<b>${p.icon} ${p.name}</b> · 🪙 ${fmt(p.cost)}${p.need ? ' + ' + Object.entries(p.need).map(([z, n]) => `${EL[z].sym}×${fmt(n)}`).join(' ') : ''}<br><small>${p.desc}</small><br>${st.ok ? `<span class="ok">👆 ${R.pvZoom ? '땅' : '행성'}을 눌러 사용 (Space)</span>` : `<span class="no">${st.why}</span>`}`;
   if ($('#pvTip').innerHTML !== tip) $('#pvTip').innerHTML = tip;
   const logSig = (R.godLog || []).join('|');
   if (R.sig.pvlog !== logSig) { R.sig.pvlog = logSig; $('#pvLog').innerHTML = (R.godLog || []).slice(-5).map(l => `<div>${l}</div>`).join(''); }
@@ -2245,8 +2732,7 @@ function renderPlanetView() {
     const dsig = Object.keys(g.species).join();
     if (R.sig.pvdex !== dsig) {
       R.sig.pvdex = dsig;
-      const n = Object.keys(g.species).length;
-      $('#pvDex').innerHTML = `<div class="pv-dex-head"><b>📖 생물 도감 ${n}/${SPECIES.length}</b><button class="btn" data-pv="dex">닫기</button></div><div class="pv-dex-grid">${SPECIES.map(sp => {
+      $('#pvDex').innerHTML = `<div class="pv-dex-head"><b>📖 생물 도감 ${Object.keys(g.species).length}/${SPECIES.length}</b><button class="btn" data-pv="dex">닫기</button></div><div class="pv-dex-grid">${SPECIES.map(sp => {
         const has = g.species[sp.id];
         return `<div class="pv-sp ${has ? 'has' : ''}"><div class="pv-sp-icon">${has ? sp.icon : '❔'}</div><b>${has ? sp.name : '???'}</b><small>${has ? sp.desc : `생명 ${sp.life} 이상${sp.condText ? ' · ' + sp.condText : ''}`}</small></div>`;
       }).join('')}</div>`;
@@ -2254,12 +2740,31 @@ function renderPlanetView() {
   }
   $('#pvDex').classList.toggle('on', !!R.pvDex);
   $('#pvStats').classList.toggle('hide', !!R.pvHideStats);
-  if (performance.now() >= R.pvNextEvent && !g.done || performance.now() >= R.pvNextEvent && Math.random() < 0.5) { pvScheduleEvent(); pvEvent(); }
+  if (!g.done && performance.now() >= R.pvNextEvent) { pvScheduleEvent(); pvEvent(); }
+}
+function pvPhoto() {
+  const src = R.pvZoom ? $('#pvSurf') : $('#pvPlanetCv');
+  if (!src) return;
+  const k = R.pvZoom ? 6 : 6, c = document.createElement('canvas');
+  c.width = src.width * k; c.height = src.height * k;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  if (!R.pvZoom) { ctx.fillStyle = '#03040b'; ctx.fillRect(0, 0, c.width, c.height); }
+  ctx.drawImage(src, 0, 0, c.width, c.height);
+  const a = document.createElement('a');
+  a.download = `${S.god.name}_${R.pvZoom ? '지상' : '행성'}.png`;
+  a.href = c.toDataURL('image/png');
+  a.click();
+  pvImpact('mission');
+  toast('📸 사진을 저장했어요!');
 }
 function pvAction(a) {
   if (a === 'close') return closePlanetView();
+  if (a === 'levels') { closePlanetView(); return openLevelSelect(); }
   if (a === 'dex') { R.pvDex = !R.pvDex; R.sig.pvdex = null; return; }
   if (a === 'stats') { R.pvHideStats = !R.pvHideStats; return; }
+  if (a === 'zoom') return setZoom(!R.pvZoom);
+  if (a === 'photo') return pvPhoto();
   if (a === 'rename') {
     const n = prompt('행성의 이름을 지어주세요 (최대 16자)', S.god.name);
     if (n && n.trim()) { S.god.name = n.trim().slice(0, 16); S.god.named = true; godLog(`✏️ 행성 이름: <b>${S.god.name}</b>`); }
@@ -2290,6 +2795,7 @@ function adminPanelHtml() {
       <button class="btn" data-admin="void">🕳️ 공허 행성 완성 (엔딩 2)</button>
       <button class="btn" data-admin="coins">🪙 코인 +1000조</button>
       <button class="btn" data-admin="god">✨ 신의 권능 즉시 해금</button>
+      <button class="btn" data-admin="levels">🗺️ 생명의 행성 레벨 1~5 모두 열기</button>
       <button class="btn" data-admin="nocd">⏩ 권능 쿨타임 ${R.godNoCd ? '켜기' : '없애기'}</button>
       <button class="btn" data-admin="resetgod">🔄 테라포밍 처음부터</button>
       <button class="btn" data-admin="backup">💾 지금 상태 백업</button>
@@ -2333,8 +2839,9 @@ function adminAction(a) {
   if (a === 'void') doVoid();
   if (a === 'coins') doCoins();
   if (a === 'god') { doVoid(); doGod(); }
-  if (a === 'resetgod') { S.god = Object.assign(godDefault(), { unlocked: true }); R.godLog = []; }
-  if (a === 'all') { doEl(); doReb(); doVoid(); doCoins(); doGod(); }
+  if (a === 'resetgod') { S.god = Object.assign(godDefault(), { unlocked: true }); R.godLog = []; R.surf = null; }
+  if (a === 'levels') S.godCleared = Math.max(S.godCleared || 0, 4);
+  if (a === 'all') { doEl(); doReb(); doVoid(); doCoins(); doGod(); S.godCleared = Math.max(S.godCleared || 0, 4); }
   R.sig = {}; save();
   toast('🛠️ 관리자: 적용 완료!', 'disc', 2500);
   if (a === 'all' || a === 'god' || a === 'resetgod') { m.classList.remove('on'); switchTab('void'); openPlanetView(); }
@@ -2868,7 +3375,7 @@ function renderArcade() {
 
 /* ---------- 엔딩 ---------- */
 const ENDINGS = {
-  3: { icon: '🌱', title: '생명의 요람', cond: '신의 권능으로 불타는 행성을 생명의 행성으로',
+  3: { icon: '🌱', title: '생명의 요람', cond: '생명의 행성 레벨 5 「종말의 행성」 클리어',
     lines: ['끝없이 불타던 행성이 식어 용암은 돌이 되고, 혜성과 비가 바다를 채웠다.',
       '번개가 첫 생명을 깨우고, 이끼가 바위를 부숴 흙을 만들고, 숲이 대륙을 뒤덮었다.',
       '수소 한 알에서 시작된 연금술이 마침내 숨 쉬는 세계를 낳았다.',
@@ -3868,7 +4375,9 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-rep]'))) return buyRep(el.dataset.rep);
   if ((el = t.closest('[data-upg]'))) return buyUpg(el.dataset.upg);
   if ((el = t.closest('[data-power]'))) return usePower(el.dataset.power);
-  if (t.closest('[data-planet-open]')) return openPlanetView();
+  if (t.closest('[data-planet-open]')) return S.god.unlocked ? openLevelSelect() : unlockGod();
+  if ((el = t.closest('[data-lv-start]'))) return startLevel(+el.dataset.lvStart);
+  if (t.closest('[data-lv-close]') || t.id === 'lvModal') return $('#lvModal').classList.remove('on');
   if ((el = t.closest('[data-pv-slot]'))) { const i = +el.dataset.pvSlot; if (R.pvSel === i) pvCast(); else { R.pvSel = i; SFX.tone(600, 0.04, 'triangle', 0.03); } return; }
   if ((el = t.closest('[data-pv-speed]'))) { R.pvSpeed = +el.dataset.pvSpeed; pvScheduleEvent(); return; }
   if ((el = t.closest('[data-pv]'))) return pvAction(el.dataset.pv);
@@ -3991,11 +4500,35 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 $('#btnAdmin').onclick = openAdmin;
 // 행성 모드: 행성을 누르면 고른 권능을 그 자리에 사용
 document.addEventListener('pointerdown', e => {
-  if (!R.pvOpen || !e.target.closest || !e.target.closest('#planetView #godPlanet')) return;
+  if (!R.pvOpen || !e.target.closest || !e.target.closest('#planetView #godPlanet, #planetView #pvSurf')) return;
   if (clickAllowed(e, 'planet', e.clientX, e.clientY)) pvCast([e.clientX, e.clientY]);
 });
+// 확대/축소: 마우스 휠 · 두 손가락
+let pvWheelT = 0;
+document.addEventListener('wheel', e => {
+  if (!R.pvOpen || !e.target.closest || !e.target.closest('#planetView')) return;
+  e.preventDefault();
+  const now = performance.now();
+  if (now - pvWheelT < 350) return;
+  pvWheelT = now;
+  setZoom(e.deltaY < 0);
+}, { passive: false });
+const pinch = new Map();
+let pinch0 = 0;
+document.addEventListener('pointerdown', e => { if (R.pvOpen && e.pointerType === 'touch') { pinch.set(e.pointerId, [e.clientX, e.clientY]); if (pinch.size === 2) { const [a, b] = [...pinch.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); } } });
+document.addEventListener('pointermove', e => {
+  if (!pinch.has(e.pointerId)) return;
+  pinch.set(e.pointerId, [e.clientX, e.clientY]);
+  if (pinch.size === 2 && pinch0) {
+    const [a, b] = [...pinch.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+    if (d / pinch0 > 1.35) { setZoom(true); pinch0 = d; } else if (d / pinch0 < 0.72) { setZoom(false); pinch0 = d; }
+  }
+});
+['pointerup', 'pointercancel'].forEach(ev => document.addEventListener(ev, e => { pinch.delete(e.pointerId); if (pinch.size < 2) pinch0 = 0; }));
 document.addEventListener('keydown', e => {
   if (!R.pvOpen || ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if (e.key === '+' || e.key === '=') setZoom(true);
+  if (e.key === '-') setZoom(false);
   if (e.key === 'Escape') return closePlanetView();
   if (/^Digit[0-9]$/.test(e.code)) { const d = +e.code.slice(5), i = d === 0 ? 9 : d - 1; if (GOD_POWERS[i]) R.pvSel = i; e.preventDefault(); }
   if (e.code === 'Space') { e.preventDefault(); pvCast(); }
