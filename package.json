@@ -1,0 +1,11 @@
+{
+  "name": "element-alchemist",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": "26.x"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "1.2.1"
+  }
+}

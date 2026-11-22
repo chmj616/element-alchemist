@@ -1,5 +1,5 @@
 // 원소 연금술사 서비스 워커: 네트워크 우선(항상 최신 버전), 오프라인일 때만 캐시 사용
-const CACHE = 'element-alchemist-v2';
+const CACHE = 'element-alchemist-v3';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -14,7 +14,8 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const req = e.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api/')) return; // 계정·저장은 캐시 금지
   e.respondWith(
     fetch(req)
       .then(async res => {

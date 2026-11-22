@@ -659,8 +659,30 @@ body.pv-lock{overflow:hidden}
 .touch{display:none}
 html:not(.touch-input) .pv-touch-only{display:none}
 html.touch-input .pc{display:none}html.touch-input .touch{display:inline}
+.acct-btn{width:auto;padding:0 10px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
+.acct-btn[hidden]{display:none}
+#acctModal{position:fixed;inset:0;z-index:3600;display:none;overflow:auto;padding:16px;background:#05081af0;text-align:center}
+#acctModal.on{display:flex}
+.acct-box{margin:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(560px,100%)}
+.acct-box h2{margin:0 0 10px}
+.acct-box p{line-height:1.5}
+.acct-stack,#acctForm{display:flex;flex-direction:column;gap:10px;max-width:320px;margin:14px auto}
+.acct-stack .big-btn,.acct-stack .btn,#acctForm .big-btn{margin:0;width:100%}
+.acct-box .big-btn.alt{background:linear-gradient(135deg,#2f9e44,#1971c2)}
+#acctForm label{display:flex;flex-direction:column;gap:4px;text-align:left;font-size:13px}
+#acctForm input{padding:10px;font-size:16px;border-radius:8px;border:1px solid var(--line);background:#0a0e1c;color:var(--text);min-width:0}
+.acct-msg{min-height:18px;color:#ffd43b;font-size:13px}
+.acct-note{display:block;margin:10px 0;line-height:1.6;color:var(--dim)}
+.acct-box .btnrow{justify-content:center;margin-top:10px}
+.acct-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.acct-choice>div{border:1px solid var(--line);border-radius:10px;padding:8px;min-width:0;font-size:12px}
+.acct-choice h3{margin:0 0 6px}
+.acct-choice>div>div{display:flex;justify-content:space-between;flex-wrap:wrap;gap:0 6px;padding:2px 0}
+.acct-choice .big-btn{margin:8px 0 0;width:100%;padding:9px}
 #tabLock{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:#05081af5;text-align:center;padding:20px}
 #tabLock.on{display:flex}
+#planetView.zoomed .pv-banner{top:auto;bottom:148px;transform:translate(-50%,12px);opacity:0;pointer-events:none;width:max-content;max-width:94vw;transition:opacity .3s,transform .3s}
+#planetView.zoomed .pv-banner.on{transform:translate(-50%,0);opacity:1}
 .pv-evo{position:absolute;left:0;right:0;top:-50px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
 .evo-era{font-size:13px;font-weight:800;color:#ffd43b;text-shadow:0 2px 4px #000}
 .evo-line{display:flex;align-items:center;gap:1px;font-size:15px;background:#000a;padding:2px 8px;border-radius:12px}
@@ -737,6 +759,13 @@ html.touch-input .pc{display:none}html.touch-input .touch{display:inline}
 .admin-main{grid-column:1/-1;margin:0;background:linear-gradient(135deg,#f59f00,#d6336c);line-height:1.4}
 .admin-main small{font-weight:400;font-size:11px}
 @media (min-width:701px) and (max-width:1120px){.pv-world{top:176px}#planetView.world .pv-alert{top:208px}}
+@media (max-height:500px) and (orientation:landscape){
+  #planetView.world .pv-world{top:90px;bottom:54px}
+  #planetView.world .pv-evo,#planetView.world .pv-tip{display:none}
+  #planetView.world .pv-slot{width:40px;height:40px}
+  #planetView.world .pv-alert{top:96px}
+  #planetView.zoomed .pv-banner{bottom:60px}
+}
 /* ---------- 모바일 ---------- */
 main>*,#content,.hstats>*,.row>*,.rinfo{min-width:0}
 html,body{max-width:100%;overflow-x:hidden}
@@ -749,6 +778,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
   .hstat{min-width:0;padding:3px 6px;border-radius:8px}
   .hstat .lbl{font-size:9px}.hstat .val{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .hbtn{width:100%;height:100%;font-size:16px}
+  .acct-btn{font-size:10px;padding:2px;min-width:0;max-width:none}
   main{padding:8px;gap:8px}
   /* 모바일: 원자핵을 가운데 크게, 글은 그 아래 작게 */
   #corePanel{flex-direction:column;align-items:center;gap:4px}
@@ -838,6 +868,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
 <div id="discModal"></div>
 <div id="pickModal"></div>
 <div id="adminModal"></div>
+<div id="acctModal"></div>
 <div id="tabLock"><div><h2>🗂️ 한 탭에서만 플레이</h2><p id="tabLockMsg"></p><p>진행 상황이 덮어써지지 않도록 이 탭은 멈춰 있어요.</p><button class="big-btn" id="tabTake">여기서 플레이</button></div></div>
 <div id="planetView"></div>
 <div id="lvModal"></div>
@@ -852,6 +883,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
     <div class="hstat"><span class="lbl">발견한 원소</span><span class="val" id="hDisc">1/118</span></div>
     <div class="hstat"><span class="lbl">최고 스테이지</span><span class="val" id="hStage">0</span></div>
     <div class="hstat"><span class="lbl">코인</span><span class="val" id="hCoins" style="color:#ffd43b">🪙 0</span></div>
+    <button class="hbtn acct-btn" id="btnAcct">👤 로그인</button>
     <button class="hbtn" id="btnSound" title="소리 켜기/끄기">🔊</button>
   </div>
 </header>
@@ -1024,6 +1056,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
           <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허에서 우주 창조 = <b>엔딩 2</b> · 불타는 행성을 생명의 행성으로 = <b>엔딩 3</b>.</li>
           <li><b>생명의 행성</b>: 우주를 완성하면 공허 탭이 '🌍 행성'이 되고, '🌱 생명의 행성으로' 버튼(신의 권능 해금 1조 코인)에서 레벨 1~5 행성을 순서대로 골라 전체 화면 모드에 들어가요. 레벨 5를 깨면 엔딩 3. 아래 단축 바에서 권능을 골라(숫자키 1~0) 행성을 누르면 사용돼요. 용암을 식혀 지각을 만들고, 바다·대기·자기장·산소를 지구처럼 맞추고 생명을 100까지 키우면 레벨 클리어. <b>Ctrl+휠</b>(모바일은 두 손가락)로 행성 → 지상 → 🗺️ 펼친 행성 순으로 확대돼요. 펼친 행성은 행성 전체를 직사각형으로 편 지도라 끌어서 동서로 한 바퀴 돌 수 있고, 휠로 확대하면 생물이 자세히 보여요. 커서를 대면(모바일은 길게 누르면) 이름이 나와요. 행성 시간은 이 화면을 보고 있을 때만 흐르고, 배속하면 쿨타임·보호막·재해도 같이 빨라져요. 소행성·감마선이 올 때는 ×1로 느려져요. 미션 보상은 레벨마다 처음 한 번이에요. 미션 체크리스트, 📸 사진 저장, 소행성(눌러서 격추)·태양 플레어·초화산·유성우 같은 사건, 생물 도감 12종, 시간 배속, 행성 이름 짓기도 있어요.</li>
           <li><b>업적 난이도</b>: ★쉬움 생산 +1% · ★★보통 +3%(전투 +1%) · ★★★어려움 +6%(+3%) · ★★★★매우 어려움 +12%(+6%) · ★★★★★전설 +25%(+12%).</li>
+          <li><b>계정</b>: 오른쪽 위 👤에서 아이디와 비밀번호로 가입하면 클라우드에 저장돼 다른 기기에서 이어 할 수 있어요. 이메일을 받지 않으니 비밀번호는 잊지 마세요. 로그인 없이 게스트로도 할 수 있어요.</li>
           <li><b>클릭</b>: 원자핵뿐 아니라 화면 빈 배경을 눌러도 수소를 얻어요.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
           <li><b>조합법 해금</b>: 처음엔 1~10번 원소만 융합할 수 있어요. 5스테이지마다 다음 단계 조합법이 열리고, 50스테이지를 클리어하면 자연 원소(1~92번)를 모두 만들 수 있어요.</li>
@@ -1476,7 +1509,7 @@ function defaultState() {
     totalH: 0, goldens: 0, ach: {}, sound: true,
     prestige: { count: 0, seeds: 0, best: 0 },
     coins: 0, totalCoins: 0, elv: new Array(119).fill(0),
-    void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false, e3: false }, god: godDefault(), godCleared: 0, godAst: 0, misPaid: {},
+    void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false, e3: false }, god: godDefault(), godCleared: 0, godAst: 0, misPaid: {}, godGrant: false, offFrom: 0, offPlayed: 0,
     arcade: { plays: 0, earned: 0, best: {} }, synthKills: 0, rareKills: 0,
   };
 }
@@ -1498,6 +1531,8 @@ function normalizeSave(raw) {
   for (const k of ['totalClicks', 'totalFusions', 'kills', 'playTime', 'totalH', 'goldens', 'coins', 'totalCoins', 'godAst', 'synthKills', 'rareKills']) s[k] = num(d[k]);
   s.lastSave = num(d.lastSave, now);
   s.sound = d.sound !== false;
+  s.godGrant = d.godGrant === true;
+  s.offFrom = num(d.offFrom); s.offPlayed = num(d.offPlayed);
   s.upg = flags(d.upg, UPGRADES.map(u => u.id));
   s.ach = flags(d.ach, ACHS.map(a => a.id));
   s.endings = Object.assign({ e1: false, e2: false, e3: false }, flags(d.endings, ['e1', 'e2', 'e3']));
@@ -1560,15 +1595,18 @@ function normalizeSave(raw) {
 }
 function load() {
   const raw = localStorage.getItem(SAVE_KEY);
-  R.bootRaw = raw;
+  R.bootRaw = raw; R.bootStamp = 0; R.loadFailed = false;
   S = defaultState();
   if (!raw) return 0;
   try {
     const d = JSON.parse(raw);
     if (!d || typeof d !== 'object' || Array.isArray(d)) throw new Error('세이브 형식이 아님');
     S = normalizeSave(d);
-    return Math.min(OFFLINE_CAP, Math.max(0, (Date.now() - S.lastSave) / 1000));
+    R.bootStamp = S.lastSave;
+    if (!S.offFrom) { S.offFrom = S.lastSave; S.offPlayed = 0; } // 보상은 서버 시각을 받은 뒤 계산
+    return;
   } catch (e) {
+    R.loadFailed = true;
     console.warn('세이브 불러오기 실패', e);
     try { localStorage.setItem(BROKEN_KEY, raw); } catch (err) { /* 저장 불가 환경 */ }
     S = defaultState();
@@ -1576,9 +1614,12 @@ function load() {
   }
 }
 let saveLocked = true; // 주 탭이 되기 전 · 초기화/불러오기 직후 페이지를 떠날 때 다시 저장되는 것을 막음
+// 기기 시계를 바꿔도 달라지지 않는 현재 시각 (서버 시각을 받은 뒤)
+const srvNow = () => (R.srv ? R.srv.now + (performance.now() - R.srv.at) : Date.now());
 function save() {
   if (saveLocked) return;
-  S.lastSave = Date.now();
+  // 서버 시각을 모를 때는 기기 시계를 뒤로 돌려도 저장 시각이 과거로 가지 않게
+  S.lastSave = R.srv ? Math.round(srvNow()) : Math.max(S.lastSave || 0, Date.now());
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* 저장 불가 환경 */ }
 }
 
@@ -1781,7 +1822,7 @@ function rebirth() {
   const gain = seedsGain();
   if (!confirm(`🌌 빅뱅을 일으켜 새로운 우주에서 다시 시작할까요?\n\n받는 것: 별의 씨앗 +${gain}개 (영구)\n유지: 업적, 통계, 별의 씨앗, 공허(우주), 생명의 행성, 엔딩, 오락실 기록\n초기화: 원소, 수소, 🪙 코인, 시설, 모든 강화, 스테이지`)) return;
   const keep = {
-    misPaid: S.misPaid, ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, god: S.god, godCleared: S.godCleared, godAst: S.godAst, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills,
+    misPaid: S.misPaid, godGrant: S.godGrant, lastSave: S.lastSave, offFrom: S.offFrom, offPlayed: S.offPlayed, ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, god: S.god, godCleared: S.godCleared, godAst: S.godAst, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
     prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
@@ -2108,6 +2149,7 @@ function unlockGod() {
   if (S.void.idx <= 118) return toast('🔒 공허의 행성을 먼저 완성해야 해요');
   if (S.coins < GOD_UNLOCK_COST) return toast(`🪙 코인이 부족해요 (${fmt(GOD_UNLOCK_COST)} 필요)`);
   S.coins = S.coins - GOD_UNLOCK_COST + GOD_START_GRANT;
+  S.godGrant = true;
   g.unlocked = true;
   SFX.discover();
   particles(innerWidth / 2, innerHeight / 2, 50, '#ffd43b');
@@ -2115,6 +2157,14 @@ function unlockGod() {
   godLog('✨ 신의 권능 해금! 불타는 행성을 식혀 생명을 키워보세요.');
   R.sig.god = null; R.sig.void = null;
   setTimeout(openLevelSelect, 400);
+}
+// 축하금이 생기기 전에 해금했고 아직 레벨 1을 못 깬 사람에게 한 번
+function grantLateFund() {
+  if (!S.god.unlocked || S.godGrant || S.godCleared) return;
+  S.godGrant = true;
+  S.coins += GOD_START_GRANT; S.totalCoins += GOD_START_GRANT;
+  toast(`✨ 생명의 행성 시작 자금 🪙 +${fmt(GOD_START_GRANT)}`, 'disc', 6000);
+  save();
 }
 function usePower(id, pt) {
   const g = S.god, p = GOD_POWERS.find(x => x.id === id);
@@ -2254,7 +2304,7 @@ const GOD_LEVELS = [null,
     eff: 0.8, costMul: 2, cdMul: 1.3, leak: 1.3, targets: { crust: [75, 100], temp: [8, 28], atm: [0.75, 1.4], water: [50, 82], mag: [65, 100], o2: [16, 24] } },
   { name: '쌍성의 불지옥', stars: 4, desc: '두 개의 태양 아래 타오르는 행성. 태양 플레어와 천재지변이 몰아쳐요.', start: { temp: 200, crust: 0, atm: 0, mag: 0, water: 0 }, growth: 0.65, events: 2.2, heat: 1.9, hab: 0.86, reward: 3e13, flare: true,
     eff: 0.65, costMul: 4, cdMul: 1.6, leak: 1.7, targets: { crust: [80, 100], temp: [10, 25], atm: [0.8, 1.3], water: [55, 80], mag: [70, 100], o2: [17, 23] } },
-  { name: '종말의 행성', stars: 5, desc: '소행성과 감마선 폭발, 연쇄 재해가 쏟아지는 마지막 시련. 생명 50부터는 🛡️ 보호막을 아끼지 마세요.', start: { temp: 200, crust: 0, atm: 0, mag: 0, water: 0 }, growth: 0.65, events: 2.8, lifeDmg: 0.7, heat: 2.2, hab: 0.9, reward: 1e14, asteroid: true,
+  { name: '종말의 행성', stars: 5, desc: '소행성과 감마선 폭발, 연쇄 재해가 쏟아지는 마지막 시련. 생명 50부터는 🛡️ 보호막을 아끼지 마세요. ×20 배속으로는 깨기 매우 어려워요.', start: { temp: 200, crust: 0, atm: 0, mag: 0, water: 0 }, growth: 0.65, events: 2.8, lifeDmg: 0.7, heat: 2.2, hab: 0.9, reward: 1e14, asteroid: true,
     eff: 0.5, costMul: 8, cdMul: 2, leak: 2.2, targets: { crust: [85, 100], temp: [12, 22], atm: [0.85, 1.2], water: [58, 78], mag: [75, 100], o2: [18, 22] } },
 ];
 function godLevel() { return GOD_LEVELS[S.god.level || 2] || GOD_LEVELS[2]; }
@@ -2507,6 +2557,7 @@ function surfWeatherPick() {
   W.wT = 15 + Math.random() * 20;
 }
 const WEATHER_NAME = { clear: '☀️ 맑음', rain: '🌧️ 비', storm: '⛈️ 폭풍우', snow: '❄️ 눈', ash: '🌋 화산재' };
+const SURF_COLD = new Set(['penguin', 'polar']); // 추운 곳에서만 사는 생물
 function surfUpdate(dt) {
   const g = S.god, W = R.surf;
   W.t += dt;
@@ -2536,7 +2587,7 @@ function surfUpdate(dt) {
     const missing = desire[type] - have.length;
     for (let s = 0; s < (missing > desire[type] * 0.5 ? missing : missing > 0 && Math.random() < dt * 2 ? 1 : 0); s++) {
       // 돌고래·고래는 바다가 있을 때만
-      const e = { type, art: pickOne(KINDS[type].filter(a => sl > 0 || (a !== 'dolphin' && a !== 'whale'))), ph: Math.random() * 6, d: Math.random() };
+      const e = { type, art: pickOne(KINDS[type].filter(a => (sl > 0 || (a !== 'dolphin' && a !== 'whale')) && (g.temp < 8 || !SURF_COLD.has(a)))), ph: Math.random() * 6, d: Math.random() };
       let x = Math.random() * SW, tries = 0;
       const wet = swims(e), fly = flies(e), sp = CREATURES[e.art][4];
       while (tries++ < 20 && !fly && (wet ? surfElev(x) > sl - 3 : !land(x))) x = Math.random() * SW;
@@ -2547,6 +2598,7 @@ function surfUpdate(dt) {
     }
     if (have.length > desire[type]) W.ents.splice(W.ents.indexOf(have[0]), 1);
   }
+  if (g.temp >= 10) W.ents = W.ents.filter(e => !SURF_COLD.has(e.art));
   for (const e of W.ents) {
     e.ph += dt * 6; e.x += e.vx * dt;
     const bad = !flies(e) && (swims(e) ? surfElev(e.x) > sl - 3 : !land(e.x));
@@ -3049,7 +3101,7 @@ function worldDraw(cv) {
   if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
   if (W.w && (W.w !== w || W.h !== h) && camAtMin()) W.cam.z = 0; // 전체 보기 중 창 크기가 바뀌면 계속 전체 보기
   W.w = w; W.h = h;
-  if (!W.cam.z) W.cam.z = camMin();
+  if (!W.cam.z) W.cam.z = w / h < 1.4 ? Math.max(camMin(), h / WH) : camMin(); // 세로로 긴 화면은 높이를 채워서 시작
   camClamp();
   const ctx = cv.getContext('2d'), C = W.cam, z = C.z, vw = w / z, vh = h / z, whole = vw >= WW - 0.01;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -3382,7 +3434,8 @@ function planetAdvance(realDt) {
 }
 function planetStep(dt) {
   const g = S.god;
-  godTick(dt);
+  if (g.done) { checkSpecies(); checkMissions(); } // 완성한 행성은 더 이상 나빠지지 않음
+  else godTick(dt);
   for (const id in g.cd) if ((g.cd[id] -= dt) <= 0) delete g.cd[id];
   if (g.done) { g.gamma = 0; g.chainIn = 0; g.asts = []; }
   else {
@@ -3536,7 +3589,7 @@ function openPlanetView() {
     </div>
     <div class="pv-center"><div class="pv-orbit"><div id="godPlanet" class="god-planet pv-planet"><canvas id="pvPlanetCv" width="104" height="104"></canvas></div><div id="godMoon" class="god-moon pv-moon">🌕</div></div></div>
     <div class="pv-surface"><canvas id="pvSurf" width="${SW}" height="${SH}"></canvas><div class="pv-surf-info" id="pvSurfInfo"></div><div class="pv-surf-hint"><span class="pc">Ctrl+휠 ↑ 펼친 행성 · ↓ 행성 · 커서를 대면 이름</span><span class="touch">두 손가락으로 전환 · 길게 누르면 이름</span></div></div>
-    <div class="pv-world"><div class="pv-evo" id="pvEvo"></div><canvas id="pvWorld"></canvas><div class="pv-cam" id="pvCamInfo"></div><div class="pv-surf-info" id="pvWorldInfo"></div><div class="pv-surf-hint"><span class="pc">끌기 이동 · 휠 확대 · Ctrl+휠 커서 쪽 확대 · 커서를 대면 이름 · 전체 지도에서 Ctrl+휠 ↓ 지상</span><span class="touch">끌기 이동 · 두 손가락 확대 · 길게 누르면 이름</span></div></div>
+    <div class="pv-world"><div class="pv-evo" id="pvEvo"></div><canvas id="pvWorld"></canvas><div class="pv-cam" id="pvCamInfo"></div><div class="pv-surf-info" id="pvWorldInfo"></div><div class="pv-surf-hint"><span class="pc">끌기 이동 · 휠 확대 · Ctrl+휠 커서 쪽 확대 · 커서를 대면 이름 · 전체 지도에서 Ctrl+휠 ↓ 지상</span><span class="touch">끌기 이동 · 두 손가락 확대·전체 보기 · 길게 누르면 이름</span></div></div>
     <div class="pv-enter-hint"><span class="pc">Ctrl+휠 ↑ 로 확대</span><span class="touch">두 손가락으로 확대</span></div>
     <div class="pv-alert" id="pvAlert"></div><div class="pv-hover" id="pvHover"></div>
     <div class="pv-banner" id="pvBanner"></div>
@@ -3647,7 +3700,7 @@ function renderPlanetView() {
     $('#pvCd' + i).style.height = st.left > 0 && p.cd ? Math.min(100, st.left / (p.cd * 1000 * L.cdMul) * 100) + '%' : '0';
   });
   const p = GOD_POWERS[R.pvSel], st = pvPowerState(p);
-  const tip = `<b>${p.icon} ${p.name}</b> · 🪙 ${fmt(powerCost(p))}${p.need ? ' + ' + Object.entries(powerNeed(p)).map(([z, n]) => `${EL[z].sym}×${fmt(n)}`).join(' ') : ''}<br><small>${p.desc}</small><br>${st.ok ? `<span class="ok">👆 ${R.pvZoom ? '땅' : '행성'}을 눌러 사용 (Space)</span>` : `<span class="no">${st.why}</span>`}`;
+  const tip = `<b>${p.icon} ${p.name}</b> · 🪙 ${fmt(powerCost(p))}${p.need ? ' + ' + Object.entries(powerNeed(p)).map(([z, n]) => `${EL[z].sym}×${fmt(n)}`).join(' ') : ''}<br><small>${p.desc}</small><br>${st.ok ? `<span class="ok">👆 ${R.pvZoom ? '땅' : '행성'}을 눌러 사용<span class="pc"> (Space)</span></span>` : `<span class="no">${st.why}</span>`}`;
   if ($('#pvTip').innerHTML !== tip) $('#pvTip').innerHTML = tip;
   const logSig = (R.godLog || []).join('|');
   if (R.sig.pvlog !== logSig) { R.sig.pvlog = logSig; $('#pvLog').innerHTML = (R.godLog || []).slice(-5).map(l => `<div>${l}</div>`).join(''); }
@@ -3697,7 +3750,7 @@ function pvAction(a) {
 }
 
 /* ---------- 관리자 모드 (테스트용) ---------- */
-const ADMIN_PW = '0616', ADMIN_HINT = '시작';
+const ADMIN_HINT = '시작'; // 비밀번호는 서버 환경 변수로 확인
 const BACKUP_KEY = SAVE_KEY + '_backup';
 function openAdmin() {
   const m = $('#adminModal');
@@ -3732,13 +3785,18 @@ function adminBackup(force) {
   if (force || !localStorage.getItem(BACKUP_KEY)) { localStorage.setItem(BACKUP_KEY, JSON.stringify(S)); return true; }
   return false;
 }
-function adminAction(a) {
+async function adminAction(a) {
   const m = $('#adminModal');
   if (a === 'close') return m.classList.remove('on');
   if (a === 'hint') return setText('adminMsg', `💡 힌트: ${ADMIN_HINT}`);
   if (a === 'login') {
-    if (($('#adminPw')?.value || '') === ADMIN_PW) { R.admin = true; SFX.ach(); return openAdmin(); }
-    setText('adminMsg', '❌ 비밀번호가 틀렸어요');
+    if (R.adminBusy) return;
+    R.adminBusy = true;
+    setText('adminMsg', '확인 중…');
+    const res = await api('admin', { password: $('#adminPw')?.value || '' });
+    R.adminBusy = false;
+    if (res.ok) { R.admin = true; SFX.ach(); return openAdmin(); }
+    setText('adminMsg', '❌ ' + (res.error || '확인하지 못했어요'));
     const b = m.querySelector('.admin-box'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
     return;
   }
@@ -5333,7 +5391,7 @@ document.addEventListener('click', e => {
   if (t.closest('[data-lv-view]')) { $('#lvModal').classList.remove('on'); return openPlanetView(); }
   if (t.closest('[data-lv-close]') || t.id === 'lvModal') return $('#lvModal').classList.remove('on');
   if ((el = t.closest('[data-pv-slot]'))) { const i = +el.dataset.pvSlot; if (R.pvSel === i) pvCast(); else { R.pvSel = i; SFX.tone(600, 0.04, 'triangle', 0.03); } return; }
-  if ((el = t.closest('[data-pv-speed]'))) { R.pvSpeed = +el.dataset.pvSpeed; return; }
+  if ((el = t.closest('[data-pv-speed]'))) { R.pvSpeed = +el.dataset.pvSpeed; if (R.pvSpeed > 1 && S.god.level >= 4 && !S.god.done) pvBanner('⏩ 배속하면 대응할 시간이 줄어서 <b>더 어려워져요</b>', 'bad'); return; }
   if ((el = t.closest('[data-pv]'))) return pvAction(el.dataset.pv);
   if (t.closest('[data-god-unlock]')) return unlockGod();
   if ((el = t.closest('[data-admin]'))) return adminAction(el.dataset.admin);
@@ -5611,7 +5669,9 @@ $('#btnImport').onclick = () => {
   };
 }
 $('#btnReset').onclick = () => {
-  if (!confirm('정말 처음부터 다시 시작할까요? 모든 진행 상황이 사라집니다.')) return;
+  const acct = acctMeta();
+  if (!confirm('정말 처음부터 다시 시작할까요? 모든 진행 상황이 사라집니다.' + (acct ? `\n${acct.user} 계정의 클라우드 저장도 초기화돼요.` : ''))) return;
+  if (acct) acctSetMeta({ ...acct, reset: true });
   saveLocked = true;
   localStorage.removeItem(SAVE_KEY);
   location.reload();
@@ -5634,6 +5694,8 @@ function claimTab() {
     if (waited || localStorage.getItem(SAVE_KEY) !== R.bootRaw) { location.reload(); return; }
     R.master = true; saveLocked = false; last = performance.now();
     $('#tabLock').classList.remove('on');
+    grantLateFund();
+    acctStart();
   };
   if (!navigator.locks) return become();
   const timer = setTimeout(() => { waited = true; block('게임이 다른 탭이나 창에서 실행 중이에요.'); }, 1500);
@@ -5660,17 +5722,287 @@ function claimTab() {
 }
 
 /* =====================================================================
- *  메인 루프
+ *  계정 · 클라우드 저장
+ *  - 로그인하지 않으면 게스트(이 브라우저에만 저장)
+ *  - 서버는 저장마다 번호(rev)를 매김. 다른 기기가 먼저 저장했으면 덮어쓰지 않고 고르게 함
+ *  - ACCT_KEY: 이 브라우저의 세이브가 어느 계정의 몇 번 저장에서 이어진 것인지
  * ===================================================================== */
-const offline = load();
-refreshSynthStages(S.prestige.count);
-if (offline > 10) {
-  const gain = totalRate() * offline;
-  if (gain > 0) {
-    addH(gain);
-    setTimeout(() => toast(`🌙 오프라인 ${fmtTime(offline)} 동안 <b>${fmt(gain)} H</b>를 생산했습니다!`, '', 6000), 300);
+const ACCT_KEY = SAVE_KEY + '_account', GUEST_KEY = SAVE_KEY + '_guest';
+const HAS_SERVER = location.protocol.startsWith('http');
+const A = { user: null, state: 'boot', busy: false, sending: null, lastPush: 0, lastInput: 0, retryAt: 0, view: '' };
+
+function acctMeta() {
+  try {
+    const m = JSON.parse(localStorage.getItem(ACCT_KEY) || 'null');
+    return m && typeof m.user === 'string' && Number.isInteger(m.rev) ? m : null;
+  } catch (e) { return null; }
+}
+function acctSetMeta(m) {
+  try { m ? localStorage.setItem(ACCT_KEY, JSON.stringify(m)) : localStorage.removeItem(ACCT_KEY); } catch (e) { /* 저장 불가 환경 */ }
+}
+async function api(action, body, keepalive) {
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 15000);
+  try {
+    const res = await fetch('/api/' + action, body === undefined
+      ? { cache: 'no-store', signal: ctl.signal }
+      : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: !!keepalive, signal: ctl.signal });
+    const out = await res.json();
+    if (typeof out.now === 'number') R.srv = { now: out.now, at: performance.now() };
+    return Object.assign(out, { ok: res.ok, status: res.status });
+  } catch (e) {
+    return { ok: false, status: 0, error: '서버에 연결할 수 없어요. 인터넷 연결을 확인해 주세요.' };
+  } finally { clearTimeout(timer); }
+}
+
+/* ---------- 오프라인 보상: 서버 시간 기준 ---------- */
+function offlineGrant(now, cap = Infinity) {
+  if (!S.offFrom) return;
+  const sec = Math.min(OFFLINE_CAP, cap, (now - S.offFrom) / 1000 - S.offPlayed);
+  S.offFrom = 0; S.offPlayed = 0;
+  if (sec > 10) {
+    const gain = totalRate() * sec;
+    if (gain > 0) {
+      addH(gain);
+      toast(`🌙 오프라인 ${fmtTime(sec)} 동안 <b>${fmt(gain)} H</b>를 생산했습니다!`, '', 6000);
+    }
+  }
+  save();
+}
+
+/* ---------- 동기화 ---------- */
+async function acctStart() {
+  if (!HAS_SERVER) { A.state = 'local'; offlineGrant(Date.now()); return acctBadge(); }
+  if (A.busy || !R.master) return;
+  A.busy = true;
+  const r = await api('me');
+  A.busy = false;
+  if (!R.master) return;
+  if (!r.ok) { A.state = 'offline'; A.retryAt = performance.now() + 60000; return acctBadge(); }
+  if (r.user) return acctAdopt(r.user, r.save);
+  A.user = null;
+  A.state = acctMeta() ? 'expired' : 'guest';
+  offlineGrant(srvNow());
+  acctBadge();
+  const admin = location.pathname.replace(/\/+$/, '').endsWith('/admin') || location.hash === '#admin';
+  if (!admin && !localStorage.getItem(GUEST_KEY)) acctOpen(A.state === 'expired' ? 'login' : 'welcome');
+}
+function acctFresh() { return !S.totalClicks && S.totalH < 1 && !S.coins && !S.prestige.count && discCount() <= 1; }
+function acctReplaceLocal(raw, meta) {
+  saveLocked = true;
+  try {
+    if (raw) localStorage.setItem(SAVE_KEY, JSON.stringify(normalizeSave(JSON.parse(raw))));
+    else localStorage.removeItem(SAVE_KEY);
+    acctSetMeta(meta);
+  } catch (e) {
+    saveLocked = false;
+    return toast('❌ 저장을 불러오지 못했어요');
+  }
+  location.reload();
+}
+// 다른 사람 계정으로 바뀔 때는 이전 사람의 백업도 남기지 않음
+function acctForgetBackups() { for (const k of [PREIMPORT_KEY, BACKUP_KEY, BROKEN_KEY]) localStorage.removeItem(k); }
+function acctAdopt(user, cloud) {
+  const m = acctMeta(), mine = !!m && m.user === user, other = !!m && !mine;
+  A.user = user;
+  if (other) {
+    acctForgetBackups();
+    return acctReplaceLocal(cloud && cloud.data, { user, rev: cloud ? cloud.rev : 0 });
+  }
+  if (!cloud) {
+    acctSetMeta({ user, rev: 0 });
+    return acctReady(null);
+  }
+  const take = () => acctReplaceLocal(cloud.data, { user, rev: cloud.rev, synced: acctStamp(cloud.data) });
+  if (mine) {
+    // 브라우저 세이브가 사라졌거나 깨졌으면 빈 세이브로 클라우드를 덮지 않음 (직접 초기화한 경우만 예외)
+    if ((!R.bootRaw || R.loadFailed) && !m.reset) return take();
+    if (m.rev === cloud.rev || acctOwnSave(m, cloud)) {
+      acctSetMeta({ ...m, rev: cloud.rev });
+      return acctReady(cloud);
+    }
+    // 이 기기에서 마지막 동기화 뒤에 논 게 없으면 다른 기기의 새 저장을 그대로 받음
+    if (A.state === 'boot' && m.synced && R.bootStamp - m.synced < 15000) return take();
+  } else if (acctFresh()) return take();
+  acctConflict(user, cloud);
+}
+// 이 브라우저가 보낸 저장인가 (화면을 떠나며 보낸 저장은 응답을 못 받으므로 보낸 목록으로 판단)
+function acctOwnSave(m, cloud) { return Array.isArray(m.sent) && m.sent.includes(acctStamp(cloud.data)); }
+function acctStamp(data) { try { return JSON.parse(data).lastSave || 0; } catch (e) { return 0; } }
+function acctReady(cloud) {
+  A.state = 'ok';
+  // 로그인 중에는 서버가 기록한 마지막 저장 시각보다 길게 받을 수 없음
+  offlineGrant(srvNow(), cloud ? (srvNow() - cloud.updatedAt) / 1000 : Infinity);
+  acctBadge();
+  if (A.view && A.view !== 'conflict') acctClose();
+  return acctPush();
+}
+function acctPush(keepalive) {
+  if (A.sending) return A.sending;
+  if (A.state !== 'ok' || !R.master || saveLocked) return Promise.resolve(false);
+  save();
+  const m = acctMeta();
+  if (!m || m.user !== A.user) return Promise.resolve(false);
+  const data = JSON.stringify(S), stamp = S.lastSave;
+  const sent = (Array.isArray(m.sent) ? m.sent : []).concat(stamp).slice(-8);
+  acctSetMeta({ ...m, sent });
+  A.lastPush = performance.now();
+  A.sending = (async () => {
+    let r = await api('save', { user: A.user, rev: m.rev, data }, keepalive && data.length < 20000);
+    // 방금 새로고침할 때 보낸 내 저장이 먼저 도착한 경우: 그 위에 이어서 저장
+    for (let i = 0; i < 3 && r.status === 409 && r.save && acctOwnSave({ sent }, r.save); i++) r = await api('save', { user: A.user, rev: r.save.rev, data });
+    if (saveLocked) return r.ok;
+    if (r.ok) {
+      acctSetMeta({ user: m.user, rev: r.rev, synced: stamp, sent });
+      A.failed = false;
+    } else if (r.status === 409 && r.save) acctConflict(A.user, r.save);
+    else if (r.status === 401 || r.status === 403) {
+      A.state = 'expired';
+      toast('🔑 로그인이 만료됐어요. 다시 로그인하면 이어서 저장돼요.', '', 7000);
+    } else A.failed = true;
+    acctBadge();
+    return r.ok;
+  })().finally(() => { A.sending = null; });
+  return A.sending;
+}
+// DB가 쉴 수 있게(무료 한도) 자주 보내지 않음: 플레이 중 2분, 방치 15분, 뒤에 있으면 30분, 화면을 떠날 때 즉시
+function acctTick() {
+  if (!R.master) return;
+  const now = performance.now();
+  if (A.state === 'offline' && now >= A.retryAt) { A.retryAt = now + 60000; acctStart(); return; }
+  if (A.state !== 'ok') return;
+  const gap = A.failed ? 60e3 : document.hidden ? 1800e3 : now - A.lastInput < 120e3 ? 120e3 : 900e3;
+  if (now - A.lastPush >= gap) acctPush();
+}
+
+/* ---------- 화면 ---------- */
+function acctBadge() {
+  const b = $('#btnAcct'), name = A.user || acctMeta()?.user;
+  const label = A.state === 'ok' ? `${A.failed ? '⚠️' : '☁️'} ${name}` : A.state === 'conflict' ? '⚠️ 저장 선택' : A.state === 'expired' ? '🔑 다시 로그인' : A.state === 'offline' ? '📴 오프라인' : '👤 로그인';
+  setText('btnAcct', label);
+  b.hidden = A.state === 'local';
+  b.title = A.state === 'ok' ? (A.failed ? '클라우드 저장 실패: 1분 뒤 다시 시도' : '클라우드에 저장 중') : label;
+}
+function saveSummary(s, when) {
+  let n = 0;
+  for (let z = 1; z <= 118; z++) if (s.disc[z]) n++;
+  return [['저장 시각', new Date(when || 0).toLocaleString('ko-KR')], ['플레이 시간', fmtTime(s.playTime)], ['발견한 원소', n + ' / 118'], ['최고 스테이지', Math.max(s.prestige.best, s.battle.maxStage)], ['환생', s.prestige.count + '회'], ['생명의 행성', s.godCleared + ' / 5'], ['코인', fmt(s.coins)]]
+    .map(([k, v]) => `<div>${k}<b>${esc(v)}</b></div>`).join('');
+}
+function acctConflict(user, cloud) {
+  let parsed;
+  try { parsed = normalizeSave(JSON.parse(cloud.data)); } catch (e) { return toast('❌ 클라우드 저장을 읽지 못했어요'); }
+  A.state = 'conflict'; A.user = user; A.cloud = cloud;
+  acctBadge();
+  acctOpen('conflict', parsed);
+}
+function acctOpen(view, data) {
+  const box = $('#acctModal'), name = esc(A.user || acctMeta()?.user || '');
+  A.view = view;
+  let h = '';
+  if (view === 'welcome') {
+    h = `<h2>⚛️ 원소 연금술사</h2><p>계정을 만들면 다른 기기에서도 이어서 할 수 있어요.</p>
+      <div class="acct-stack"><button class="big-btn" data-acct="login">로그인</button><button class="big-btn alt" data-acct="signup">회원가입</button><button class="btn" data-acct="guest">게스트로 하기</button></div>`;
+  } else if (view === 'login' || view === 'signup') {
+    const up = view === 'signup';
+    h = `<h2>${up ? '회원가입' : '로그인'}</h2>
+      <form id="acctForm" novalidate>
+        <label>아이디<input name="username" id="acctId" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="16" placeholder="영문·숫자·_ 3~16자"></label>
+        <label>비밀번호<input name="password" id="acctPw" type="password" autocomplete="${up ? 'new-password' : 'current-password'}" maxlength="72" placeholder="8자 이상"></label>
+        ${up ? '<label>비밀번호 확인<input name="password2" id="acctPw2" type="password" autocomplete="new-password" maxlength="72"></label>' : ''}
+        <div class="acct-msg" id="acctMsg" role="alert"></div>
+        <button class="big-btn" id="acctSubmit" type="submit">${up ? '가입하고 시작' : '로그인'}</button>
+      </form>
+      ${up ? '<small class="acct-note">지금 이 기기의 진행 상황이 새 계정에 저장돼요.<br>이메일을 받지 않아서 <b>비밀번호를 잊으면 찾을 수 없어요.</b><br>다른 사이트에서 쓰는 비밀번호는 쓰지 마세요.</small>' : ''}
+      <div class="btnrow"><button class="btn" data-acct="${up ? 'login' : 'signup'}">${up ? '이미 계정이 있어요' : '계정 만들기'}</button><button class="btn" data-acct="guest">닫기</button></div>`;
+  } else if (view === 'account') {
+    h = `<h2>☁️ ${name}</h2><p id="acctMsg">${A.failed ? '마지막 클라우드 저장에 실패했어요.' : '클라우드에 자동 저장되고 있어요.'}</p>
+      <div class="acct-stack"><button class="big-btn" data-acct="push">☁️ 지금 저장</button><button class="btn" data-acct="logout">로그아웃</button><button class="btn" data-acct="close">닫기</button></div>
+      <small class="acct-note">로그아웃하면 저장한 뒤 이 기기에서는 진행 상황이 지워져요.<br>다시 로그인하면 그대로 돌아와요.</small>`;
+  } else if (view === 'conflict') {
+    h = `<h2>어느 저장으로 이어갈까요?</h2><p><b>${name}</b> 계정과 이 기기의 진행이 달라요. 고르지 않은 쪽은 이 기기에 백업돼요.</p>
+      <div class="acct-choice"><div><h3>☁️ 클라우드</h3>${saveSummary(data, A.cloud.updatedAt)}<button class="big-btn" data-acct="cloud">이걸로</button></div>
+      <div><h3>📱 이 기기</h3>${saveSummary(S, R.bootStamp || S.lastSave)}<button class="big-btn alt" data-acct="device">이걸로</button></div></div>
+      <button class="btn" data-acct="close">나중에 (그동안 클라우드 저장 안 됨)</button>`;
+  }
+  box.innerHTML = `<div class="acct-box" role="dialog" aria-modal="true">${h}</div>`;
+  box.classList.add('on');
+  if (view === 'login' || view === 'signup') setTimeout(() => $('#acctId')?.focus(), 30);
+}
+function acctClose() { A.view = ''; $('#acctModal').classList.remove('on'); }
+async function acctAction(a) {
+  if (a === 'login' || a === 'signup') return acctOpen(a);
+  if (a === 'guest') { localStorage.setItem(GUEST_KEY, '1'); return acctClose(); }
+  if (a === 'close') return acctClose();
+  if (a === 'push') { setText('acctMsg', '저장 중…'); if (A.sending) await A.sending; return setText('acctMsg', (await acctPush()) ? '✅ 저장했어요.' : '❌ 저장하지 못했어요.'); }
+  if (a === 'logout') {
+    setText('acctMsg', '저장 중…');
+    if (A.sending) await A.sending;
+    if (!(await acctPush())) return setText('acctMsg', '❌ 저장하지 못해서 로그아웃하지 않았어요. 잠시 후 다시 해주세요.');
+    const r = await api('logout', {});
+    if (!r.ok) return setText('acctMsg', '❌ ' + r.error);
+    acctForgetBackups();
+    localStorage.setItem(GUEST_KEY, '1');
+    return acctReplaceLocal(null, null);
+  }
+  if (a === 'cloud') {
+    save();
+    localStorage.setItem(PREIMPORT_KEY, JSON.stringify(S));
+    return acctReplaceLocal(A.cloud.data, { user: A.user, rev: A.cloud.rev, synced: acctStamp(A.cloud.data) });
+  }
+  if (a === 'device') {
+    localStorage.setItem(PREIMPORT_KEY, A.cloud.data);
+    const undo = $('#btnUndoImport');
+    if (undo) undo.hidden = false;
+    acctSetMeta({ user: A.user, rev: A.cloud.rev });
+    acctClose();
+    if (A.sending) await A.sending;
+    return acctReady(A.cloud);
   }
 }
+async function acctSubmit(form) {
+  const up = !!form.password2, btn = $('#acctSubmit');
+  if (btn.disabled) return;
+  const username = form.username.value.trim().toLowerCase(), password = form.password.value;
+  const fail = msg => setText('acctMsg', msg);
+  if (!/^[a-z0-9_]{3,16}$/.test(username)) return fail('아이디는 영문·숫자·_ 3~16자예요.');
+  if (password.length < 8) return fail('비밀번호는 8자 이상이에요.');
+  if (up && form.password2.value !== password) return fail('비밀번호 확인이 달라요.');
+  const m = acctMeta();
+  if (m && m.user !== username && !confirm(`이 기기에는 ${m.user} 계정의 진행이 있어요.\n${username}(으)로 바꾸면 이 기기에서는 지워져요. 마지막으로 클라우드에 저장된 뒤의 진행은 사라져요. 계속할까요?`)) return;
+  btn.disabled = true;
+  fail('잠시만요…');
+  const r = await api(up ? 'signup' : 'login', up ? { username, password, password2: form.password2.value } : { username, password });
+  btn.disabled = false;
+  if (!r.ok) return fail(r.error || '실패했어요.');
+  form.reset();
+  acctClose();
+  toast(up ? '🎉 가입 완료! 이제 클라우드에 저장돼요.' : '☁️ 로그인했어요.', 'disc');
+  A.state = 'login';
+  acctAdopt(r.user, r.save);
+}
+
+$('#btnAcct').onclick = () => {
+  if (A.state === 'ok') return acctOpen('account');
+  if (A.state === 'conflict') return acctConflict(A.user, A.cloud);
+  if (A.state === 'offline') { toast('📴 서버에 연결 중…', '', 2000); return acctStart(); }
+  acctOpen('login');
+};
+$('#acctModal').addEventListener('click', e => {
+  e.stopPropagation(); // 게임 쪽 클릭 처리로 넘기지 않음
+  const b = e.target.closest('[data-acct]');
+  if (b) acctAction(b.dataset.acct);
+});
+$('#acctModal').addEventListener('submit', e => { e.preventDefault(); acctSubmit(e.target); });
+for (const ev of ['pointerdown', 'keydown']) document.addEventListener(ev, () => { A.lastInput = performance.now(); }, true);
+document.addEventListener('visibilitychange', () => { if (document.hidden) acctPush(true); });
+window.addEventListener('pagehide', () => { acctPush(true); });
+setInterval(acctTick, 5000);
+
+/* =====================================================================
+ *  메인 루프
+ * ===================================================================== */
+load();
+refreshSynthStages(S.prestige.count);
 let last = performance.now(), uiAcc = 0, saveAcc = 0;
 function tick() {
   if (!R.master) return;
@@ -5678,6 +6010,7 @@ function tick() {
   const dt = Math.min(OFFLINE_CAP, (now - last) / 1000);
   last = now;
   S.playTime += dt;
+  if (S.offFrom) S.offPlayed += dt;
   addH(totalRate() * dt);
   if (R.pvOpen && !document.hidden) planetAdvance(Math.min(dt, 1));
   battleAdvance(dt);
