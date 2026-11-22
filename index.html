@@ -625,6 +625,18 @@ body.pv-lock{overflow:hidden}
 .pv-surface{position:absolute;left:50%;top:50%;transform:translate(-50%,-56%) scale(.6);opacity:0;pointer-events:none;transition:transform .6s ease-out,opacity .6s;width:min(94vw,calc((100vh - 250px) * 1.786));aspect-ratio:200/112;z-index:1}
 #planetView.zoomed .pv-surface{opacity:1;transform:translate(-50%,-56%) scale(1);pointer-events:auto}
 .pv-surface canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges;border:4px solid #2b2b2b;outline:2px solid #6b6b6b;cursor:crosshair;touch-action:none}
+.pv-world{position:absolute;left:50%;top:50%;transform:translate(-50%,-54%) scale(.6);opacity:0;pointer-events:none;transition:transform .6s ease-out,opacity .6s;width:min(94vw,calc((100vh - 270px) * 1.6));aspect-ratio:240/150;z-index:1}
+#planetView.world .pv-world{opacity:1;transform:translate(-50%,-54%) scale(1);pointer-events:auto}
+#planetView.world .pv-surface{opacity:0;transform:translate(-50%,-56%) scale(1.6);pointer-events:none}
+.pv-world canvas{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges;border:4px solid #2b2b2b;outline:2px solid #6b6b6b;cursor:crosshair;touch-action:none}
+.pv-world .pv-surf-info{top:auto;bottom:8px;max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-evo{position:absolute;left:0;right:0;top:-46px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
+.evo-era{font-size:13px;font-weight:800;color:#ffd43b;text-shadow:0 2px 4px #000}
+.evo-line{display:flex;align-items:center;gap:1px;font-size:15px;background:#000a;padding:2px 8px;border-radius:12px}
+.evo-line i{font-style:normal;color:#495057;font-size:10px}
+.evo-sp{opacity:.3;filter:grayscale(1)}
+.evo-sp.on{opacity:1;filter:none}
+.evo-sp.new{animation:blink 1s infinite;transform:scale(1.2)}
 .pv-surf-info{position:absolute;left:8px;top:8px;background:#000a;padding:3px 8px;font-size:12px;border-radius:4px;font-family:monospace}
 .pv-surf-hint{position:absolute;right:8px;bottom:-22px;font-size:11px;color:var(--dim)}
 .pv-lvbadge{display:inline-block;font-size:12px;font-weight:900;letter-spacing:2px;color:#ffd43b;font-family:monospace}
@@ -670,6 +682,10 @@ body.pv-lock{overflow:hidden}
 @media (max-width:700px){
   .pv-mis{max-height:90px;font-size:10px}
   .pv-surface{width:96vw;transform:translate(-50%,-50%) scale(.6)}
+  .pv-world{width:96vw}
+  #planetView.zoomed .pv-mis{display:none}
+  .evo-line{font-size:11px}.evo-era{font-size:11px}
+  .pv-world .pv-surf-info{font-size:9px}
   #planetView.zoomed .pv-surface{transform:translate(-50%,-50%) scale(1)}
   .lv-card{flex-wrap:wrap}.lv-planet{width:44px;height:44px}
 }
@@ -968,7 +984,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
           <li><b>오락실</b>: 카드 맞추기(3단계) · 원소 퀴즈(4모드) · 원소 사천성 · 원자 잡기 · 순서 터치 · 원소 2048 · 기억 순서 · 업다운 — 8가지 미니게임으로 코인 획득. 최근 10분 판수만큼 보상이 줄어드는 피로도가 있어요.</li>
           <li><b>공허</b>: 주기율표 순서대로 원소를 바치면 우주가 태어나요. 원소 하나를 다 채울 때마다 생산량 ×1.02 (영구). 118번까지 채우면 <b>엔딩 2</b>.</li>
           <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허에서 우주 창조 = <b>엔딩 2</b> · 불타는 행성을 생명의 행성으로 = <b>엔딩 3</b>.</li>
-          <li><b>생명의 행성</b>: 우주를 완성하면 공허 탭이 '🌍 행성'이 되고, '🌱 생명의 행성으로' 버튼(신의 권능 해금 1조 코인)에서 레벨 1~5 행성을 순서대로 골라 전체 화면 모드에 들어가요. 레벨 5를 깨면 엔딩 3. 아래 인벤토리 바에서 권능을 골라(숫자키 1~0) 행성을 누르면 사용돼요. 용암을 식혀 지각을 만들고, 바다·대기·자기장·산소를 지구처럼 맞추고 생명을 100까지 키우면 레벨 클리어. 🔍 확대(휠·두 손가락)하면 도트 그림의 지상에서 나무가 자라고 생물이 움직이고 비·눈·폭풍이 내리는 모습을 볼 수 있어요. 미션 체크리스트, 📸 사진 저장, 소행성(눌러서 격추)·태양 플레어·초화산·유성우 같은 사건, 생물 도감 12종, 시간 배속, 행성 이름 짓기도 있어요.</li>
+          <li><b>생명의 행성</b>: 우주를 완성하면 공허 탭이 '🌍 행성'이 되고, '🌱 생명의 행성으로' 버튼(신의 권능 해금 1조 코인)에서 레벨 1~5 행성을 순서대로 골라 전체 화면 모드에 들어가요. 레벨 5를 깨면 엔딩 3. 아래 인벤토리 바에서 권능을 골라(숫자키 1~0) 행성을 누르면 사용돼요. 용암을 식혀 지각을 만들고, 바다·대기·자기장·산소를 지구처럼 맞추고 생명을 100까지 키우면 레벨 클리어. 🔍 확대(휠·두 손가락)하면 도트 지상 화면, 한 번 더 확대하면 월드박스 같은 🗺️ 월드 지도(생명이 미생물부터 인류까지 순서대로 번식, 마을·진화 연표)를 볼 수 있어요. 지상에서는 나무가 자라고 생물이 움직이고 비·눈·폭풍이 내리는 모습을 볼 수 있어요. 미션 체크리스트, 📸 사진 저장, 소행성(눌러서 격추)·태양 플레어·초화산·유성우 같은 사건, 생물 도감 12종, 시간 배속, 행성 이름 짓기도 있어요.</li>
           <li><b>업적 난이도</b>: ★쉬움 생산 +1% · ★★보통 +3%(전투 +1%) · ★★★어려움 +6%(+3%) · ★★★★매우 어려움 +12%(+6%) · ★★★★★전설 +25%(+12%).</li>
           <li><b>클릭</b>: 원자핵뿐 아니라 화면 빈 배경을 눌러도 수소를 얻어요.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
@@ -2376,7 +2392,7 @@ function surfUpdate(dt) {
   const sl = seaElev(), land = x => surfElev(x) > sl + 2;
   // 나무: 생명·지각·기온 조건이 맞으면 점점 늘고 자라고, 너무 뜨거우면 불타 사라짐
   const okTree = g.seeded && g.crust >= 50 && g.temp > -5 && g.temp < 45 && g.life > 12;
-  const want = okTree ? Math.floor(g.life / 100 * 42 * (g.species.fern ? 1 : 0.35)) : 0;
+  const want = okTree ? Math.floor(g.life / 100 * 85 * (g.species.fern ? 1 : 0.35)) : 0;
   // 행성 상태보다 많이 모자라면(처음 확대했을 때 등) 바로 채우고, 그 뒤로는 하나씩 자라남
   const addTree = grown => { for (let k = 0; k < 20; k++) { const x = 4 + Math.random() * (SW - 8); if (land(x)) { W.trees.push({ x, g: grown ? 0.5 + Math.random() * 0.5 : 0.05, pine: Math.random() < 0.35 }); return; } } };
   if (W.trees.length < want * 0.6) while (W.trees.length < want) { const n = W.trees.length; addTree(true); if (W.trees.length === n) break; }
@@ -2385,10 +2401,10 @@ function surfUpdate(dt) {
   for (const tr of W.trees) tr.g = Math.min(1, tr.g + dt * 0.12);
   // 생물
   const desire = {
-    fish: g.species.fish && sl > 0 ? Math.min(10, Math.floor(g.life / 9)) : 0,
-    shell: g.species.shell && sl > 0 ? 4 : 0,
-    dino: g.species.dino ? 3 : 0, bird: g.species.bird ? 6 : 0, mammal: g.species.mammal ? 4 : 0, human: g.species.human ? 5 : 0,
-    insect: g.species.insect ? 10 : 0,
+    fish: g.species.fish && sl > 0 ? Math.min(32, Math.floor(g.life / 3)) : 0,
+    shell: g.species.shell && sl > 0 ? 12 : 0,
+    dino: g.species.dino ? 8 : 0, bird: g.species.bird ? 16 : 0, mammal: g.species.mammal ? 14 : 0, human: g.species.human ? 16 : 0,
+    insect: g.species.insect ? 32 : 0,
   };
   for (const type in desire) {
     const have = W.ents.filter(e => e.type === type);
@@ -2529,13 +2545,254 @@ function surfFx(kind, clientX) {
   if (kind === 'ice') { R.surf.weather = 'snow'; R.surf.wT = 15; }
   if (kind === 'volcano') { R.surf.weather = 'ash'; R.surf.wT = 12; }
 }
-function setZoom(on) {
-  if (!!R.pvZoom === on) return;
-  R.pvZoom = on;
-  if (on && !R.surf) surfInit();
-  $('#planetView').classList.toggle('zoomed', on);
-  SFX.tone(on ? 300 : 600, 0.3, 'sine', 0.04, on ? 2 : 0.5);
+/* ---------- 2단계 확대: 월드 지도 (위에서 내려다보는 도트 타일 지도) ---------- */
+const WW = 240, WH = 150;
+// 지질 시대: 가장 최근에 등장한 생물 기준
+const ERAS = {
+  none: '불모의 시대 · 아직 생명 없음', microbe: '시생대 · 최초의 생명', algae: '원생대 · 산소의 탄생', shell: '캄브리아기 · 생명 대폭발',
+  moss: '오르도비스기 · 육지로 올라온 생명', trilo: '실루리아기 · 바다의 번성', fish: '데본기 · 물고기의 시대', fern: '석탄기 · 거대한 숲',
+  insect: '페름기 · 곤충의 시대', dino: '쥐라기 · 공룡의 시대', bird: '백악기 · 하늘의 지배자', mammal: '신생대 · 포유류의 시대', human: '인류세 · 문명의 시작',
+};
+// 종류별 최대 개체 수 (생명 수치에 비례해 차례로 번식)
+const WORLD_POP = { microbe: 200, algae: 120, shell: 70, trilo: 80, fish: 140, insect: 120, dino: 30, bird: 45, mammal: 70, human: 90 };
+const T = { DEEP: 0, SHALLOW: 1, BEACH: 2, GRASS: 3, HILL: 4, MOUNT: 5, SNOW: 6, LAVA: 7, ROCK: 8, DESERT: 9, ICE: 10, SOIL: 11 };
+function worldInit() {
+  const M = pxMaps((S.god.level || 2) * 101 + 7);
+  // 육지와 바다가 적당히 섞인 지역을 골라서 보여줌
+  const sea = S.god.water > 0.5 ? M.sorted[Math.min(M.sorted.length - 1, Math.floor(S.god.water / 100 * M.sorted.length))] : -1;
+  let best = 0, bestScore = 9;
+  for (let o = 0; o < 16; o++) {
+    let land = 0;
+    for (let i = 0; i < 400; i++) {
+      const x = (i * 37) % WW, y = (i * 53) % WH;
+      if (M.h[worldK(M, x, y, o / 16)] > sea) land++;
+    }
+    const sc = Math.abs(land / 400 - 0.5);
+    if (sc < bestScore) { bestScore = sc; best = o / 16; }
+  }
+  R.world = { t: 0, off: best, tiles: new Uint8Array(WW * WH), key: '', img: null, trees: [], ents: [], villages: [], fx: [], clouds: [], spot: [], seenSpecies: {} };
+  for (let i = 0; i < 7; i++) R.world.clouds.push({ x: Math.random() * WW, y: Math.random() * WH, r: 10 + Math.random() * 16 });
+  Object.keys(S.god.species).forEach(k => R.world.seenSpecies[k] = true);
 }
+function worldK(M, x, y, off) {
+  const u = (off + x / WW * 0.42) % 1, v = 0.27 + y / WH * 0.46;
+  return Math.min(PX.H - 1, (v * PX.H) | 0) * PX.W + ((u * PX.W) | 0);
+}
+function worldTerrain() {
+  const g = S.god, W = R.world, M = pxMaps((g.level || 2) * 101 + 7);
+  const key = [Math.round(g.water / 2), Math.round(g.crust / 5), Math.round(g.temp / 5), Math.round(g.life / 10), g.seeded, !!g.species.moss].join('|');
+  if (W.key === key && W.img) return;
+  W.key = key;
+  const sea = g.water > 0.5 ? M.sorted[Math.min(M.sorted.length - 1, Math.floor(g.water / 100 * M.sorted.length))] : -1;
+  const molten = Math.max(0, 1 - g.crust / 70), veg = g.seeded ? g.life / 100 : 0;
+  const img = new ImageData(WW, WH), D = img.data;
+  const pal = {
+    0: [28, 76, 168], 1: [52, 128, 210], 2: [226, 206, 140], 3: [92, 178, 72], 4: [120, 160, 80], 5: [118, 112, 108], 6: [238, 242, 248],
+    7: [255, 120, 20], 8: [102, 92, 88], 9: [214, 184, 112], 10: [200, 226, 246], 11: [128, 96, 64],
+  };
+  for (let y = 0; y < WH; y++) for (let x = 0; x < WW; x++) {
+    const k = worldK(M, x, y, W.off), h = M.h[k], d = M.d[k];
+    let t;
+    if (h <= sea) t = g.temp < -5 ? T.ICE : h < sea - 0.05 ? T.DEEP : T.SHALLOW;
+    else if (d < molten * 1.05) t = T.LAVA;
+    else {
+      const e = (h - Math.max(0, sea)) / (1 - Math.max(0, sea));
+      if (h < sea + 0.012 && sea > 0) t = T.BEACH;
+      else if (g.temp < -5 || (e > 0.72 && g.temp < 25)) t = T.SNOW;
+      else if (e > 0.55) t = T.MOUNT;
+      else if (e > 0.42) t = T.HILL;
+      else if (veg > 0.1 && d > 1 - veg * 1.1) t = T.GRASS;
+      else if (g.temp > 45) t = T.DESERT;
+      else t = g.species.moss ? T.SOIL : T.ROCK;
+    }
+    W.tiles[y * WW + x] = t;
+    let c = pal[t];
+    const n = ((x * 7 + y * 13) % 5) / 40 - 0.05 + (d - 0.5) * 0.15; // 타일 질감
+    if (t === T.LAVA) c = d < molten * 0.5 ? [255, 214, 70] : [214, 64, 18];
+    const i4 = (y * WW + x) * 4;
+    D[i4] = Math.max(0, Math.min(255, c[0] * (1 + n))); D[i4 + 1] = Math.max(0, Math.min(255, c[1] * (1 + n))); D[i4 + 2] = Math.max(0, Math.min(255, c[2] * (1 + n))); D[i4 + 3] = 255;
+  }
+  W.img = img;
+  // 조건이 바뀌어 살 수 없게 된 나무·마을 정리
+  W.trees = W.trees.filter(tr => W.tiles[(tr.y | 0) * WW + (tr.x | 0)] === T.GRASS);
+}
+const wTile = (x, y) => (x < 0 || y < 0 || x >= WW || y >= WH) ? -1 : R.world.tiles[(y | 0) * WW + (x | 0)];
+const isWater = t => t === T.DEEP || t === T.SHALLOW;
+const isLand = t => t === T.GRASS || t === T.HILL || t === T.BEACH || t === T.SOIL || t === T.DESERT;
+function worldRandTile(test, tries = 60) {
+  for (let i = 0; i < tries; i++) { const x = Math.random() * WW, y = Math.random() * WH; if (test(wTile(x, y))) return [x, y]; }
+  return null;
+}
+function worldUpdate(dt) {
+  const g = S.god, W = R.world;
+  W.t += dt;
+  worldTerrain();
+  const L = g.seeded ? g.life / 100 : 0;
+  // 새로 등장한 생물: 알림 + 첫 개체 강조
+  for (const sp of SPECIES) if (g.species[sp.id] && !W.seenSpecies[sp.id]) {
+    W.seenSpecies[sp.id] = true;
+    W.newest = { id: sp.id, t: 0 };
+    pvBanner(`${sp.icon} <b>${sp.name}</b> 등장! ${ERAS[sp.id]}`, 'good');
+  }
+  if (W.newest) W.newest.t += dt;
+  // 나무 (고사리 이후 숲)
+  const treeWant = g.species.fern ? Math.floor(L * 520) : g.species.moss ? Math.floor(L * 80) : 0;
+  if (W.trees.length < treeWant) for (let i = 0; i < Math.min(12, treeWant - W.trees.length) && Math.random() < dt * 20; i++) {
+    const p = worldRandTile(t => t === T.GRASS); if (p) W.trees.push({ x: p[0], y: p[1], g: 0, big: Math.random() < 0.3 });
+  }
+  if (W.trees.length > treeWant + 10) W.trees.splice(0, 8);
+  for (const tr of W.trees) tr.g = Math.min(1, tr.g + dt * 0.5);
+  // 생물: 종류별로 차례로 번식
+  const want = {};
+  for (const id in WORLD_POP) want[id] = g.species[id] ? Math.floor(WORLD_POP[id] * Math.min(1, 0.25 + L)) : 0;
+  for (const type in want) {
+    const have = W.ents.filter(e => e.type === type).length;
+    const water = ['microbe', 'algae', 'fish', 'shell', 'trilo'].includes(type);
+    if (have < want[type]) {
+      const n = Math.max(1, Math.ceil((want[type] - have) * dt * 0.8));
+      for (let i = 0; i < n; i++) {
+        // 이미 있는 같은 종 근처에서 번식 (없으면 알맞은 곳 아무데나)
+        const parent = W.ents.find(e => e.type === type && Math.random() < 0.2);
+        let p = parent ? [parent.x + (Math.random() - 0.5) * 6, parent.y + (Math.random() - 0.5) * 6] : null;
+        const ok = t => type === 'shell' || type === 'trilo' || type === 'microbe' ? t === T.SHALLOW || (type === 'microbe' && t === T.DEEP) : water ? isWater(t) : type === 'bird' ? true : isLand(t);
+        if (!p || !ok(wTile(p[0], p[1]))) p = worldRandTile(ok);
+        if (!p) break;
+        const sp = { microbe: 1, algae: 0.6, shell: 0.3, trilo: 2, fish: 7, insect: 9, dino: 3, bird: 14, mammal: 4, human: 3 }[type];
+        const a = Math.random() * Math.PI * 2;
+        W.ents.push({ type, x: p[0], y: p[1], vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, sp, t: Math.random() * 6, born: 0 });
+      }
+    } else if (have > want[type] + 3) {
+      const idx = W.ents.findIndex(e => e.type === type); W.ents.splice(idx, 1);
+    }
+  }
+  for (const e of W.ents) {
+    e.t += dt; e.born += dt;
+    if (Math.random() < dt * 0.6) { const a = Math.atan2(e.vy, e.vx) + (Math.random() - 0.5) * 2; e.vx = Math.cos(a) * e.sp; e.vy = Math.sin(a) * e.sp; }
+    if (e.type === 'human' && W.villages.length && Math.random() < dt * 0.3) { // 사람은 마을 쪽으로
+      const v = W.villages[Math.floor(Math.random() * W.villages.length)]; const a = Math.atan2(v.y - e.y, v.x - e.x); e.vx = Math.cos(a) * e.sp; e.vy = Math.sin(a) * e.sp;
+    }
+    const nx = e.x + e.vx * dt, ny = e.y + e.vy * dt, t = wTile(nx, ny);
+    const water = ['microbe', 'algae', 'fish', 'shell', 'trilo'].includes(e.type);
+    const ok = e.type === 'bird' ? t !== -1 : water ? isWater(t) : isLand(t);
+    if (ok) { e.x = nx; e.y = ny; } else { e.vx *= -1; e.vy *= -1; }
+  }
+  // 마을 (지적 생명체): 해안 근처 초원에 생겨나 집이 늘어남
+  if (g.species.human) {
+    if (W.villages.length < 5 && Math.random() < dt * 0.25) {
+      const p = worldRandTile(t => t === T.GRASS, 200);
+      if (p && !W.villages.some(v => Math.hypot(v.x - p[0], v.y - p[1]) < 30)) W.villages.push({ x: p[0], y: p[1], houses: [], t: 0 });
+    }
+    for (const v of W.villages) {
+      v.t += dt;
+      if (v.houses.length < 10 && Math.random() < dt * 0.5) {
+        const a = Math.random() * Math.PI * 2, r = 2 + v.houses.length * 1.1;
+        const hx = v.x + Math.cos(a) * r, hy = v.y + Math.sin(a) * r;
+        if (isLand(wTile(hx, hy))) v.houses.push({ x: hx, y: hy, roof: ['#c0392b', '#a0522d', '#7f8c8d'][v.houses.length % 3] });
+      }
+    }
+  } else W.villages = [];
+  for (const c of W.clouds) { c.x += dt * 3; if (c.x - c.r > WW) c.x = -c.r; }
+  for (const f of W.fx) f.t += dt;
+  W.fx = W.fx.filter(f => f.t < 1.4);
+}
+function worldDraw(cv) {
+  const ctx = cv.getContext('2d'), g = S.god, W = R.world;
+  worldTerrain();
+  ctx.putImageData(W.img, 0, 0);
+  const day = 0.5 + 0.5 * Math.cos(W.t * 0.06);
+  // 밭 (마을 주변)
+  for (const v of W.villages) for (let i = 0; i < Math.min(v.houses.length, 6); i++) {
+    const fx = Math.round(v.x + 6 + i * 3), fy = Math.round(v.y + 5);
+    if (isLand(wTile(fx, fy))) { ctx.fillStyle = i % 2 ? '#d4b44a' : '#b7c95a'; ctx.fillRect(fx, fy, 3, 2); }
+  }
+  // 나무
+  for (const tr of W.trees) {
+    const x = Math.round(tr.x), y = Math.round(tr.y);
+    if (tr.g < 0.4) { ctx.fillStyle = '#7bd36a'; ctx.fillRect(x, y, 1, 1); continue; }
+    ctx.fillStyle = '#5b3a1e'; ctx.fillRect(x, y + 1, 1, 1);
+    ctx.fillStyle = tr.big ? '#1e6b2a' : '#2e8b3a'; ctx.fillRect(x - (tr.big ? 1 : 0), y - (tr.big ? 1 : 0), tr.big ? 3 : 2, tr.big ? 2 : 1);
+    if (tr.big) { ctx.fillStyle = '#3aa14a'; ctx.fillRect(x, y - 1, 1, 1); }
+  }
+  // 집
+  for (const v of W.villages) for (const h of v.houses) {
+    const x = Math.round(h.x), y = Math.round(h.y);
+    ctx.fillStyle = '#e6d2b0'; ctx.fillRect(x, y, 3, 2);
+    ctx.fillStyle = h.roof; ctx.fillRect(x, y - 1, 3, 1);
+    if (day < 0.45) { ctx.fillStyle = '#ffd43b'; ctx.fillRect(x + 1, y + 1, 1, 1); }
+  }
+  // 생물
+  const col = { microbe: '#c8f7c5', algae: '#3f9b4a', shell: '#f783ac', trilo: '#c9a06b', fish: '#d0ebff', insect: '#ffe066', dino: '#4f8a3c', bird: '#ffffff', mammal: '#8d5b3a', human: '#f1c27d' };
+  for (const e of W.ents) {
+    const x = Math.round(e.x), y = Math.round(e.y), c = col[e.type];
+    const pop = e.born < 0.6 ? 1 + (0.6 - e.born) * 3 : 1; // 막 태어난 개체는 반짝
+    if (pop > 1) { ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 1, y - 1, 3, 3); }
+    ctx.fillStyle = c;
+    if (e.type === 'dino') { ctx.fillRect(x, y, 3, 2); ctx.fillRect(x + (e.vx > 0 ? 3 : -1), y - 1, 1, 1); }
+    else if (e.type === 'mammal') ctx.fillRect(x, y, 2, 2);
+    else if (e.type === 'bird') { const f = Math.sin(e.t * 12) > 0; ctx.fillRect(x - 1, y - (f ? 1 : 0), 1, 1); ctx.fillRect(x, y, 1, 1); ctx.fillRect(x + 1, y - (f ? 1 : 0), 1, 1); ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(x, y + 4, 1, 1); }
+    else if (e.type === 'human') { ctx.fillRect(x, y, 1, 2); ctx.fillStyle = '#4dabf7'; ctx.fillRect(x, y + 1, 1, 1); }
+    else if (e.type === 'insect') { if (Math.sin(e.t * 20) > 0) ctx.fillRect(x, y, 1, 1); }
+    else if (e.type === 'algae') ctx.fillRect(x, y, 2, 1);
+    else if (e.type === 'fish') ctx.fillRect(x, y, 2, 1);
+    else ctx.fillRect(x, y, 1, 1);
+  }
+  // 새 생물 등장 강조 링
+  if (W.newest && W.newest.t < 3) {
+    const first = W.ents.find(e => e.type === W.newest.id) || W.trees[W.trees.length - 1];
+    if (first) { const r = 3 + (W.newest.t % 1) * 10; ctx.strokeStyle = `rgba(255,212,59,${1 - (W.newest.t % 1)})`; ctx.strokeRect(Math.round(first.x - r), Math.round(first.y - r), Math.round(r * 2), Math.round(r * 2)); }
+  }
+  // 구름 그림자 · 비
+  const rainy = R.surf && (R.surf.weather === 'rain' || R.surf.weather === 'storm');
+  if (g.atm > 0.4 && g.temp < 100) for (const c of W.clouds) {
+    ctx.fillStyle = rainy ? 'rgba(90,100,120,.35)' : 'rgba(255,255,255,.28)';
+    for (let i = -c.r; i < c.r; i += 2) { const hh = Math.sqrt(c.r * c.r - i * i) * 0.5; ctx.fillRect(Math.round(c.x + i), Math.round(c.y - hh), 2, Math.round(hh * 2)); }
+    if (rainy) { ctx.fillStyle = 'rgba(165,216,255,.7)'; for (let i = 0; i < 12; i++) ctx.fillRect(Math.round(c.x + (Math.sin(i * 9 + W.t * 7) * c.r)), Math.round(c.y + ((W.t * 40 + i * 7) % 14)), 1, 2); }
+  }
+  // 권능 효과
+  for (const f of W.fx) {
+    const r = f.t * 14, a = 1 - f.t / 1.4;
+    ctx.fillStyle = { meteor: `rgba(255,140,40,${a})`, comet: `rgba(170,220,255,${a})`, volcano: `rgba(255,80,20,${a})` }[f.type] || `rgba(255,255,255,${a * 0.5})`;
+    ctx.fillRect(Math.round(f.x - r), Math.round(f.y - r / 2), Math.round(r * 2), Math.round(r));
+  }
+  // 밤
+  if (day < 0.5) { ctx.fillStyle = `rgba(5,10,40,${(0.5 - day) * 1.1})`; ctx.fillRect(0, 0, WW, WH); for (const v of W.villages) for (const h of v.houses) { ctx.fillStyle = '#ffd43b'; ctx.fillRect(Math.round(h.x) + 1, Math.round(h.y) + 1, 1, 1); } }
+  // 진화 연표
+  const counts = {};
+  for (const e of W.ents) counts[e.type] = (counts[e.type] || 0) + 1;
+  const latest = [...SPECIES].reverse().find(sp => g.species[sp.id]);
+  const era = ERAS[latest ? latest.id : 'none'];
+  const sig = Object.keys(g.species).join() + '|' + era;
+  if (R.sig.evo !== sig) {
+    R.sig.evo = sig;
+    $('#pvEvo').innerHTML = `<div class="evo-era">⏳ ${era}</div><div class="evo-line">${SPECIES.map(sp => `<span class="evo-sp ${g.species[sp.id] ? 'on' : ''} ${latest && latest.id === sp.id ? 'new' : ''}" title="${sp.name}">${g.species[sp.id] ? sp.icon : '·'}</span>`).join('<i>›</i>')}</div>`;
+  }
+  const houses = W.villages.reduce((s, v) => s + v.houses.length, 0);
+  setText('pvWorldInfo', `🐾 개체 ${W.ents.length + W.trees.length}  ·  🌳 나무 ${W.trees.length}  ·  🐟 ${counts.fish || 0}  🦕 ${counts.dino || 0}  🐦 ${counts.bird || 0}  🐘 ${counts.mammal || 0}  🧑 ${counts.human || 0}${houses ? `  ·  🏘️ 마을 ${W.villages.length}곳 (집 ${houses}채)` : ''}  ·  ${day > 0.5 ? '☀️ 낮' : '🌙 밤'}`);
+}
+function worldFx(kind, clientX, clientY) {
+  if (!R.world) return;
+  const cv = $('#pvWorld'), r = cv ? cv.getBoundingClientRect() : null;
+  const x = r && clientX != null ? (clientX - r.left) / r.width * WW : WW / 2, y = r && clientY != null ? (clientY - r.top) / r.height * WH : WH / 2;
+  R.world.fx.push({ type: kind, x, y, t: 0 });
+  if (kind === 'meteor' || kind === 'volcano') { // 충돌 지점 주변 생명 피해
+    R.world.ents = R.world.ents.filter(e => Math.hypot(e.x - x, e.y - y) > 8);
+    R.world.trees = R.world.trees.filter(tr => Math.hypot(tr.x - x, tr.y - y) > 8);
+  }
+}
+const ZOOM_NAMES = ['🪐 행성', '🔍 지상', '🗺️ 월드'];
+function setZoomLevel(n) {
+  n = Math.max(0, Math.min(2, n));
+  if ((R.pvZoom | 0) === n) return;
+  R.pvZoom = n;
+  if (n >= 1 && !R.surf) surfInit();
+  if (n === 2 && !R.world) worldInit();
+  const v = $('#planetView');
+  v.classList.toggle('zoomed', n >= 1);
+  v.classList.toggle('world', n === 2);
+  SFX.tone(n ? 260 + n * 120 : 600, 0.3, 'sine', 0.04, n ? 2 : 0.5);
+  pvBanner(`${ZOOM_NAMES[n]} 보기`, '');
+}
+function setZoom(on) { setZoomLevel((R.pvZoom | 0) + (on ? 1 : -1)); }
 
 /* ---------- 사건 ---------- */
 const shielded = () => (S.god.shieldUntil || 0) > Date.now();
@@ -2655,7 +2912,7 @@ function pvAsteroid(forceSize) {
 function openPlanetView() {
   if (!S.god.unlocked) return unlockGod();
   if (!S.god.level) return openLevelSelect();
-  R.pvOpen = true; R.pvSel = R.pvSel || 0; R.pvSpeed = R.pvSpeed || 1; R.pvZoom = false; R.pvRot = R.pvRot || 0;
+  R.pvOpen = true; R.pvSel = R.pvSel || 0; R.pvSpeed = R.pvSpeed || 1; R.pvZoom = 0; R.pvRot = R.pvRot || 0;
   pvScheduleEvent();
   const g = S.god, L = godLevel(), v = $('#planetView');
   v.className = '';
@@ -2678,7 +2935,8 @@ function openPlanetView() {
         <b id="pvVal_${s.k}"></b></div>`).join('')}<div class="pv-shield" id="pvShield"></div></div>
     </div>
     <div class="pv-center"><div class="pv-orbit"><div id="godPlanet" class="god-planet pv-planet"><canvas id="pvPlanetCv" width="104" height="104"></canvas></div><div id="godMoon" class="god-moon pv-moon">🌕</div></div></div>
-    <div class="pv-surface"><canvas id="pvSurf" width="${SW}" height="${SH}"></canvas><div class="pv-surf-info" id="pvSurfInfo"></div><div class="pv-surf-hint">🔍 휠을 내리거나 두 손가락을 오므리면 행성으로 돌아가요</div></div>
+    <div class="pv-surface"><canvas id="pvSurf" width="${SW}" height="${SH}"></canvas><div class="pv-surf-info" id="pvSurfInfo"></div><div class="pv-surf-hint">🔍 한 번 더 확대하면 🗺️ 월드 지도 · 휠을 내리면 행성으로</div></div>
+    <div class="pv-world"><div class="pv-evo" id="pvEvo"></div><canvas id="pvWorld" width="${WW}" height="${WH}"></canvas><div class="pv-surf-info" id="pvWorldInfo"></div><div class="pv-surf-hint">🔍 휠을 내리면 지상 화면으로</div></div>
     <div class="pv-banner" id="pvBanner"></div>
     <div class="pv-log" id="pvLog"></div>
     <div class="pv-dex" id="pvDex"></div>
@@ -2697,14 +2955,15 @@ function openPlanetView() {
     R.pvRot = (R.pvRot || 0) + dt * 0.12 * Math.min(R.pvSpeed, 5);
     const pc = $('#pvPlanetCv');
     if (pc && !R.pvZoom && (R.pvFrame = (R.pvFrame || 0) + 1) % 2 === 0) drawPixelPlanet(pc, now / 1000);
-    if (R.pvZoom) { if (!R.surf) surfInit(); surfUpdate(dt * R.pvSpeed); surfDraw($('#pvSurf')); }
+    if (R.pvZoom >= 1) { if (!R.surf) surfInit(); surfUpdate(dt * R.pvSpeed); if (R.pvZoom === 1) surfDraw($('#pvSurf')); }
+    if (R.pvZoom === 2) { if (!R.world) worldInit(); worldUpdate(dt * R.pvSpeed); worldDraw($('#pvWorld')); }
     R.pvRAF = requestAnimationFrame(loop);
   };
   R.pvRAF = requestAnimationFrame(loop);
   drawPixelPlanet($('#pvPlanetCv'), performance.now() / 1000);
 }
 function closePlanetView() {
-  R.pvOpen = false; R.pvZoom = false;
+  R.pvOpen = false; R.pvZoom = 0;
   cancelAnimationFrame(R.pvRAF);
   $('#planetView').className = '';
   $('#planetView').innerHTML = '';
@@ -2715,7 +2974,8 @@ function pvCast(pt) {
   const p = GOD_POWERS[R.pvSel];
   if (!p) return;
   if (usePower(p.id, pt)) {
-    if (R.pvZoom) surfFx(p.fx, pt ? pt[0] : null);
+    if (R.pvZoom === 1) surfFx(p.fx, pt ? pt[0] : null);
+    if (R.pvZoom === 2) worldFx(p.fx, pt ? pt[0] : null, pt ? pt[1] : null);
     pvImpact(['meteor', 'comet', 'volcano'].includes(p.fx) ? 'cast' : 'cast', null, pt);
     if (['meteor', 'comet', 'volcano'].includes(p.fx) || p.id === 'tectonic') setTimeout(() => pvImpact('big', null, pt), p.fx === 'volcano' ? 50 : 650);
   }
@@ -2759,7 +3019,7 @@ function renderPlanetView() {
   }
   setText('pvShield', shielded() ? `🛡️ 보호막 ${Math.ceil((g.shieldUntil - Date.now()) / 1000)}초` : '');
   $$('[data-pv-speed]').forEach(b => b.classList.toggle('on', +b.dataset.pvSpeed === R.pvSpeed));
-  setText('pvZoomBtn', R.pvZoom ? '🪐 행성 보기' : '🔍 확대');
+  setText('pvZoomBtn', ['🔍 확대', '🗺️ 월드 보기', '🪐 행성 보기'][R.pvZoom | 0]);
   GOD_POWERS.forEach((p, i) => {
     const st = pvPowerState(p), slot = $('#pvSlot' + i);
     slot.classList.toggle('sel', i === R.pvSel);
@@ -2786,7 +3046,7 @@ function renderPlanetView() {
   if (!g.done && performance.now() >= R.pvNextEvent) { pvScheduleEvent(); pvEvent(); }
 }
 function pvPhoto() {
-  const src = R.pvZoom ? $('#pvSurf') : $('#pvPlanetCv');
+  const src = R.pvZoom === 2 ? $('#pvWorld') : R.pvZoom ? $('#pvSurf') : $('#pvPlanetCv');
   if (!src) return;
   const k = R.pvZoom ? 6 : 6, c = document.createElement('canvas');
   c.width = src.width * k; c.height = src.height * k;
@@ -2795,7 +3055,7 @@ function pvPhoto() {
   if (!R.pvZoom) { ctx.fillStyle = '#03040b'; ctx.fillRect(0, 0, c.width, c.height); }
   ctx.drawImage(src, 0, 0, c.width, c.height);
   const a = document.createElement('a');
-  a.download = `${S.god.name}_${R.pvZoom ? '지상' : '행성'}.png`;
+  a.download = `${S.god.name}_${['행성', '지상', '월드'][R.pvZoom | 0]}.png`;
   a.href = c.toDataURL('image/png');
   a.click();
   pvImpact('mission');
@@ -2806,7 +3066,7 @@ function pvAction(a) {
   if (a === 'levels') { closePlanetView(); return openLevelSelect(); }
   if (a === 'dex') { R.pvDex = !R.pvDex; R.sig.pvdex = null; return; }
   if (a === 'stats') { R.pvHideStats = !R.pvHideStats; return; }
-  if (a === 'zoom') return setZoom(!R.pvZoom);
+  if (a === 'zoom') return setZoomLevel(((R.pvZoom | 0) + 1) % 3);
   if (a === 'photo') return pvPhoto();
   if (a === 'rename') {
     const n = prompt('행성의 이름을 지어주세요 (최대 16자)', S.god.name);
@@ -4543,7 +4803,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 $('#btnAdmin').onclick = openAdmin;
 // 행성 모드: 행성을 누르면 고른 권능을 그 자리에 사용
 document.addEventListener('pointerdown', e => {
-  if (!R.pvOpen || !e.target.closest || !e.target.closest('#planetView #godPlanet, #planetView #pvSurf')) return;
+  if (!R.pvOpen || !e.target.closest || !e.target.closest('#planetView #godPlanet, #planetView #pvSurf, #planetView #pvWorld')) return;
   if (clickAllowed(e, 'planet', e.clientX, e.clientY)) pvCast([e.clientX, e.clientY]);
 });
 // 확대/축소: 마우스 휠 · 두 손가락
