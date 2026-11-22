@@ -3657,6 +3657,13 @@ $('#btnInstall').onclick = async () => {
 if (matchMedia('(display-mode: standalone)').matches) setText('installState', '✅ 앱으로 실행 중');
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 $('#btnAdmin').onclick = openAdmin;
+// 관리자 바로가기 링크: /admin 또는 #admin 으로 들어오면 관리자 로그인 창을 바로 띄움
+function adminLinkCheck() {
+  const p = location.pathname.replace(/\/+$/, '');
+  if (p.endsWith('/admin') || location.hash === '#admin') { switchTab('settings'); openAdmin(); }
+}
+window.addEventListener('hashchange', adminLinkCheck);
+setTimeout(adminLinkCheck, 300);
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'adminPw') adminAction('login'); });
 /* 배경을 눌러도 수소 획득 (패널·버튼이 아닌 빈 곳) */
 document.addEventListener('click', e => {
