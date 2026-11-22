@@ -491,6 +491,62 @@ textarea{width:100%;height:70px;margin-top:8px;background:#0a0e1c;color:var(--te
 .ach small{color:var(--dim);font-size:12px}
 .ach-sum{background:linear-gradient(90deg,#5f3dc4,#1971c2);border-radius:12px;padding:12px 16px;margin-bottom:12px;font-weight:700}
 .fact-box{margin-top:8px;padding:8px 10px;background:#0a0e1c;border-radius:8px;font-size:13px;color:#c9d6ff}
+/* ---------- 탭 하이라이트(모바일 파란 사각형) 제거 ---------- */
+html{-webkit-tap-highlight-color:transparent}
+#core,#core *,#coreWrap,.nucleus{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;outline:none}
+:focus:not(:focus-visible){outline:none}
+body,main,#corePanel{cursor:default}
+/* ---------- 업적 난이도 ---------- */
+.ach-tier{display:block;font-size:11px;margin-top:3px;color:#8b95bf}
+.ach.done .ach-tier.t1{color:#adb5bd}.ach.done .ach-tier.t2{color:#74c0fc}.ach.done .ach-tier.t3{color:#b197fc}.ach.done .ach-tier.t4{color:#ffa94d}.ach.done .ach-tier.t5{color:#ffd43b;text-shadow:0 0 8px #ffd43b88}
+/* ---------- 신의 권능 ---------- */
+.god-lock{text-align:center;padding:30px 16px;background:radial-gradient(circle at 50% 0%,#3b2f8f55,transparent 70%),var(--panel);border:1px solid #5f3dc4;border-radius:16px}
+.god-lock-icon{font-size:64px;filter:drop-shadow(0 0 20px #ffd43b)}
+.god-lock p{color:#c9d6ff;line-height:1.7}
+.god-need{color:#ffa94d!important}
+.god-unlock{margin:0 auto;background:linear-gradient(135deg,#f59f00,#e8590c)}
+.god-wrap{display:flex;gap:14px;flex-wrap:wrap}
+.god-stage{position:relative;flex:1;min-width:280px;height:340px;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:radial-gradient(circle at center,#0f1838,#03040b 75%);display:flex;align-items:center;justify-content:center}
+.god-space{position:absolute;inset:0;background-image:radial-gradient(1.5px 1.5px at 10% 20%,#fff8,transparent),radial-gradient(1px 1px at 80% 30%,#fff7,transparent),radial-gradient(1.5px 1.5px at 30% 80%,#fff6,transparent),radial-gradient(1px 1px at 65% 75%,#fff8,transparent)}
+.god-planet{position:relative;width:220px;height:220px;border-radius:50%;transition:background .8s,box-shadow .8s}
+.god-planet.clouds::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse 40% 10% at 30% 35%,#ffffffaa,transparent),radial-gradient(ellipse 35% 8% at 65% 55%,#ffffff99,transparent),radial-gradient(ellipse 30% 8% at 40% 75%,#ffffff88,transparent);animation:cloudDrift 18s linear infinite}
+@keyframes cloudDrift{from{background-position:0 0}to{background-position:220px 0}}
+.god-planet.aurora::after{content:'';position:absolute;inset:-14px;border-radius:50%;border:3px solid transparent;border-top-color:#63e6be99;border-bottom-color:#b197fc88;filter:blur(3px);animation:spin 9s linear infinite}
+.god-planet.hit{animation:shake .4s}
+.god-planet[class*=pulse-]{animation:planetGrow .6s}
+.god-moon{position:absolute;font-size:34px;animation:orbitMoon 12s linear infinite}
+@keyframes orbitMoon{from{transform:rotate(0) translateX(150px) rotate(0)}to{transform:rotate(360deg) translateX(150px) rotate(-360deg)}}
+.god-stage-name{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-weight:800;font-size:17px;text-shadow:0 2px 6px #000}
+.god-panel{flex:1;min-width:280px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.god-life{display:flex;align-items:center;gap:10px;font-weight:800}
+.god-life .bar{flex:1;height:22px}
+.god-hab{font-size:13px;color:#c9d6ff}
+.god-stat{display:grid;grid-template-columns:96px 1fr 82px;align-items:center;gap:8px;font-size:13px}
+.gs-bar{position:relative;height:12px;background:#0a0e1c;border-radius:6px;border:1px solid var(--line)}
+.gs-target{position:absolute;top:0;bottom:0;background:#2f9e4455;border-left:1px solid #69db7c;border-right:1px solid #69db7c}
+.gs-mark{position:absolute;top:-4px;width:6px;height:18px;margin-left:-3px;border-radius:3px;background:#ff8787;box-shadow:0 0 6px #ff8787;transition:left .3s}
+.gs-mark.ok{background:#69db7c;box-shadow:0 0 6px #69db7c}
+.gs-val{text-align:right;font-weight:700}
+.god-tip{color:var(--dim);font-size:11px;line-height:1.5}
+.god-powers{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.god-power{position:relative;overflow:hidden;text-align:left;background:linear-gradient(160deg,#2b1b4f,#141a2e);border:1px solid #5f3dc4;border-radius:12px;padding:10px;color:var(--text);cursor:pointer;display:flex;flex-direction:column;gap:3px}
+.god-power:hover:not(:disabled){border-color:var(--gold)}
+.god-power:disabled{opacity:.5;cursor:not-allowed}
+.gp-icon{font-size:28px}.god-power b{font-size:14px}.god-power small{font-size:11px;color:#c9d6ff;line-height:1.45}
+.gp-cost{font-size:12px;color:var(--gold);font-weight:700;margin-top:auto}
+.gp-cd{position:absolute;left:0;bottom:0;height:4px;background:var(--accent)}
+.god-meteor{position:fixed;font-size:40px;z-index:950;pointer-events:none;filter:drop-shadow(0 0 12px #ff922b)}
+/* ---------- 관리자 ---------- */
+#adminModal{position:fixed;inset:0;z-index:3500;display:none;align-items:center;justify-content:center;background:#05081acc;backdrop-filter:blur(4px)}
+#adminModal.on{display:flex;animation:fadein .2s}
+.admin-box{background:var(--panel);border:1px solid #f59f00;border-radius:16px;padding:20px;width:min(560px,94vw);text-align:center}
+.admin-box h2{margin:0 0 8px}
+.admin-box input{width:200px;padding:10px;font-size:20px;text-align:center;letter-spacing:6px;border-radius:10px;border:1px solid var(--line);background:#0a0e1c;color:var(--text)}
+.admin-msg{min-height:20px;margin:8px 0;color:#ffd43b;font-size:13px}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left}
+.admin-grid .btn{padding:10px}
+.admin-main{grid-column:1/-1;margin:0;background:linear-gradient(135deg,#f59f00,#d6336c);line-height:1.4}
+.admin-main small{font-weight:400;font-size:11px}
 /* ---------- 모바일 ---------- */
 main>*,#content,.hstats>*,.row>*,.rinfo{min-width:0}
 html,body{max-width:100%;overflow-x:hidden}
@@ -567,6 +623,12 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
   .end-stats{grid-template-columns:repeat(2,1fr)}
   .pick-grid{grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px}
   #golden{width:56px;height:56px;font-size:38px}
+  .void-wrap,.god-wrap{flex-direction:column}
+  .god-stage{min-width:0;height:270px}.god-planet{width:170px;height:170px}
+  .god-panel{min-width:0}
+  .god-stat{grid-template-columns:82px 1fr 70px;font-size:12px}
+  .god-powers{grid-template-columns:1fr 1fr}
+  .admin-grid{grid-template-columns:1fr}
 }
 @media (max-width:380px){
   .arc-menu{grid-template-columns:1fr}
@@ -581,6 +643,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
 <div id="golden" title="초신성 파편! 클릭하세요!">🌟</div>
 <div id="discModal"></div>
 <div id="pickModal"></div>
+<div id="adminModal"></div>
 <div id="endModal"></div>
 
 <header>
@@ -623,6 +686,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
       <button class="tabbtn" data-tab="battle">⚔️ 전투<span class="dot" id="battleDot"></span></button>
       <button class="tabbtn" data-tab="shop">🏪 상점</button>
       <button class="tabbtn" data-tab="void">🕳️ 공허</button>
+      <button class="tabbtn" data-tab="god">✨ 신의 권능</button>
       <button class="tabbtn" data-tab="arcade">🎰 오락실</button>
       <button class="tabbtn" data-tab="table">🧪 주기율표</button>
       <button class="tabbtn" data-tab="ach">🏆 업적</button>
@@ -721,6 +785,9 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
       <div id="arcStage" class="arc-stage"></div>
     </div>
 
+    <!-- 신의 권능 -->
+    <div class="tab" id="tab-god"><div id="godBox"></div></div>
+
     <!-- 공허 -->
     <div class="tab" id="tab-void">
       <p class="tip">🕳️ <b>공허</b>에 주기율표 <b>순서대로</b>(수소 → 헬륨 → 리튬 …) 원소를 바치면 그 안에서 새로운 행성이 자라납니다.<br>
@@ -732,7 +799,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
       </div>
       <div class="sec-head"><h3>📜 공허 진행도</h3><small id="voidProg"></small></div>
       <div id="voidTrack" class="void-track"></div>
-      <div class="sec-head"><h3>🏁 엔딩</h3><small>엔딩 1: 5000층 최종 보스 처치 · 엔딩 2: 공허의 행성 완성</small></div>
+      <div class="sec-head"><h3>🏁 엔딩</h3><small>엔딩 1: 5000층 최종 보스 처치 · 엔딩 2: 공허의 행성 완성 · 엔딩 3: 생명의 행성 완성</small></div>
       <div id="endingList" class="endings"></div>
     </div>
 
@@ -760,7 +827,10 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
           <li><b>전투</b> 탭에서 원소로 파티를 꾸려 적과 싸웁니다. 보유 개수가 많고 원자 번호가 클수록 강합니다. 스테이지를 깰수록 생산량이 <b>+3%</b>씩 증가합니다.</li>
           <li><b>오락실</b>: 카드 맞추기(3단계) · 원소 퀴즈(4모드) · 원소 사천성 · 원자 잡기 · 순서 터치 · 원소 2048 · 기억 순서 · 업다운 — 8가지 미니게임으로 코인 획득. 최근 10분 판수만큼 보상이 줄어드는 피로도가 있어요.</li>
           <li><b>공허</b>: 주기율표 순서대로 원소를 바치면 행성이 자라요. 원소 하나를 다 채울 때마다 생산량 ×1.02 (영구). 118번까지 채우면 <b>엔딩 2</b>.</li>
-          <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허의 행성 완성 = <b>엔딩 2</b>.</li>
+          <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허의 행성 완성 = <b>엔딩 2</b> · 신의 권능으로 생명의 행성 완성 = <b>엔딩 3</b>.</li>
+          <li><b>신의 권능</b>: 공허의 행성을 완성한 뒤 1조 코인으로 해금. 운석·혜성·화산·핵 점화·번개·광합성 등 11가지 권능으로 기온·대기·바다·자기장·산소를 지구처럼 맞추고 생명을 100까지 키우면 엔딩 3.</li>
+          <li><b>업적 난이도</b>: ★쉬움 생산 +1% · ★★보통 +3%(전투 +1%) · ★★★어려움 +6%(+3%) · ★★★★매우 어려움 +12%(+6%) · ★★★★★전설 +25%(+12%).</li>
+          <li><b>클릭</b>: 원자핵뿐 아니라 화면 빈 배경을 눌러도 수소를 얻어요.</li>
           <li><b>상점</b>: 원소를 팔아 코인을 얻고, 코인으로 원소를 강화하면 그 원소의 공격력·체력이 레벨마다 ×1.2 늘어나요.</li>
           <li><b>조합법 해금</b>: 처음엔 1~10번 원소만 융합할 수 있어요. 5스테이지마다 다음 단계 조합법이 열리고, 50스테이지를 클리어하면 자연 원소(1~92번)를 모두 만들 수 있어요.</li>
           <li><b>인공 원소</b>: 테크네튬(43), 프로메튬(61), 93번 이후 원소는 자연에 거의 없어 융합할 수 없어요. 지정된 보스 층에 <b>인공 원소 보스</b>로 등장하고, 처치하면 1개 확정 획득. 이미 지나온 인공 원소는 다른 보스 층에서 <b>4% 확률</b>로 희귀 보스로 다시 나와요. 등장 층은 <b>25층(Tc) ~ 300층(Og)으로 고정</b>이라, 마지막 원소 Og는 300층 보스를 잡아야 얻어요. 환생하면 같은 층에서 다시 등장하고, 이번 회차에 이미 잡은 층에서는 다시 나오지 않아요.</li>
@@ -780,6 +850,9 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
           <button class="btn" id="btnImport">📥 저장 코드 불러오기</button>
           <button class="btn danger" id="btnReset">🗑️ 처음부터 다시하기</button>
         </div>
+        <h3>🔐 관리자</h3>
+        <p>테스트용 관리자 모드예요. 비밀번호가 필요해요.</p>
+        <div class="btnrow"><button class="btn" id="btnAdmin">🔐 관리자 모드</button></div>
         <h3>📲 앱으로 설치</h3>
         <p>홈 화면에 설치하면 앱처럼 전체 화면으로 즐길 수 있어요.<br>
         · 안드로이드/PC 크롬: 아래 버튼 또는 주소창의 설치 아이콘<br>
@@ -1028,7 +1101,18 @@ const ACHS = [
   { id: 'rare1',   icon: '✨', name: '희귀한 만남',       desc: '희귀 출현 보스 처치',      check: () => S.rareKills >= 1 },
   { id: 'elv25',   icon: '💪', name: '극한 단련',         desc: '원소 하나를 강화 Lv.25',   check: () => S.elv.some(v => v >= 25) },
   { id: 'elvwide', icon: '🧬', name: '균형 잡힌 연금술',  desc: '원소 10종을 강화 Lv.5 이상', check: () => S.elv.filter(v => v >= 5).length >= 10 },
-  { id: 'coin1b',  icon: '🏦', name: '원소 재벌',         desc: '코인 누적 10억 획득',      check: () => S.totalCoins >= 1e9 },
+  { id: 'coin1e4',  icon: '🪙', name: '동전 한 줌',       desc: '코인 누적 1만 획득',      check: () => S.totalCoins >= 1e4 },
+  { id: 'coin1e5',  icon: '💵', name: '두둑한 지갑',       desc: '코인 누적 10만 획득',     check: () => S.totalCoins >= 1e5 },
+  { id: 'coin1e6',  icon: '💰', name: '백만장자',          desc: '코인 누적 100만 획득',    check: () => S.totalCoins >= 1e6 },
+  { id: 'coin1e7',  icon: '💎', name: '천만장자',          desc: '코인 누적 1000만 획득',   check: () => S.totalCoins >= 1e7 },
+  { id: 'coin1e8',  icon: '🏧', name: '억만장자',          desc: '코인 누적 1억 획득',      check: () => S.totalCoins >= 1e8 },
+  { id: 'coin1b',   icon: '🏦', name: '원소 재벌',         desc: '코인 누적 10억 획득',     check: () => S.totalCoins >= 1e9 },
+  { id: 'coin1e10', icon: '🏛️', name: '원소 은행장',       desc: '코인 누적 100억 획득',    check: () => S.totalCoins >= 1e10 },
+  { id: 'coin1e11', icon: '👑', name: '우주 경제의 지배자', desc: '코인 누적 1000억 획득',   check: () => S.totalCoins >= 1e11 },
+  { id: 'godpow',   icon: '✨', name: '신의 권능',         desc: '신의 권능 해금',          check: () => S.god.unlocked },
+  { id: 'meteor100', icon: '☄️', name: '운석 폭격',        desc: '운석 100개 낙하',         check: () => S.god.meteors >= 100 },
+  { id: 'seedlife', icon: '🦠', name: '첫 번째 생명',      desc: '생명의 씨앗 심기',        check: () => S.god.seeded },
+  { id: 'terra',    icon: '🌍', name: '생명의 요람',        desc: '생명의 행성 완성 (엔딩 3)', check: () => S.god.done },
   { id: 'void92',  icon: '🌊', name: '자연의 봉헌',       desc: '공허에 원소 92종 봉헌',    check: () => voidDone() >= 92 },
   { id: 'gold50',  icon: '🌠', name: '별똥별 수집가',     desc: '초신성 파편 50개 획득',     check: () => S.goldens >= 50 },
   { id: 'fus1m',   icon: '🏭', name: '거대 융합로',       desc: '융합 1,000,000회',         check: () => S.totalFusions >= 1e6 },
@@ -1050,6 +1134,24 @@ const ACHS = [
   { id: 'reb7',    icon: '🌈', name: '일곱 번째 하늘',    desc: '환생 7회 (5000층 개방)',   check: () => S.prestige.count >= 7 },
 ];
 function achCount() { return ACHS.filter(a => S.ach[a.id]).length; }
+// 업적 난이도 (1 쉬움 ~ 5 전설) — 어려울수록 영구 보너스가 큼
+const ACH_TIERS = {
+  1: { name: '쉬움', prod: 0.01, combat: 0 }, 2: { name: '보통', prod: 0.03, combat: 0.01 }, 3: { name: '어려움', prod: 0.06, combat: 0.03 },
+  4: { name: '매우 어려움', prod: 0.12, combat: 0.06 }, 5: { name: '전설', prod: 0.25, combat: 0.12 },
+};
+const ACH_TIER = {
+  c100: 1, c1k: 1, h1k: 1, d2: 1, d6: 1, d10: 1, s5: 1, f100: 1, gold1: 1, synth1: 1, sell1: 1, arc1: 1, void10: 1, coin1e4: 1, coin1e5: 1,
+  c10k: 2, combo: 2, h1m: 2, d26: 2, d30: 2, noble: 2, s25: 2, gold10: 2, elv10: 2, memo12: 2, whack35: 2, ud10: 2, coin1e6: 2, coin1e7: 2, meteor100: 2, seedlife: 2,
+  h1b: 3, d79: 3, d60: 3, d92: 3, s50: 3, s100: 3, s300: 3, f10k: 3, bigbang: 3, unlock92: 3, c100k: 3, k1000: 3, syn5: 3, rare1: 3, elvwide: 3, void54: 3,
+  quiz10: 3, link0: 3, order25: 3, g2048na: 3, simon10: 3, arc50: 3, reb1: 3, party5: 3, nat92: 3, coin1e8: 3, coin1b: 3,
+  h1t: 4, d118: 4, s1000: 4, genesis: 4, h1q: 4, s2000: 4, k10000: 4, syn28: 4, elv25: 4, void92: 4, gold50: 4, fus1m: 4, memhard: 4, reb3: 4, reb5: 4, end2: 4,
+  coin1e10: 4, coin1e11: 4, godpow: 4,
+  s5000: 5, end1: 5, reb7: 5, terra: 5,
+};
+const achTier = a => ACH_TIER[a.id] || 2;
+function achBonus(kind) { let b = 0; for (const a of ACHS) if (S.ach[a.id]) b += ACH_TIERS[achTier(a)][kind]; return b; }
+const tierStars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+const tierReward = n => `생산 +${ACH_TIERS[n].prod * 100}%${ACH_TIERS[n].combat ? ` · 전투 +${ACH_TIERS[n].combat * 100}%` : ''}`;
 
 /* ---------- 효과음 (WebAudio 합성) ---------- */
 const SFX = {
@@ -1172,7 +1274,7 @@ function defaultState() {
     totalH: 0, goldens: 0, ach: {}, sound: true,
     prestige: { count: 0, seeds: 0, best: 0 },
     coins: 0, totalCoins: 0, elv: new Array(119).fill(0),
-    void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false },
+    void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false, e3: false }, god: godDefault(),
     arcade: { plays: 0, earned: 0, best: {} }, synthKills: 0, rareKills: 0,
   };
 }
@@ -1189,7 +1291,9 @@ function load() {
     if (!Array.isArray(S.elv) || S.elv.length < 119) S.elv = new Array(119).fill(0);
     if (!isFinite(S.coins)) S.coins = 0;
     S.void = Object.assign({ idx: 1, fed: 0 }, d.void || {});
-    S.endings = Object.assign({ e1: false, e2: false }, d.endings || {});
+    S.endings = Object.assign({ e1: false, e2: false, e3: false }, d.endings || {});
+    S.god = Object.assign(godDefault(), d.god || {});
+    S.god.cd = S.god.cd || {};
     S.arcade = Object.assign({ plays: 0, earned: 0, best: {} }, d.arcade || {});
     S.arcade.best = S.arcade.best || {};
     if (!Array.isArray(S.counts) || S.counts.length < 119) S.counts = defaultState().counts;
@@ -1287,7 +1391,7 @@ function discCount() { let n = 0; for (let z = 1; z <= 118; z++) if (S.disc[z]) 
 function prodMult() {
   let m = (1 + discCount() * (S.upg.resonance ? 0.10 : 0.05)) * (1 + 0.03 * S.battle.maxStage);
   if (S.upg.warp) m *= 3;
-  m *= 1 + 0.02 * achCount();
+  m *= 1 + achBonus('prod');
   m *= prestigeProd();
   m *= voidMult();
   return m;
@@ -1383,7 +1487,7 @@ function checkAchs() {
     if (!S.ach[a.id] && a.check()) {
       S.ach[a.id] = true;
       SFX.ach();
-      toast(`<span style="font-size:26px">${a.icon}</span><div><b>🏆 업적 달성: ${a.name}</b><br><small>${a.desc} · 생산량 +2%</small></div>`, 'disc', 4500);
+      toast(`<span style="font-size:26px">${a.icon}</span><div><b>🏆 업적 달성: ${a.name}</b><br><small>${tierStars(achTier(a))} ${ACH_TIERS[achTier(a)].name} · ${a.desc}<br>보상: ${tierReward(achTier(a))}</small></div>`, 'disc', 4500);
       R.sig.ach = null;
     }
   }
@@ -1400,7 +1504,7 @@ function rebirth() {
   const gain = seedsGain();
   if (!confirm(`🌌 빅뱅을 일으켜 새로운 우주에서 다시 시작할까요?\n\n받는 것: 별의 씨앗 +${gain}개 (영구)\n유지: 업적, 통계, 별의 씨앗\n초기화: 원소, 수소, 시설, 강화, 스테이지`)) return;
   const keep = {
-    ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills,
+    ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, god: S.god, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
     prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
@@ -1431,9 +1535,9 @@ function renderAch() {
   if (R.sig.ach === sig) return;
   R.sig.ach = sig;
   const n = achCount();
-  $('#achSum').innerHTML = `🏆 업적 ${n} / ${ACHS.length} 달성 · 생산량 보너스 <span style="color:#ffd43b">+${n * 2}%</span>`;
+  $('#achSum').innerHTML = `🏆 업적 ${n} / ${ACHS.length} 달성 · 보너스 생산 <span style="color:#ffd43b">+${Math.round(achBonus('prod') * 100)}%</span> · 전투 <span style="color:#ff8787">+${Math.round(achBonus('combat') * 100)}%</span><br><small>★쉬움 +1% · ★★보통 +3% · ★★★어려움 +6% · ★★★★매우 어려움 +12% · ★★★★★전설 +25% (생산) — 어려운 업적일수록 보상이 커요</small>`;
   $('#achList').innerHTML = ACHS.map(a => `<div class="ach ${S.ach[a.id] ? 'done' : ''}">
-    <div class="aicon">${S.ach[a.id] ? a.icon : '🔒'}</div><div><b>${a.name}</b><small>${a.desc}</small></div></div>`).join('');
+    <div class="aicon">${S.ach[a.id] ? a.icon : '🔒'}</div><div><b>${a.name}</b><small>${a.desc}</small><span class="ach-tier t${achTier(a)}">${tierStars(achTier(a))} ${tierReward(achTier(a))}</span></div></div>`).join('');
 }
 
 const GEN_R = 1.18;
@@ -1606,15 +1710,293 @@ function renderVoid() {
     $('#voidTrack').innerHTML = h;
     setText('voidProg', `${done} / 118 완료 · ${st[2]} ${st[1]}`);
   }
-  const esig = '' + S.endings.e1 + S.endings.e2;
+  const esig = '' + S.endings.e1 + S.endings.e2 + S.endings.e3;
   if (R.sig.end !== esig) {
     R.sig.end = esig;
-    $('#endingList').innerHTML = [1, 2].map(n => {
+    $('#endingList').innerHTML = [1, 2, 3].map(n => {
       const ok = S.endings['e' + n], E = ENDINGS[n];
       return `<div class="ending-card ${ok ? 'done' : ''}"><div class="ec-icon">${ok ? E.icon : '🔒'}</div><div><b>엔딩 ${n} · ${ok ? E.title : '???'}</b><small>${E.cond}</small></div>
         ${ok ? `<button class="btn" data-ending="${n}">🎬 다시 보기</button>` : ''}</div>`;
     }).join('');
   }
+}
+
+/* ---------- 신의 권능: 공허의 행성을 생명의 행성으로 ---------- */
+const GOD_UNLOCK_COST = 1e12; // 1조 코인
+const godDefault = () => ({ unlocked: false, temp: -60, atm: 0.05, o2: 0, water: 5, mag: 10, life: 0, seeded: false, moon: false, done: false, meteors: 0, cd: {} });
+// 지구형 목표 범위
+const GOD_TARGET = { temp: [5, 30], atm: [0.7, 1.5], water: [50, 85], mag: [60, 100], o2: [15, 25] };
+const GOD_STATS = [
+  { k: 'temp', icon: '🌡️', name: '평균 기온', unit: '℃', min: -100, max: 120, fmt: v => v.toFixed(1) },
+  { k: 'atm', icon: '🌫️', name: '대기압', unit: 'atm', min: 0, max: 3, fmt: v => v.toFixed(2) },
+  { k: 'water', icon: '🌊', name: '바다 면적', unit: '%', min: 0, max: 100, fmt: v => v.toFixed(1) },
+  { k: 'mag', icon: '🧲', name: '자기장', unit: '', min: 0, max: 100, fmt: v => v.toFixed(0) },
+  { k: 'o2', icon: '🫁', name: '산소 농도', unit: '%', min: 0, max: 35, fmt: v => v.toFixed(1) },
+];
+const LIFE_STAGES = [[0, '불모의 행성', '🪨'], [5, '원시 수프', '🧪'], [20, '미생물의 바다', '🦠'], [40, '초록 대륙', '🌿'], [60, '공룡의 시대', '🦕'], [80, '생태계의 번성', '🌳'], [100, '생명의 행성', '🌍']];
+function godStage() { let s = LIFE_STAGES[0]; for (const x of LIFE_STAGES) if (S.god.life >= x[0]) s = x; return s; }
+function fitScore(v, [lo, hi], soft) { if (v >= lo && v <= hi) return 1; return Math.max(0, 1 - (v < lo ? lo - v : v - hi) / soft); }
+// 거주 가능성 0~1 (기온·대기·바다·자기장)
+function habitability() {
+  const g = S.god;
+  return (fitScore(g.temp, GOD_TARGET.temp, 40) + fitScore(g.atm, GOD_TARGET.atm, 0.7) + fitScore(g.water, GOD_TARGET.water, 40) + fitScore(g.mag, GOD_TARGET.mag, 50)) / 4;
+}
+const GOD_POWERS = [
+  { id: 'meteor', icon: '☄️', name: '운석 낙하', desc: '얼음과 광물을 품은 운석을 떨어뜨려요. 기온↑ 바다↑ 대기↑ · 생명은 충격으로 15% 감소', cost: 1e9, cd: 3, fx: 'meteor',
+    act: g => { g.temp += 6; g.water += 2.5; g.atm += 0.03; g.life *= 0.85; g.meteors++; } },
+  { id: 'comet', icon: '🧊', name: '혜성 유도', desc: '거대한 얼음 혜성으로 바다를 채워요. 바다↑↑ 기온↓', cost: 3e9, cd: 8, fx: 'comet',
+    act: g => { g.water += 8; g.temp -= 5; } },
+  { id: 'volcano', icon: '🌋', name: '화산 분출', desc: '화산 가스로 대기를 두껍게 해요. 대기↑↑ 기온↑(온실 효과) 산소↓', cost: 3e9, cd: 8, fx: 'volcano',
+    act: g => { g.atm += 0.12; g.temp += 4; g.o2 = Math.max(0, g.o2 - 1.5); } },
+  { id: 'core', icon: '🧲', name: '핵 점화', desc: '행성 핵의 철을 녹여 자기장을 만들어요 (철 Fe 1,000개 소모). 자기장이 약하면 대기가 우주로 새어 나가요', cost: 5e9, cd: 15, need: { 26: 1000 }, fx: 'core',
+    act: g => { g.mag += 15; } },
+  { id: 'sun', icon: '☀️', name: '태양 렌즈', desc: '햇빛을 모아 행성을 데워요. 기온↑↑ (40℃가 넘으면 바다가 증발)', cost: 2e9, cd: 6, fx: 'sun',
+    act: g => { g.temp += 10; if (g.temp > 40) g.water = Math.max(0, g.water - 3); } },
+  { id: 'ice', icon: '❄️', name: '빙하기', desc: '행성을 식혀요. 기온↓↓ · 생명 5% 감소', cost: 2e9, cd: 10, fx: 'ice',
+    act: g => { g.temp -= 12; g.life *= 0.95; } },
+  { id: 'scrub', icon: '🌀', name: '대기 정화', desc: '너무 두꺼운 대기를 우주로 날려보내요. 대기↓ 기온↓', cost: 2e9, cd: 8, fx: 'scrub',
+    act: g => { g.atm = Math.max(0, g.atm - 0.1); g.temp -= 3; } },
+  { id: 'seed', icon: '🌱', name: '생명의 씨앗', desc: '탄소·질소·산소·인으로 첫 생명을 심어요 (C 1,000 · N 500 · O 500 · P 100). 이후 조건이 맞으면 생명이 스스로 자라요', cost: 2e10, cd: 30, need: { 6: 1000, 7: 500, 8: 500, 15: 100 }, fx: 'seed',
+    cond: g => g.water >= 30 && g.temp >= 0 && g.temp <= 50, condText: '바다 30% 이상, 기온 0~50℃일 때만 심을 수 있어요',
+    act: g => { g.seeded = true; g.life += 5; } },
+  { id: 'storm', icon: '⚡', name: '번개 폭풍', desc: '번개로 유기물 합성을 촉진해요 (밀러-유리 실험). 생명 +3', cost: 5e9, cd: 6, fx: 'storm',
+    cond: g => g.seeded, condText: '먼저 생명의 씨앗을 심어야 해요',
+    act: g => { g.life += 3; } },
+  { id: 'photo', icon: '🌳', name: '광합성 가속', desc: '식물이 이산화탄소를 산소로 바꿔요. 산소↑↑ 대기 약간↓ (산소 15% 이상이어야 복잡한 생명이 40을 넘어 자라요)', cost: 1e10, cd: 10, fx: 'seed',
+    cond: g => g.life >= 20, condText: '생명이 20 이상이어야 해요',
+    act: g => { g.o2 += 3; g.atm = Math.max(0, g.atm - 0.02); } },
+  { id: 'moon', icon: '🌙', name: '위성 포획', desc: '달을 만들어 자전축을 안정시켜요 (1회). 자기장 +10 · 생명 성장 속도 ×1.5', cost: 2e11, cd: 0, once: true, fx: 'moon',
+    act: g => { g.moon = true; g.mag += 10; } },
+];
+function godClamp(g) {
+  g.temp = Math.max(-150, Math.min(200, g.temp)); g.atm = Math.max(0, Math.min(5, g.atm));
+  g.water = Math.max(0, Math.min(100, g.water)); g.mag = Math.max(0, Math.min(100, g.mag));
+  g.o2 = Math.max(0, Math.min(35, g.o2)); g.life = Math.max(0, Math.min(100, g.life));
+}
+function godLog(msg) { R.godLog = (R.godLog || []).concat(msg).slice(-8); R.sig.godlog = null; }
+function godTick(dt) {
+  const g = S.god;
+  if (!g || !g.unlocked) return;
+  // 자연 변화: 기온은 대기 두께에 따른 평형 온도로 천천히 수렴
+  const eq = -45 + 55 * Math.min(g.atm, 2.5) + (g.moon ? 3 : 0);
+  g.temp += (eq - g.temp) * Math.min(1, 0.01 * dt);
+  if (g.mag < 40) g.atm = Math.max(0, g.atm - 0.0015 * dt * (1 - g.mag / 40)); // 자기장이 약하면 태양풍에 대기 유출
+  if (g.temp > 60) g.water = Math.max(0, g.water - 0.1 * dt);                  // 너무 뜨거우면 바다 증발
+  const H = habitability();
+  if (g.seeded) {
+    if (H > 0.5) g.life = Math.min(g.o2 >= 15 ? 100 : 40, g.life + 0.25 * H * (g.moon ? 1.5 : 1) * dt);
+    else if (H < 0.3) g.life = Math.max(0, g.life - 0.3 * dt);
+  }
+  if (g.life >= 20 && g.o2 < 21) g.o2 = Math.min(21, g.o2 + 0.01 * g.life / 20 * dt); // 자연 광합성
+  godClamp(g);
+  if (!g.done && g.life >= 100 && H >= 0.8) {
+    g.done = true; S.endings.e3 = true;
+    godLog('🌍 생명의 행성이 완성되었습니다!');
+    setTimeout(() => showEnding(3), 900);
+  }
+}
+function unlockGod() {
+  const g = S.god;
+  if (g.unlocked) return;
+  if (S.void.idx <= 118) return toast('🔒 공허의 행성을 먼저 완성해야 해요');
+  if (S.coins < GOD_UNLOCK_COST) return toast(`🪙 코인이 부족해요 (${fmt(GOD_UNLOCK_COST)} 필요)`);
+  S.coins -= GOD_UNLOCK_COST;
+  g.unlocked = true;
+  SFX.discover();
+  particles(innerWidth / 2, innerHeight / 2, 50, '#ffd43b');
+  toast('✨ <b>신의 권능이 해금되었습니다!</b><br>공허의 행성을 생명이 숨 쉬는 행성으로 만들어 보세요.', 'disc', 6000);
+  godLog('✨ 신의 권능 해금! 행성의 기후를 바꿔 생명을 키워보세요.');
+  R.sig.god = null;
+}
+function usePower(id) {
+  const g = S.god, p = GOD_POWERS.find(x => x.id === id);
+  if (!g.unlocked || !p) return;
+  const now = Date.now();
+  if (!R.godNoCd && (g.cd[id] || 0) > now) return;
+  if (p.once && g.moon) return toast('🌙 이미 위성이 있어요');
+  if (p.cond && !p.cond(g)) return toast('⚠️ ' + p.condText);
+  if (S.coins < p.cost) return toast(`🪙 코인이 부족해요 (${fmt(p.cost)} 필요)`);
+  if (p.need) for (const z in p.need) if (S.counts[z] < p.need[z]) return toast(`⚠️ ${EL[z].name}(${EL[z].sym})이(가) ${fmt(p.need[z])}개 필요해요`);
+  S.coins -= p.cost;
+  if (p.need) for (const z in p.need) S.counts[z] -= p.need[z];
+  const before = { ...g };
+  p.act(g); godClamp(g);
+  g.cd[id] = now + p.cd * 1000;
+  const diff = GOD_STATS.concat([{ k: 'life', icon: '🧬', fmt: v => v.toFixed(1) }])
+    .filter(s => Math.abs(g[s.k] - before[s.k]) > 0.001).map(s => `${s.icon}${g[s.k] > before[s.k] ? '+' : ''}${s.fmt(g[s.k] - before[s.k])}`).join(' ');
+  godLog(`${p.icon} ${p.name} ${diff}`);
+  godFx(p.fx);
+}
+function godFx(kind) {
+  const pl = $('#godPlanet');
+  if (!pl) return;
+  const [x, y] = centerOf(pl), r = pl.offsetWidth / 2;
+  if (kind === 'meteor' || kind === 'comet') {
+    const m = document.createElement('div');
+    m.className = 'god-meteor'; m.textContent = kind === 'meteor' ? '☄️' : '🧊';
+    m.style.left = (x + 260) + 'px'; m.style.top = (y - 260) + 'px';
+    document.body.appendChild(m);
+    m.animate([{ transform: 'translate(0,0) scale(1.4)' }, { transform: `translate(${-260 + r * 0.3}px, ${260 - r * 0.2}px) scale(.6)` }], { duration: 650, easing: 'ease-in' })
+      .onfinish = () => { m.remove(); particles(x + r * 0.3, y - r * 0.2, 26, kind === 'meteor' ? '#ff922b' : '#a5d8ff'); SFX.boss(); pl.classList.remove('hit'); void pl.offsetWidth; pl.classList.add('hit'); };
+    SFX.tone(900, 0.6, 'sawtooth', 0.03, 0.2);
+  } else {
+    const color = { volcano: '#ff6b6b', core: '#ffd43b', sun: '#ffe066', ice: '#d0ebff', scrub: '#c5f6fa', seed: '#69db7c', storm: '#fff3bf', moon: '#e9ecef' }[kind] || '#fff';
+    particles(x, y, 30, color);
+    pl.classList.remove('pulse-' + kind); void pl.offsetWidth; pl.classList.add('pulse-' + kind);
+    kind === 'storm' ? SFX.hit(true) : SFX.ach();
+  }
+}
+function renderGodPlanet() {
+  const g = S.god, pl = $('#godPlanet');
+  if (!pl) return;
+  // 기온에 따른 땅 색: 차가움(흰 얼음) → 온화(갈색) → 뜨거움(용암)
+  const t = g.temp;
+  const land = t < -20 ? '#dbe9f5' : t < 5 ? '#a1887f' : t < 40 ? '#8d6e63' : t < 80 ? '#e65100' : '#bf360c';
+  const w = (g.water / 100) * 0.95, l = Math.min(1, g.life / 100) * 0.9;
+  pl.style.background = `radial-gradient(circle at 32% 28%, #ffffff55 0%, transparent 38%),
+    radial-gradient(ellipse 30% 22% at 62% 62%, rgba(67,160,71,${l}) 0 60%, transparent 100%),
+    radial-gradient(ellipse 22% 26% at 30% 66%, rgba(56,142,60,${l}) 0 60%, transparent 100%),
+    radial-gradient(ellipse 26% 18% at 50% 30%, rgba(102,187,106,${l}) 0 60%, transparent 100%),
+    radial-gradient(circle, rgba(25,118,210,${w}) 0 100%), ${land}`;
+  const atmGlow = Math.min(60, g.atm * 26);
+  pl.style.boxShadow = `0 0 ${atmGlow}px ${atmGlow / 3}px rgba(135,206,250,${Math.min(0.8, g.atm / 1.5)}), inset -30px -24px 50px #000c`;
+  pl.classList.toggle('clouds', g.atm > 0.5);
+  pl.classList.toggle('aurora', g.mag >= 60);
+  $('#godMoon').style.display = g.moon ? '' : 'none';
+  const st = godStage();
+  setText('godStageName', `${st[2]} ${st[1]}`);
+}
+function renderGod() {
+  const g = S.god, box = $('#godBox');
+  if (!g.unlocked) {
+    const ready = S.void.idx > 118;
+    const html = `<div class="god-lock"><div class="god-lock-icon">✨</div><h2>신의 권능</h2>
+      <p>공허에서 완성한 행성을 <b>지구처럼 생명이 살 수 있는 행성</b>으로 바꾸는 힘이에요.<br>
+      기온·대기·바다·자기장·산소를 맞추고, 운석과 혜성, 화산과 번개로 생명을 키워보세요.</p>
+      ${ready ? `<div class="bar" style="max-width:420px;margin:14px auto"><div class="fill gold" style="width:${Math.min(100, S.coins / GOD_UNLOCK_COST * 100)}%"></div><span>🪙 ${fmt(S.coins)} / ${fmt(GOD_UNLOCK_COST)}</span></div>
+        <button class="big-btn god-unlock" data-god-unlock ${S.coins < GOD_UNLOCK_COST ? 'disabled' : ''}>✨ 신의 권능 해금 (🪙 ${fmt(GOD_UNLOCK_COST)})</button>`
+        : `<p class="god-need">🔒 먼저 <b>🕳️ 공허</b>에서 행성을 완성하세요 (${voidDone()} / 118)</p>`}</div>`;
+    if (box.innerHTML !== html) box.innerHTML = html;
+    R.sig.god = null;
+    return;
+  }
+  if (R.sig.god !== 'ui') {
+    R.sig.god = 'ui'; R.sig.godlog = null;
+    box.innerHTML = `<div class="god-wrap">
+      <div class="god-stage"><div class="god-space"></div><div id="godPlanet" class="god-planet"></div><div id="godMoon" class="god-moon">🌕</div>
+        <div class="god-stage-name" id="godStageName"></div></div>
+      <div class="god-panel">
+        <div class="god-life"><span>🧬 생명</span><div class="bar"><div class="fill green" id="godLifeFill"></div><span id="godLifeText"></span></div></div>
+        <div class="god-hab" id="godHab"></div>
+        ${GOD_STATS.map(s => `<div class="god-stat"><span class="gs-name">${s.icon} ${s.name}</span>
+          <div class="gs-bar"><div class="gs-target" style="left:${(GOD_TARGET[s.k][0] - s.min) / (s.max - s.min) * 100}%;width:${(GOD_TARGET[s.k][1] - GOD_TARGET[s.k][0]) / (s.max - s.min) * 100}%"></div><div class="gs-mark" id="gsMark_${s.k}"></div></div>
+          <span class="gs-val" id="gsVal_${s.k}"></span></div>`).join('')}
+        <small class="god-tip">초록 구간이 지구형 목표 범위예요. 기온은 대기가 두꺼울수록 높아지는 쪽으로 천천히 변하고, 자기장이 40 미만이면 대기가 새어 나가요.</small>
+      </div></div>
+      <div class="sec-head"><h3>✨ 권능</h3><small>코인과 원소를 소모해요</small></div>
+      <div class="god-powers">${GOD_POWERS.map(p => `<button class="god-power" data-power="${p.id}" id="gp_${p.id}">
+        <div class="gp-icon">${p.icon}</div><b>${p.name}</b><small>${p.desc}</small><span class="gp-cost">🪙 ${fmt(p.cost)}${p.need ? ' + 원소' : ''}</span><i class="gp-cd" id="gpcd_${p.id}"></i></button>`).join('')}</div>
+      <div class="sec-head"><h3>📜 행성 일지</h3></div><div class="blog" id="godLog"></div>`;
+  }
+  renderGodPlanet();
+  const H = habitability();
+  $('#godLifeFill').style.width = g.life + '%';
+  setText('godLifeText', `${g.life.toFixed(1)} / 100${!g.seeded ? ' · 🌱 생명의 씨앗을 심으세요' : g.o2 < 15 && g.life >= 39.9 ? ' · 🫁 산소 15% 이상 필요' : ''}`);
+  const habHtml = `🌎 거주 가능성 <b style="color:${H >= 0.8 ? '#8ce99a' : H >= 0.5 ? '#ffd43b' : '#ff8787'}">${(H * 100).toFixed(0)}%</b> · ${g.seeded ? (H > 0.5 ? '생명이 자라는 중' : H < 0.3 ? '⚠️ 생명이 줄어드는 중' : '생명 정체') : '아직 생명 없음'}${g.done ? ' · 🏆 생명의 행성 완성!' : ' · 목표: 생명 100 + 거주 가능성 80%'}`;
+  if ($('#godHab').innerHTML !== habHtml) $('#godHab').innerHTML = habHtml;
+  for (const s of GOD_STATS) {
+    const v = g[s.k], pct = Math.max(0, Math.min(100, (v - s.min) / (s.max - s.min) * 100));
+    const ok = v >= GOD_TARGET[s.k][0] && v <= GOD_TARGET[s.k][1];
+    const m = $('#gsMark_' + s.k); m.style.left = pct + '%'; m.classList.toggle('ok', ok);
+    setText('gsVal_' + s.k, `${s.fmt(v)}${s.unit} ${ok ? '✅' : ''}`);
+  }
+  const now = Date.now();
+  for (const p of GOD_POWERS) {
+    const btn = $('#gp_' + p.id), left = R.godNoCd ? 0 : Math.max(0, (g.cd[p.id] || 0) - now);
+    btn.disabled = left > 0 || S.coins < p.cost || (p.once && g.moon);
+    $('#gpcd_' + p.id).style.width = left > 0 && p.cd ? (left / (p.cd * 1000) * 100) + '%' : '0';
+  }
+  if (R.sig.godlog !== (R.godLog || []).length + '|' + (R.godLog || []).slice(-1)[0]) {
+    R.sig.godlog = (R.godLog || []).length + '|' + (R.godLog || []).slice(-1)[0];
+    const lg = $('#godLog');
+    lg.innerHTML = (R.godLog || ['✨ 권능을 사용해 행성을 바꿔보세요.']).map(l => `<div>${l}</div>`).join('');
+    lg.scrollTop = lg.scrollHeight;
+  }
+}
+
+/* ---------- 관리자 모드 (테스트용) ---------- */
+const ADMIN_PW = '0616', ADMIN_HINT = '시작';
+const BACKUP_KEY = SAVE_KEY + '_backup';
+function openAdmin() {
+  const m = $('#adminModal');
+  m.innerHTML = R.admin ? adminPanelHtml() : `<div class="admin-box"><h2>🔐 관리자 모드</h2>
+    <p>비밀번호를 입력하세요</p>
+    <input id="adminPw" type="password" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="비밀번호">
+    <div class="admin-msg" id="adminMsg"></div>
+    <div class="btnrow" style="justify-content:center"><button class="big-btn" data-admin="login">확인</button><button class="btn" data-admin="hint">💡 힌트</button><button class="btn" data-admin="close">닫기</button></div></div>`;
+  m.classList.add('on');
+  setTimeout(() => $('#adminPw')?.focus(), 50);
+}
+function adminPanelHtml() {
+  const has = !!localStorage.getItem(BACKUP_KEY);
+  return `<div class="admin-box"><h2>🛠️ 관리자 패널</h2>
+    <p class="admin-msg">테스트용 기능이에요. 처음 조작할 때 지금 진행 상황을 자동으로 백업해요.${has ? ' <b style="color:#8ce99a">백업 있음</b>' : ''}</p>
+    <div class="admin-grid">
+      <button class="big-btn admin-main" data-admin="all">🚀 생명의 행성 프로젝트 체험 세팅<br><small>모든 원소 + 환생 7회 + 공허 완성 + 코인 + 신의 권능 해금</small></button>
+      <button class="btn" data-admin="elements">🧪 모든 원소 발견 + 각 100만 개</button>
+      <button class="btn" data-admin="rebirth">🌌 환생 7회 · 씨앗 300 · 5000층 개방</button>
+      <button class="btn" data-admin="void">🕳️ 공허 행성 완성 (엔딩 2)</button>
+      <button class="btn" data-admin="coins">🪙 코인 +1000조</button>
+      <button class="btn" data-admin="god">✨ 신의 권능 즉시 해금</button>
+      <button class="btn" data-admin="nocd">⏩ 권능 쿨타임 ${R.godNoCd ? '켜기' : '없애기'}</button>
+      <button class="btn" data-admin="resetgod">🔄 테라포밍 처음부터</button>
+      <button class="btn" data-admin="backup">💾 지금 상태 백업</button>
+      <button class="btn danger" data-admin="restore" ${has ? '' : 'disabled'}>♻️ 백업으로 되돌리기</button>
+    </div>
+    <div class="btnrow" style="justify-content:center;margin-top:12px"><button class="btn" data-admin="logout">🔒 관리자 모드 종료</button><button class="btn" data-admin="close">닫기</button></div></div>`;
+}
+function adminBackup(force) {
+  if (force || !localStorage.getItem(BACKUP_KEY)) { localStorage.setItem(BACKUP_KEY, JSON.stringify(S)); return true; }
+  return false;
+}
+function adminAction(a) {
+  const m = $('#adminModal');
+  if (a === 'close') return m.classList.remove('on');
+  if (a === 'hint') return setText('adminMsg', `💡 힌트: ${ADMIN_HINT}`);
+  if (a === 'login') {
+    if (($('#adminPw')?.value || '') === ADMIN_PW) { R.admin = true; SFX.ach(); return openAdmin(); }
+    setText('adminMsg', '❌ 비밀번호가 틀렸어요');
+    const b = m.querySelector('.admin-box'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+    return;
+  }
+  if (!R.admin) return;
+  if (a === 'logout') { R.admin = false; R.godNoCd = false; return m.classList.remove('on'); }
+  if (a === 'restore') {
+    if (!confirm('관리자 조작 전 백업으로 되돌릴까요? 지금 상태는 사라져요.')) return;
+    saveLocked = true;
+    localStorage.setItem(SAVE_KEY, localStorage.getItem(BACKUP_KEY));
+    localStorage.removeItem(BACKUP_KEY);
+    return location.reload();
+  }
+  if (a === 'backup') { adminBackup(true); toast('💾 지금 상태를 백업했어요'); return openAdmin(); }
+  if (a === 'nocd') { R.godNoCd = !R.godNoCd; toast(R.godNoCd ? '⏩ 권능 쿨타임 없음' : '⏩ 권능 쿨타임 원래대로'); return openAdmin(); }
+  if (adminBackup(false)) toast('💾 관리자 조작 전 진행 상황을 백업했어요 (관리자 패널에서 되돌리기 가능)');
+  const doEl = () => { for (let z = 1; z <= 118; z++) { S.disc[z] = true; S.counts[z] = Math.max(S.counts[z], 1e6); } R.discQueue = []; };
+  const doReb = () => { S.prestige.count = Math.max(7, S.prestige.count); S.prestige.seeds = Math.max(300, S.prestige.seeds); S.prestige.best = 5000; S.battle.maxStage = Math.max(S.battle.maxStage, 5000); refreshSynthStages(S.prestige.count); };
+  const doVoid = () => { S.void.idx = 119; S.void.fed = 0; S.endings.e2 = true; };
+  const doCoins = () => { S.coins += 1e15; S.totalCoins += 1e15; };
+  const doGod = () => { S.god.unlocked = true; };
+  if (a === 'elements') doEl();
+  if (a === 'rebirth') doReb();
+  if (a === 'void') doVoid();
+  if (a === 'coins') doCoins();
+  if (a === 'god') { doVoid(); doGod(); }
+  if (a === 'resetgod') { S.god = Object.assign(godDefault(), { unlocked: true }); R.godLog = []; }
+  if (a === 'all') { doEl(); doReb(); doVoid(); doCoins(); doGod(); }
+  R.sig = {}; save();
+  toast('🛠️ 관리자: 적용 완료!', 'disc', 2500);
+  if (a === 'all' || a === 'god' || a === 'resetgod') { m.classList.remove('on'); switchTab('god'); }
+  else openAdmin();
 }
 
 /* ---------- 오락실 (미니게임) ---------- */
@@ -2144,6 +2526,11 @@ function renderArcade() {
 
 /* ---------- 엔딩 ---------- */
 const ENDINGS = {
+  3: { icon: '🌱', title: '생명의 요람', cond: '신의 권능으로 공허의 행성을 생명의 행성으로',
+    lines: ['운석이 바다를 채우고, 화산이 하늘을 덮고, 번개가 첫 생명을 깨웠다.',
+      '이끼가 바위를 덮고, 숲이 대륙을 뒤덮고, 새들이 하늘을 가른다.',
+      '수소 한 알에서 시작된 연금술이 마침내 숨 쉬는 세계를 낳았다.',
+      '언젠가 이 행성의 누군가도 밤하늘을 올려다보며 원소의 비밀을 궁금해하겠지.'] },
   1: { icon: '🌑', title: '빅 크런치를 넘어서', cond: '5000층 최종 보스 「빅 크런치」 처치',
     lines: ['5000번째 문 너머, 모든 것을 삼키려던 빅 크런치가 마침내 멈췄다.',
       '수소 한 알에서 시작한 너의 연금술은 우주의 종말마저 되돌려 놓았다.',
@@ -2156,7 +2543,7 @@ const ENDINGS = {
       '너는 이제 원소 연금술사가 아니다 — 세계의 창조자다.'] },
 };
 function showEnding(n) {
-  const E = ENDINGS[n], both = S.endings.e1 && S.endings.e2;
+  const E = ENDINGS[n], both = S.endings.e1 && S.endings.e2 && S.endings.e3;
   const stats = [['플레이 시간', fmtTime(S.playTime)], ['환생', S.prestige.count + '회'], ['총 클릭', fmt(S.totalClicks)],
     ['총 융합', fmt(S.totalFusions)], ['처치한 적', fmt(S.kills)], ['최고 스테이지', Math.max(S.prestige.best || 0, S.battle.maxStage)]];
   $('#endModal').innerHTML = `<div class="end-box">
@@ -2165,7 +2552,7 @@ function showEnding(n) {
     <h1>${E.title}</h1>
     ${E.lines.map((l, i) => `<p style="animation-delay:${0.8 + i * 1.6}s">${l}</p>`).join('')}
     <div class="end-stats" style="animation-delay:${0.8 + E.lines.length * 1.6}s">${stats.map(([k, v]) => `<div>${k}<b>${v}</b></div>`).join('')}</div>
-    ${both ? `<div class="end-both" style="animation-delay:${1.4 + E.lines.length * 1.6}s">🏆 두 엔딩을 모두 보았습니다. 당신은 진정한 원소 연금술사!</div>` : ''}
+    ${both ? `<div class="end-both" style="animation-delay:${1.4 + E.lines.length * 1.6}s">🏆 세 엔딩을 모두 보았습니다. 당신은 진정한 원소 연금술사이자 세계의 창조자!</div>` : ''}
     <button class="big-btn end-close" style="animation-delay:${1.6 + E.lines.length * 1.6}s">계속 플레이하기</button>
   </div>`;
   $('#endModal').classList.add('on');
@@ -2348,8 +2735,8 @@ function pickFuse(z) {
 /* =====================================================================
  *  전투
  * ===================================================================== */
-function atkMult() { return Math.pow(1.5, S.atkLv) * prestigeCombat(); }
-function hpMult() { return Math.pow(1.5, S.hpLv) * prestigeCombat(); }
+function atkMult() { return Math.pow(1.5, S.atkLv) * prestigeCombat() * (1 + achBonus('combat')); }
+function hpMult() { return Math.pow(1.5, S.hpLv) * prestigeCombat() * (1 + achBonus('combat')); }
 function unitStats(z) {
   if (!z || S.counts[z] < 1) return null;
   // 개수 효과: 1개 ×1, 10개 ×2, 100개 ×3 … (자릿수만큼) — 흔한 원소를 대량으로 모아도 무거운 원소를 못 이김
@@ -3052,6 +3439,7 @@ function renderTab() {
   else if (R.tab === 'ach') renderAch();
   else if (R.tab === 'shop') renderShop();
   else if (R.tab === 'void') renderVoid();
+  else if (R.tab === 'god') renderGod();
   else if (R.tab === 'arcade') renderArcade();
   else if (R.tab === 'settings') renderSettings();
 }
@@ -3128,6 +3516,10 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-gen]'))) return buyGen(+el.dataset.gen);
   if ((el = t.closest('[data-rep]'))) return buyRep(el.dataset.rep);
   if ((el = t.closest('[data-upg]'))) return buyUpg(el.dataset.upg);
+  if ((el = t.closest('[data-power]'))) return usePower(el.dataset.power);
+  if (t.closest('[data-god-unlock]')) return unlockGod();
+  if ((el = t.closest('[data-admin]'))) return adminAction(el.dataset.admin);
+  if (t.id === 'adminModal') return $('#adminModal').classList.remove('on');
   if ((el = t.closest('[data-arc]'))) return startArc(el.dataset.arc, el.dataset.opt);
   if (t.closest('[data-arc-exit]')) return arcExit();
   if ((el = t.closest('[data-mem]'))) return clickMem(+el.dataset.mem);
@@ -3241,6 +3633,15 @@ $('#btnInstall').onclick = async () => {
 };
 if (matchMedia('(display-mode: standalone)').matches) setText('installState', '✅ 앱으로 실행 중');
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+$('#btnAdmin').onclick = openAdmin;
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'adminPw') adminAction('login'); });
+/* 배경을 눌러도 수소 획득 (패널·버튼이 아닌 빈 곳) */
+document.addEventListener('click', e => {
+  const tg = e.target;
+  if (!(tg === document.body || tg === document.documentElement || tg.matches('main, #corePanel, #coreWrap, .core-info, .core-info *, #stars'))) return;
+  if ($('#discModal').classList.contains('on') || $('#endModal').classList.contains('on')) return;
+  if (clickAllowed(e, 'core', e.clientX, e.clientY)) clickCore(e.clientX, e.clientY);
+});
 $('#btnSave').onclick = () => { save(); toast('💾 저장되었습니다'); };
 $('#btnExport').onclick = () => {
   save();
@@ -3284,6 +3685,7 @@ function tick() {
   last = now;
   S.playTime += dt;
   addH(totalRate() * dt);
+  godTick(Math.min(dt, 5));
   battleTick(Math.min(dt, 2));
   uiAcc += dt;
   R.slowAcc += dt;
