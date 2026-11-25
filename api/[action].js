@@ -1,4 +1,4 @@
-// /api/time · me · signup · login · logout · save · admin
+// /api/time · me · signup · login · logout · save · admin · release
 const crypto = require('crypto');
 const L = require('./_lib');
 
@@ -18,8 +18,39 @@ async function cloudSave(userId) {
   return row ? { data: row.data, rev: row.rev, updatedAt: new Date(row.updated_at).getTime() } : null;
 }
 
+// 공개 단계: 관리자가 「일반 사이트에 배포」를 누르기 전까지 새 기능은 관리자 모드에서만 보임
+async function ensureSettings() {
+  await L.db()`CREATE TABLE IF NOT EXISTS settings (key text PRIMARY KEY, value text NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())`;
+}
+async function getRelease() {
+  try {
+    const [row] = await L.db()`SELECT value FROM settings WHERE key = 'release'`;
+    return row ? Number(row.value) || 0 : 0;
+  } catch (e) {
+    if (e.code === '42P01') return 0; // 아직 테이블이 없음
+    throw e;
+  }
+}
+function checkAdmin(body) {
+  const want = process.env.ADMIN_PASSWORD;
+  if (!want || typeof body.password !== 'string') throw new L.HttpError(400, '비밀번호를 입력해 주세요.');
+  if (!crypto.timingSafeEqual(Buffer.from(L.sha(body.password)), Buffer.from(L.sha(want)))) throw new L.HttpError(401, '비밀번호가 틀렸어요.');
+}
+
 const routes = {
   'GET time': async () => ({}),
+
+  'GET release': async () => ({ release: await getRelease() }),
+
+  'POST release': async (req, res, body) => {
+    await L.limit('release:' + L.clientIp(req), 10, 900);
+    checkAdmin(body);
+    const v = body.release;
+    if (!Number.isInteger(v) || v < 0 || v > 1000) throw new L.HttpError(400, '공개 단계가 잘못됐어요.');
+    await ensureSettings();
+    await L.db()`INSERT INTO settings (key, value) VALUES ('release', ${String(v)}) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`;
+    return { release: v };
+  },
 
   'GET me': async req => {
     const user = await L.currentUser(req);
@@ -77,11 +108,9 @@ const routes = {
   },
 
   'POST admin': async (req, res, body) => {
-    const want = process.env.ADMIN_PASSWORD;
-    if (!want || typeof body.password !== 'string') throw new L.HttpError(400, '비밀번호를 입력해 주세요.');
     await L.limit('admin:' + L.clientIp(req), 5, 900);
-    if (!crypto.timingSafeEqual(Buffer.from(L.sha(body.password)), Buffer.from(L.sha(want)))) throw new L.HttpError(401, '비밀번호가 틀렸어요.');
-    return { ok: true };
+    checkAdmin(body);
+    return { ok: true, release: await getRelease() };
   },
 };
 
