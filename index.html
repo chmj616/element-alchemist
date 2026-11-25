@@ -1154,7 +1154,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
           <li><b>오락실</b>: 카드 맞추기(3단계) · 원소 퀴즈(4모드) · 원소 사천성 · 원자 잡기 · 순서 터치 · 원소 2048 · 기억 순서 · 업다운 — 8가지 미니게임으로 코인 획득. 최근 10분 판수만큼 보상이 줄어드는 피로도가 있어요.</li>
           <li><b>공허</b>: 주기율표 순서대로 원소를 바치면 우주가 태어나요. 원소 하나를 다 채울 때마다 생산량 ×1.02 (영구). 118번까지 채우면 <b>엔딩 2</b>.</li>
           <li><b>엔딩</b>: 5000층 최종 보스 처치 = <b>엔딩 1</b> · 공허에서 우주 창조 = <b>엔딩 2</b> · 불타는 행성을 생명의 행성으로 = <b>엔딩 3</b>.</li>
-          <li><b>⚛️ 원소 쪼개기</b>: 환생 7회 + 엔딩 1 이후 주기율표 탭에서 별의 씨앗 100개를 바치면 열리는 두 번째 클리커. 원소를 클릭(스페이스바)해 쪼개면 다음 원소가 나와요(H → He → Li …). 비활성 기체는 30초 보스. 오가네손까지 쪼개고 ⚡ 에너지를 모아 💥 초신성 환생: 💠 쿼크(피해 +10%/개) · 생산 시설 5종 추가 · 다음 우주는 더 단단해요.</li>
+          <li><b>⚛️ 원소 쪼개기</b>: 환생 7회 + 엔딩 1 이후 주기율표 탭에서 가진 별의 씨앗을 모두 심으면 열리는 두 번째 클리커(심은 씨앗 1개당 피해 +1%, 대신 원래 게임의 씨앗 보너스는 사라져요). 원소를 클릭(스페이스바)해 쪼개면 다음 원소가 나와요(H → He → Li …). 비활성 기체는 30초 보스. 오가네손까지 쪼개고 ⚡ 에너지를 모아 💥 초신성 환생: 💠 쿼크(피해 +10%/개) · 생산 시설 5종 추가 · 다음 우주는 더 단단해요.</li>
           <li><b>생명의 행성</b>: 우주를 완성하면 공허 탭이 '🌍 행성'이 되고, '🌱 생명의 행성으로' 버튼(신의 권능 해금 1조 코인)에서 레벨 1~5 행성을 순서대로 골라 전체 화면 모드에 들어가요. 레벨 5를 깨면 엔딩 3. 아래 단축 바에서 권능을 골라(숫자키 1~0) 행성을 누르면 사용돼요. 용암을 식혀 지각을 만들고, 바다·대기·자기장·산소를 지구처럼 맞추고 생명을 100까지 키우면 레벨 클리어. <b>Ctrl+휠</b>(모바일은 두 손가락)로 행성 → 지상 → 🗺️ 펼친 행성 순으로 확대돼요. 펼친 행성은 행성 전체를 직사각형으로 편 지도라 끌어서 동서로 한 바퀴 돌 수 있고, 휠로 확대하면 생물이 자세히 보여요. 커서를 대면(모바일은 길게 누르면) 이름이 나와요. 행성 시간은 이 화면을 보고 있을 때만 흐르고, 배속하면 쿨타임·보호막·재해도 같이 빨라져요. 소행성·감마선이 올 때는 ×1로 느려져요. 미션 보상은 레벨마다 처음 한 번이에요. 수치는 10가지(토양·오존층·바다 염도·오염도 포함), 권능은 24가지예요(숫자키 1~0, Shift+숫자키로 11~20번). 🎈 대기·💨 산소·🧂 염도 조절은 올리기·자동·내리기를 고를 수 있고, 🏺 종자 보관소는 대멸종을 한 번 되돌려요. 미션 체크리스트, 📸 사진 저장, 소행성(눌러서 격추)·태양 플레어·초화산·유성우 같은 사건, 생물 도감 12종, 시간 배속, 행성 이름 짓기도 있어요.</li>
           <li><b>업적 난이도</b>: ★쉬움 생산 +1% · ★★보통 +3%(전투 +1%) · ★★★어려움 +6%(+3%) · ★★★★매우 어려움 +12%(+6%) · ★★★★★전설 +25%(+12%).</li>
           <li><b>계정</b>: 오른쪽 위 👤에서 아이디와 비밀번호로 가입하면 클라우드에 저장돼 다른 기기에서 이어 할 수 있어요. 이메일을 받지 않으니 비밀번호는 잊지 마세요. 로그인 없이 게스트로도 할 수 있어요.</li>
@@ -1468,7 +1468,7 @@ const ACHS = [
   { id: 'reb3',    icon: '🔁', name: '세 번째 우주',      desc: '환생 3회',                check: () => S.prestige.count >= 3 },
   { id: 'reb5',    icon: '♾️', name: '윤회하는 우주',   desc: '환생 5회',               check: () => S.prestige.count >= 5 },
   { id: 'reb7',    icon: '🌈', name: '일곱 번째 하늘',    desc: '환생 7회 (5000층 개방)',   check: () => S.prestige.count >= 7 },
-  { id: 'g2start', icon: '⚛️', name: '씨앗을 바친 자',     desc: '별의 씨앗을 바쳐 원소 쪼개기 열기', check: () => S.g2.unlocked },
+  { id: 'g2start', icon: '⚛️', name: '씨앗을 심은 자',     desc: '별의 씨앗을 모두 심어 원소 쪼개기 열기', check: () => S.g2.unlocked },
   { id: 'g2og',    icon: '🪓', name: '마지막 원소를 쪼개다', desc: '원소 쪼개기에서 오가네손(118번)까지 쪼개기', check: () => S.g2.bestZ >= 118 || S.g2.k > 0 },
   { id: 'g2reb',   icon: '💥', name: '초신성의 연금술사',  desc: '원소 쪼개기 초신성 환생 3회', check: () => S.g2.k >= 3 },
 ];
@@ -4020,6 +4020,10 @@ function adminPanelHtml() {
       <button class="btn" data-admin="rebirth">🌌 환생 7회 · 씨앗 300 · 5000층 개방</button>
       <button class="btn" data-admin="void">🕳️ 공허 행성 완성 (엔딩 2)</button>
       <button class="btn" data-admin="coins">🪙 코인 +1000조</button>
+      <button class="btn" data-admin="coins:1e20">🪙 코인 +1해 (10²⁰)</button>
+      <button class="btn" data-admin="coins:1e30">🪙 코인 +100양 (10³⁰)</button>
+      <button class="btn" data-admin="coins:1e50">🪙 코인 +10⁵⁰</button>
+      <button class="btn" data-admin="coinsx">🪙 지금 코인 ×1000</button>
       <button class="btn" data-admin="god">✨ 신의 권능 즉시 해금</button>
       <button class="btn" data-admin="levels">🗺️ 생명의 행성 레벨 1~5 모두 열기</button>
       <button class="btn" data-admin="nocd">⏩ 권능 쿨타임 ${R.godNoCd ? '켜기' : '없애기'}</button>
@@ -4081,6 +4085,8 @@ async function adminAction(a) {
   if (a === 'rebirth') doReb();
   if (a === 'void') doVoid();
   if (a === 'coins') doCoins();
+  if (a.startsWith('coins:')) { const v = +a.slice(6); S.coins += v; S.totalCoins += v; }
+  if (a === 'coinsx') { const v = Math.max(1e15, S.coins) * 999; S.coins += v; S.totalCoins += v; }
   if (a === 'god') { doVoid(); doGod(); }
   if (a === 'resetgod') { S.god = Object.assign(godDefault(), { unlocked: true }); planetViewReset(); }
   if (a === 'levels') S.godCleared = Math.max(S.godCleared || 0, 4);
@@ -6272,7 +6278,6 @@ setInterval(acctTick, 5000);
  *  원소를 두드려 쪼개면 다음 원자 번호의 원소가 튀어나와요 (H → He → Li …).
  *  환생(초신성)할 때마다 결합 에너지가 더 단단한 우주가 되고, 생산 시설이 5종씩 추가돼요.
  * ===================================================================== */
-const G2_OFFER = 100;          // 바칠 별의 씨앗
 const G2_BOSS_TIME = 30;       // 비활성 기체 보스 제한 시간(초)
 const G2_FARM_TIME = 30;       // 보스 실패 후 자동 재도전까지
 const G2_NOBLE = new Set([10, 18, 36, 54, 86, 118]);
@@ -6290,7 +6295,7 @@ const G2_MILESTONE = 10;       // 10대마다 그 시설 피해 ×2
 
 function g2Default() {
   return { unlocked: false, z: 1, hp: -1, e: 0, clv: 0, own: G2_FAC.map(() => 0), k: 0, quarks: 0, done: false,
-    farm: false, farmT: 0, bossT: 0, auto: true, intro: false, splits: 0, bestZ: 0, totalE: 0 };
+    farm: false, farmT: 0, bossT: 0, auto: true, intro: false, splits: 0, bestZ: 0, totalE: 0, planted: 0 };
 }
 function g2Normalize(v, num, int) {
   const o = v && typeof v === 'object' && !Array.isArray(v) ? v : {}, g = g2Default();
@@ -6298,7 +6303,7 @@ function g2Normalize(v, num, int) {
   g.k = int(o.k, 0, 0, 1000);
   g.z = int(o.z, 1, 1, 118);
   g.hp = num(o.hp, -1, -1);
-  for (const k of ['e', 'quarks', 'splits', 'totalE', 'farmT', 'bossT']) g[k] = num(o[k]);
+  for (const k of ['e', 'quarks', 'splits', 'totalE', 'farmT', 'bossT', 'planted']) g[k] = num(o[k]);
   g.clv = int(o.clv, 0, 0, 1e5);
   g.bestZ = int(o.bestZ, 0, 0, 118);
   g.own = G2_FAC.map((_, i) => int(Array.isArray(o.own) ? o.own[i] : 0, 0, 0, 1e5));
@@ -6312,7 +6317,8 @@ const g2IsBoss = z => G2_NOBLE.has(z) && !g2().farm && !(z === 118 && g2().done)
 const g2MaxHp = z => g2Base(z) * (g2IsBoss(z) ? 6 : 1);
 const g2Reward = z => (z === 1 ? 2 : g2Base(z) * 0.15 * (G2_NOBLE.has(z) ? 4 : 1));
 const g2FacCount = () => Math.min(G2_FAC.length, G2_PER_REBIRTH * (g2().k + 1));
-const g2QuarkMult = () => 1 + 0.1 * g2().quarks;
+// 쿼크 1개당 +10%, 심은 별의 씨앗 1개당 +1%
+const g2QuarkMult = () => (1 + 0.1 * g2().quarks) * (1 + 0.01 * (g2().planted || 0));
 function g2FacDps(i, n = g2().own[i]) { return n * G2_FAC[i].dps * Math.pow(2, Math.floor(n / G2_MILESTONE)); }
 function g2Dps() { let s = 0; for (let i = 0; i < g2FacCount(); i++) s += g2FacDps(i); return s * g2QuarkMult(); }
 function g2Click() { const L = g2().clv; return (1 + L) * Math.pow(2, Math.floor(L / 10)) * g2QuarkMult() + g2Dps() * 0.03; }
@@ -6332,19 +6338,25 @@ const g2CanOffer = () => S.endings.e1 && S.prestige.count >= 7;
 /* ---------- 해금: 별의 씨앗 바치기 ---------- */
 function g2OfferHtml() {
   const G = g2();
-  if (G.unlocked) return `<div class="g2-offer done"><b>⚛️ 원소 쪼개기</b><span>${G.k + 1}번째 우주 · 최고 ${EL[Math.max(1, G.bestZ)].sym}(${G.bestZ}번) · 💠 쿼크 ${fmt(G.quarks)}</span>
+  if (G.unlocked) return `<div class="g2-offer done"><b>⚛️ 원소 쪼개기</b><span>${G.k + 1}번째 우주 · 최고 ${EL[Math.max(1, G.bestZ)].sym}(${G.bestZ}번) · 💠 쿼크 ${fmt(G.quarks)} · 🌱 심은 씨앗 ${fmt(G.planted)}</span>
     <button class="big-btn g2-btn" data-g2="open">⚛️ 원소 쪼개기 열기</button></div>`;
   if (!g2CanOffer()) return `<div class="g2-offer locked"><b>🔒 ???</b><span>환생 7번을 하고 엔딩 1을 보면, 별의 씨앗으로 새로운 무언가를 열 수 있어요…</span></div>`;
-  const ok = S.prestige.seeds >= G2_OFFER;
-  return `<div class="g2-offer"><b>🌱 씨앗 바치기</b><span>빅 크런치를 넘어선 연금술사여, 별의 씨앗 <b>${G2_OFFER}개</b>를 바치면 원소를 쪼개는 새로운 놀이가 열려요.<br><small>바친 씨앗만큼 이 게임의 씨앗 보너스(생산 ×1.08, 전투 ×1.06)는 줄어들어요 · 보유 ${fmt(S.prestige.seeds)}개</small></span>
-    <button class="big-btn g2-btn" data-g2="offer" ${ok ? '' : 'disabled'}>🌱 씨앗 ${G2_OFFER}개 바치기</button></div>`;
+  const n = Math.floor(S.prestige.seeds), ok = n >= 1;
+  return `<div class="g2-offer"><b>🌱 씨앗 심기</b><span>빅 크런치를 넘어선 연금술사여, 가진 <b>별의 씨앗을 모두</b> 심으면 원소를 쪼개는 새로운 놀이가 열려요.<br><small>심은 씨앗 1개당 원소 쪼개기 피해 +1% · 대신 이 게임의 씨앗 보너스(생산 ×1.08, 전투 ×1.06)는 모두 사라져요 · 보유 ${fmt(n)}개</small></span>
+    <button class="big-btn g2-btn" data-g2="offer" ${ok ? '' : 'disabled'}>🌱 씨앗 ${fmt(n)}개 모두 심기</button></div>`;
 }
 function g2Offer() {
   if (g2().unlocked || !g2CanOffer()) return;
-  if (S.prestige.seeds < G2_OFFER) return toast(`🌱 별의 씨앗이 부족해요 (${G2_OFFER}개 필요)`);
-  if (!confirm(`🌱 별의 씨앗 ${G2_OFFER}개를 바칠까요?\n\n씨앗 보너스가 그만큼 줄어들고(생산 ÷${fmt(Math.pow(1.08, G2_OFFER))}), 새로운 게임 「원소 쪼개기」가 열려요.\n진행 중인 원소 연금술사 기록은 그대로예요.`)) return;
-  S.prestige.seeds -= G2_OFFER;
+  const n = Math.floor(S.prestige.seeds);
+  if (n < 1) return toast('🌱 심을 별의 씨앗이 없어요');
+  if (!confirm(`🌱 가진 별의 씨앗 ${fmt(n)}개를 모두 심을까요?
+
+원소 연금술사의 씨앗 보너스가 모두 사라지고(생산 ÷${fmt(Math.pow(1.08, n))}, 전투 ÷${fmt(Math.pow(1.06, n))}),
+새로운 게임 「원소 쪼개기」가 열려요. 심은 씨앗 1개당 그 게임의 피해 +1%.
+다른 기록(원소·스테이지·엔딩 등)은 그대로예요.`)) return;
+  S.prestige.seeds -= n;
   g2().unlocked = true;
+  g2().planted = (g2().planted || 0) + n;
   save();
   SFX.discover();
   particles(innerWidth / 2, innerHeight / 2, 50, '#69db7c');
@@ -6526,8 +6538,8 @@ function g2Rebirth() {
   if (!G.done) return;
   if (G.e < cost) return toast(`⚡ 에너지가 부족해요 (${fmt(cost)} 필요)`);
   const nf = Math.min(G2_FAC.length, G2_PER_REBIRTH * (G.k + 2)), more = nf - g2FacCount();
-  if (!confirm(`💥 초신성 환생을 할까요?\n\n필요: ⚡ ${fmt(cost)}\n받는 것: 💠 쿼크 +${g2QuarkGain()} (쿼크 1개당 피해 +10%)${more > 0 ? `\n새 생산 시설 ${more}종 추가` : ''}\n다음 우주: 원소 결합 에너지 증가율 ×${(g2Growth() + 0.12).toFixed(2)} (지금 ×${g2Growth().toFixed(2)})\n초기화: 에너지, 시설, 클릭 강화, 진행 원소`)) return;
-  const keep = { unlocked: true, k: G.k + 1, quarks: G.quarks + g2QuarkGain(), splits: G.splits, totalE: G.totalE, auto: G.auto, intro: true };
+  if (!confirm(`💥 초신성 환생을 할까요?\n\n필요: ⚡ ${fmt(cost)}\n받는 것: 💠 쿼크 +${g2QuarkGain()} (쿼크 1개당 피해 +10%, 심은 씨앗 보너스는 유지)${more > 0 ? `\n새 생산 시설 ${more}종 추가` : ''}\n다음 우주: 원소 결합 에너지 증가율 ×${(g2Growth() + 0.12).toFixed(2)} (지금 ×${g2Growth().toFixed(2)})\n초기화: 에너지, 시설, 클릭 강화, 진행 원소`)) return;
+  const keep = { unlocked: true, k: G.k + 1, quarks: G.quarks + g2QuarkGain(), planted: G.planted, splits: G.splits, totalE: G.totalE, auto: G.auto, intro: true };
   S.g2 = Object.assign(g2Default(), keep);
   save();
   SFX.discover();
@@ -6551,7 +6563,7 @@ function g2Render(force) {
   setText('g2HpText', `결합 에너지 ${fmt(Math.max(0, G.hp))} / ${fmt(max)}`);
   setText('g2E', fmt(G.e));
   setText('g2Dps', ` · 초당 피해 ${fmt(g2Dps())} · 클릭 ${fmt(g2Click())}`);
-  setText('g2Uni', `${G.k + 1}번째 우주 · 💠 ${fmt(G.quarks)}`);
+  setText('g2Uni', `${G.k + 1}번째 우주 · 💠 ${fmt(G.quarks)} · 🌱 ${fmt(G.planted)} · 피해 ×${fmt(g2QuarkMult())}`);
   const boss = $('#g2Boss');
   if (g2IsBoss(z)) {
     const left = Math.max(0, G2_BOSS_TIME - G.bossT);
