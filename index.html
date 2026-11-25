@@ -1855,9 +1855,9 @@ const R = {
 // 공개 단계: 새 기능은 관리자 모드에서 먼저 보이고, 관리자가 「일반 사이트에 배포」를 누르면 모두에게 열림
 const RELEASE_ID = 4; // 최신 단계
 const RELEASE_NOTES = {
-  1: '환생 강화 · 강화 수량 버튼 · 💎 코인 투자소 · 원소 쪼개기 연구/스킬/동위원소/임무/발전소/대기 발전/도감/💠 쿼크 상점',
+  1: '환생 강화 · 강화 수량 버튼 · 💎 코인 투자소 · 📲 앱으로 다운로드 · 원소 쪼개기 업데이트(연구/스킬/동위원소/임무/발전소/대기 발전/도감/💠 쿼크 상점 · 난이도 상향: 원소 더 단단 · 보스 체력 ×10·22초·재생 · 초신성 비용 ×25)',
   2: '🏛️ 몬스터 전시장 · 🚨 빅 크런치 소실 이벤트 · 🌘 2부 (1부 보관 · 오가기)',
-  3: '📖 게임 설명 탭 (엔딩 전 콘텐츠는 ???) · 📲 앱으로 다운로드 버튼',
+  3: '📖 게임 설명 탭 (엔딩 전 콘텐츠는 ???)',
   4: '🌘 2부 개편: ⚒️ 무기 118종 제작·강화 전투 · ⛏️ 원소 채굴(해금한 원소를 클릭) · 🌑 2500층 빅 크런치와 대화 · 🏛️ 1부/2부 전시장',
 };
 const beta = (n = 1) => !!R.admin || (R.release || 0) >= n;
@@ -4343,14 +4343,14 @@ function partTick() {
   }
 }
 function stage3Tick() {
-  const on = beta(3);
-  if (R.s3 === on) return;
-  R.s3 = on;
+  const on = beta(3), app = beta(1);
+  if (R.s3 === on + '|' + app) return;
+  R.s3 = on + '|' + app;
   $('#guideTabBtn').style.display = on ? '' : 'none';
   $('#oldHelp').style.display = on ? 'none' : '';
-  $('#oldInstall').style.display = on ? 'none' : '';
+  $('#oldInstall').style.display = app ? 'none' : '';
   $('#helpMoved').innerHTML = on ? '<div class="help-moved">📖 게임 방법은 <button class="btn" data-goto="guide">📖 설명 탭</button>에 정리돼 있어요.</div>' : '';
-  $('#appCard').innerHTML = on ? `<div class="app-card"><div><b>📲 앱으로 다운로드</b><small>홈 화면에 설치하면 주소창 없이 전체 화면으로, 아이콘 한 번에 바로 열려요.</small></div><button class="big-btn" data-install="1" id="appBtn">📲 앱으로 다운로드</button></div>` : '';
+  $('#appCard').innerHTML = app ? `<div class="app-card"><div><b>📲 앱으로 다운로드</b><small>홈 화면에 설치하면 주소창 없이 전체 화면으로, 아이콘 한 번에 바로 열려요.</small></div><button class="big-btn" data-install="1" id="appBtn">📲 앱으로 다운로드</button></div>` : '';
   installState();
   if (!on && R.tab === 'guide') switchTab('settings');
   R.guideSig = null;
@@ -4810,7 +4810,7 @@ function guideSections() {
     { id: 'g2', icon: '⚛️', title: '원소 쪼개기', lock: !e1 && '엔딩 1을 보면 공개돼요', body: L(
       '<b>환생 7회 + 엔딩 1</b> 뒤 주기율표 탭에서 가진 별의 씨앗을 <b>모두 심으면</b> 열리는 두 번째 게임 (심은 씨앗 1개당 피해 +1%, 대신 원래 게임의 씨앗 보너스는 사라져요).',
       '원소를 클릭(스페이스바)해 쪼개면 다음 원소가 나와요 (H → He → Li …). 생산 시설이 초당 피해를 줘요.',
-      '비활성 기체(Ne·Ar·Kr·Xe·Rn·Og)는 <b>30초 보스</b>.',
+      b1 ? '비활성 기체(Ne·Ar·Kr·Xe·Rn·Og)는 <b>보스</b>: 체력 ×10 · <b>22초</b> 제한 · 초당 1% 재생. 원소는 뒤로 갈수록 빠르게 단단해지고, 우주가 바뀔 때마다 더 단단해져요. 초신성 환생에 드는 에너지도 커요.' : '비활성 기체(Ne·Ar·Kr·Xe·Rn·Og)는 <b>30초 보스</b>.',
       '오가네손까지 쪼개고 ⚡ 에너지를 모으면 💥 <b>초신성 환생</b>: 💠 쿼크(피해 +10%/개) · 시설 5종 추가 · 다음 우주는 더 단단해요.',
       b1 && '🔬 연구 12종 · ⚡ 스킬 4종(숫자키 1~4) · ✨ 불안정 동위원소 · 📜 임무 · ⚡ 발전소(수소·코인 → 에너지) · 🌙 대기 발전 · 📖 원소 도감 · 💠 쿼크 상점(영구 강화).') },
     { id: 'planet', icon: '🌍', title: '생명의 행성', lock: !e2 && '엔딩 2를 보면 공개돼요', body: L(
@@ -7320,6 +7320,11 @@ const G2_FAC = [
   ['초끈 직조기', '🧵'], ['특이점 엔진', '⚫'], ['우주 상수 조율기', '🎛️'], ['무한 분열로', '♾️'], ['원초의 불꽃', '🔥'],
 ].map(([name, icon], i) => ({ name, icon, cost: 15 * Math.pow(9, i), dps: Math.pow(6.5, i) }));
 const G2_COST_GROW = 1.08;     // 시설 가격 증가율
+// 1단계: 원소 쪼개기 난이도 상향 (시뮬레이션으로 벽이 생기지 않는 값만 사용)
+// 원소 성장 1.30 → 1.34 · 보스 체력 ×6 → ×10 · 제한 30 → 22초 · 보스 초당 1% 재생 · 분열 장갑 가격 ×1.6 · 초신성 환생 비용 ×25
+const G2H = () => beta(1);
+const g2CG = () => G2_COST_GROW;
+const g2GrowStep = () => 0.12;
 const G2_MILESTONE = 10;       // 10대마다 그 시설 피해 ×2
 
 // 🔬 연구소: 이번 우주에서만 유지 (초신성 환생 시 초기화). need = 이번 우주에서 도달해야 보이는 원소, mult = 그 원소 결합 에너지의 몇 배가 가격인지
@@ -7400,14 +7405,14 @@ function g2Normalize(v, num, int) {
 }
 const g2 = () => S.g2;
 const g2Lab = id => beta() && !!g2().lab[id];
-const g2Growth = () => 1.30 + 0.12 * g2().k;                       // 우주가 바뀔수록 원소가 단단해짐
+const g2Growth = () => (G2H() ? 1.34 : 1.30) + g2GrowStep() * g2().k;                      // 우주가 바뀔수록 원소가 단단해짐
 const g2Base = z => (z === 1 ? 1 : 8 * Math.pow(g2Growth(), z - 1));
 const g2IsBoss = z => G2_NOBLE.has(z) && !g2().farm && !(z === 118 && g2().done);
-const g2MaxHp = z => g2Base(z) * (g2IsBoss(z) ? 6 : 1);
+const g2MaxHp = z => g2Base(z) * (g2IsBoss(z) ? (G2H() ? 10 : 6) : 1);
 const g2RewardMult = () => (g2Lab('recover') ? 2 : 1) * Math.pow(1.25, g2QLv('energy'));
 const g2Reward = z => (z === 1 ? 2 : g2Base(z) * 0.15 * (G2_NOBLE.has(z) ? 4 * (g2Lab('bounty') ? 5 : 1) : 1)) * g2RewardMult();
 const g2FacCount = () => Math.min(G2_FAC.length, G2_PER_REBIRTH * (g2().k + 1));
-const g2BossTime = () => G2_BOSS_TIME + (g2Lab('boss') ? 15 : 0) + 5 * g2QLv('boss');
+const g2BossTime = () => (G2H() ? 22 : G2_BOSS_TIME) + (g2Lab('boss') ? 15 : 0) + 5 * g2QLv('boss');
 // 영구 배율: 쿼크 1개당 +10%(연구 시 +15%), 심은 별의 씨앗 1개당 +1%, 원소 도감(역대 최고 원소) 1개당 +1%
 const g2QuarkMult = () => (1 + (g2Lab('quark') ? 0.15 : 0.1) * g2().quarks) * (1 + 0.01 * (g2().planted || 0)) * (beta() ? 1 + 0.01 * (g2().bestEver || 0) : 1);
 /* ---------- 일시 효과 (스킬 · 동위원소) ---------- */
@@ -7426,18 +7431,18 @@ function g2Income() {
   return dps * 0.15 * g2RewardMult();
 }
 const g2IdleEff = () => (g2Lab('idle') ? 1 : 0.25);
-const g2ClickCost = () => 20 * Math.pow(1.55, g2().clv);
+const g2ClickCost = () => 20 * Math.pow(G2H() ? 1.6 : 1.55, g2().clv);
 const g2FacBase = i => G2_FAC[i].cost * Math.pow(0.9, g2QLv('cheap'));
 function g2FacCost(i, n = 1) {
-  const k = g2().own[i], c = g2FacBase(i), r = G2_COST_GROW;
+  const k = g2().own[i], c = g2FacBase(i), r = g2CG();
   return c * Math.pow(r, k) * (Math.pow(r, n) - 1) / (r - 1);
 }
 function g2FacMax(i) {
-  const k = g2().own[i], c = g2FacBase(i) * Math.pow(G2_COST_GROW, k), r = G2_COST_GROW;
+  const r = g2CG(), k = g2().own[i], c = g2FacBase(i) * Math.pow(r, k);
   return Math.max(0, Math.floor(Math.log(g2().e * (r - 1) / c + 1) / Math.log(r)));
 }
 const g2LabCost = L => g2Base(L.need) * L.mult;
-const g2RebirthCost = () => 40 * 8 * Math.pow(g2Growth(), 117);
+const g2RebirthCost = () => 40 * 8 * Math.pow(g2Growth(), 117) * (G2H() ? 25 : 1);
 const g2QuarkGain = () => 20 * (g2().k + 1);
 const g2CanOffer = () => S.endings.e1 && S.prestige.count >= 7;
 function g2Gain(v) { const G = g2(); G.e += v; G.totalE += v; }
@@ -7622,6 +7627,7 @@ function g2Advance(dt) {
   const d = g2Dps() + (g2Lab('auto') ? 5 * g2ClickBase() : 0);
   if (d > 0) g2Hit(d * dt);
   if (g2IsBoss(G.z)) {
+    if (G2H() && G.hp > 0) G.hp = Math.min(g2MaxHp(G.z), G.hp + g2MaxHp(G.z) * 0.01 * dt); // 보스 재생 초당 1%
     if (!g2Buff('freeze')) G.bossT += dt;
     if (G.bossT >= g2BossTime()) g2BossFail();
   } else if (G.farm && G.auto) {
@@ -7821,7 +7827,7 @@ function g2Rebirth() {
   if (!G.done) return;
   if (G.e < cost) return toast(`⚡ 에너지가 부족해요 (${fmt(cost)} 필요)`);
   const nf = Math.min(G2_FAC.length, G2_PER_REBIRTH * (G.k + 2)), more = nf - g2FacCount();
-  if (!confirm(`💥 초신성 환생을 할까요?\n\n필요: ⚡ ${fmt(cost)}\n받는 것: 💠 쿼크 +${g2QuarkGain()} (1개당 피해 +10% · 💠 쿼크 탭에서 영구 강화 구매)${more > 0 ? `\n새 생산 시설 ${more}종 추가` : ''}\n다음 우주: 원소 결합 에너지 증가율 ×${(g2Growth() + 0.12).toFixed(2)} (지금 ×${g2Growth().toFixed(2)})\n유지: 쿼크·쿼크 강화, 심은 씨앗, 원소 도감, 스킬, 임무${g2QLv('keeplab') ? ', 연구(🧠 연구 기억)' : ''}\n초기화: 에너지, 시설, 클릭 강화, ${g2QLv('keeplab') ? '' : '연구, '}진행 원소`)) return;
+  if (!confirm(`💥 초신성 환생을 할까요?\n\n필요: ⚡ ${fmt(cost)}\n받는 것: 💠 쿼크 +${g2QuarkGain()} (1개당 피해 +10% · 💠 쿼크 탭에서 영구 강화 구매)${more > 0 ? `\n새 생산 시설 ${more}종 추가` : ''}\n다음 우주: 원소 결합 에너지 증가율 ×${(g2Growth() + g2GrowStep()).toFixed(2)} (지금 ×${g2Growth().toFixed(2)})\n유지: 쿼크·쿼크 강화, 심은 씨앗, 원소 도감, 스킬, 임무${g2QLv('keeplab') ? ', 연구(🧠 연구 기억)' : ''}\n초기화: 에너지, 시설, 클릭 강화, ${g2QLv('keeplab') ? '' : '연구, '}진행 원소`)) return;
   const keep = { unlocked: true, k: G.k + 1, quarks: G.quarks + g2QuarkGain(), planted: G.planted, splits: G.splits, totalE: G.totalE, auto: G.auto, intro: true,
     bestEver: 118, mis: G.mis, mlv: G.mlv, misDone: G.misDone, rerollAt: G.rerollAt, convH: G.convH, convC: G.convC, golds: G.golds, idleE: G.idleE, qSpent: G.qSpent, qup: G.qup };
   if (g2QLv('keeplab')) keep.lab = G.lab;
@@ -7902,7 +7908,7 @@ function g2Render(force) {
   if (g2IsBoss(z)) {
     const T = g2BossTime(), left = Math.max(0, T - G.bossT), fr = g2Buff('freeze');
     boss.className = 'g2-boss on' + (fr ? ' frozen' : '');
-    boss.innerHTML = `👑 비활성 기체 보스 · ${fr ? '⏸️ 멈춤' : '⏱️'} ${left.toFixed(1)}초<div class="bar"><div class="fill gold" style="width:${left / T * 100}%"></div></div>`;
+    boss.innerHTML = `👑 비활성 기체 보스 · ${fr ? '⏸️ 멈춤' : '⏱️'} ${left.toFixed(1)}초${G2H() ? ' · ♻️ 초당 1% 재생' : ''}<div class="bar"><div class="fill gold" style="width:${left / T * 100}%"></div></div>`;
   } else if (G.farm) {
     boss.className = 'g2-boss farm';
     boss.textContent = `🔁 에너지 모으는 중${G.auto ? ` · ${Math.max(0, G2_FARM_TIME - G.farmT).toFixed(0)}초 뒤 재도전` : ''}`;
