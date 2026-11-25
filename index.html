@@ -2238,11 +2238,11 @@ function rebirth() {
   if (!rebirthReady()) return;
   if (!canRebirth()) return toast(`💧 빅뱅 에너지가 부족해요: 수소 ${fmt(rebirthCost())}개 필요 (보유 ${fmt(S.counts[1])})`);
   const gain = seedsGain();
-  if (!confirm(`🌌 빅뱅을 일으켜 새로운 우주에서 다시 시작할까요?\n\n필요: 수소 ${fmt(rebirthCost())}개 (빅뱅 에너지로 소모)\n받는 것: 별의 씨앗 +${gain}개 (영구)\n유지: 업적, 통계, 별의 씨앗, 공허(우주), 생명의 행성, 엔딩, 오락실 기록, 원소 쪼개기\n초기화: 원소, 수소, 🪙 코인, 시설, 모든 강화, 스테이지`)) return;
+  if (!confirm(`🌌 빅뱅을 일으켜 새로운 우주에서 다시 시작할까요?\n\n필요: 수소 ${fmt(rebirthCost())}개 (빅뱅 에너지로 소모)\n받는 것: 별의 씨앗 +${gain}개 (영구)\n유지: 업적, 통계, 별의 씨앗, 공허(우주), 생명의 행성, 엔딩, 오락실 기록, 원소 쪼개기${P2W() ? ', ⚒️ 만든 무기' : ''}\n초기화: 원소, 수소, 🪙 코인, 시설, 모든 강화${P2W() ? '(무기 강화 레벨 포함)' : ''}, 스테이지`)) return;
   const keep = {
     misPaid: S.misPaid, godGrant: S.godGrant, lastSave: S.lastSave, offFrom: S.offFrom, offPlayed: S.offPlayed, ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, god: S.god, godCleared: S.godCleared, godAst: S.godAst, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills, g2: S.g2,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
-    part: S.part, alt: S.alt, crunch: S.crunch, p2talk: S.p2talk, p2talk2: S.p2talk2,
+    part: S.part, alt: S.alt, crunch: S.crunch, p2talk: S.p2talk, p2talk2: S.p2talk2, weap: P2W() ? S.weap : new Array(119).fill(0),
     prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
   S = Object.assign(defaultState(), keep);
@@ -4983,7 +4983,7 @@ async function adminAction(a) {
   if (a === 'bbh') { doEl(); S.counts[1] = Math.max(S.counts[1], rebirthCost()); }
   if (a === 'seeds') S.prestige.seeds += 100;
   if (a === 'achs') for (const x of ACHS) S.ach[x.id] = true;
-  if (a === 'g2') { S.g2.unlocked = true; S.g2.intro = true; S.g2.e += 1e12 * Math.pow(1e10, S.g2.k); }
+  if (a === 'g2') { if (!S.g2.unlocked) S.g2.hard = true; S.g2.unlocked = true; S.g2.intro = true; S.g2.e += 1e12 * Math.pow(1e10, S.g2.k); }
   if (a === 'rebirth') doReb();
   if (a === 'void') doVoid();
   if (a === 'coins') doCoins();
@@ -7322,7 +7322,7 @@ const G2_FAC = [
 const G2_COST_GROW = 1.08;     // 시설 가격 증가율
 // 1단계: 원소 쪼개기 난이도 상향 (시뮬레이션으로 벽이 생기지 않는 값만 사용)
 // 원소 성장 1.30 → 1.34 · 보스 체력 ×6 → ×10 · 제한 30 → 22초 · 보스 초당 1% 재생 · 분열 장갑 가격 ×1.6 · 초신성 환생 비용 ×25
-const G2H = () => beta(1);
+const G2H = () => beta(1) && !!(S.g2 && S.g2.hard); // 진행 중인 우주는 예전 수치로 끝낼 수 있게, 다음 우주(또는 새로 시작)부터 적용
 const g2CG = () => G2_COST_GROW;
 const g2GrowStep = () => 0.12;
 const G2_MILESTONE = 10;       // 10대마다 그 시설 피해 ×2
@@ -7377,7 +7377,7 @@ const G2_CONV_CD = 600;        // 발전소 쿨타임(초, 게임 시간)
 function g2Default() {
   return { unlocked: false, z: 1, hp: -1, e: 0, clv: 0, own: G2_FAC.map(() => 0), k: 0, quarks: 0, done: false,
     farm: false, farmT: 0, bossT: 0, auto: true, intro: false, splits: 0, bestZ: 0, totalE: 0, planted: 0,
-    bestEver: 0, lab: {}, sk: {}, mis: [], mlv: 0, misDone: 0, rerollAt: 0, convH: 0, convC: 0, golds: 0, idleE: 0, qSpent: 0, qup: {} };
+    bestEver: 0, lab: {}, sk: {}, mis: [], mlv: 0, misDone: 0, rerollAt: 0, convH: 0, convC: 0, golds: 0, idleE: 0, qSpent: 0, qup: {}, hard: false };
 }
 function g2Normalize(v, num, int) {
   const o = v && typeof v === 'object' && !Array.isArray(v) ? v : {}, g = g2Default();
@@ -7395,6 +7395,7 @@ function g2Normalize(v, num, int) {
   g.done = o.done === true; g.farm = o.farm === true; g.auto = o.auto !== false; g.intro = o.intro === true || g.k > 0 || g.bestZ >= 3;
   for (const L of G2_LAB) if (obj(o.lab)[L.id] === true) g.lab[L.id] = true;
   g.qSpent = Math.min(g.quarks, num(o.qSpent));
+  g.hard = o.hard === true;
   for (const Q of G2_QUP) { const v = int(obj(o.qup)[Q.id], 0, 0, Q.max); if (v) g.qup[Q.id] = v; }
   for (const s of G2_SKILLS) { const c = num(obj(o.sk)[s.id], 0, 0, s.cd); if (c) g.sk[s.id] = c; }
   if (Array.isArray(o.mis)) for (const m of o.mis.slice(0, 3)) {
@@ -7464,6 +7465,7 @@ function g2Offer() {
   if (!confirm(`🌱 가진 별의 씨앗 ${fmt(n)}개를 모두 심을까요?\n\n원소 연금술사의 씨앗 보너스가 모두 사라지고(생산 ÷${fmt(Math.pow(1.08, n))}, 전투 ÷${fmt(Math.pow(1.06, n))}),\n새로운 게임 「원소 쪼개기」가 열려요. 심은 씨앗 1개당 그 게임의 피해 +1%.\n다른 기록(원소·스테이지·엔딩 등)은 그대로예요.`)) return;
   S.prestige.seeds -= n;
   g2().unlocked = true;
+  g2().hard = beta(1);
   g2().planted = (g2().planted || 0) + n;
   save();
   SFX.discover();
@@ -7829,7 +7831,7 @@ function g2Rebirth() {
   const nf = Math.min(G2_FAC.length, G2_PER_REBIRTH * (G.k + 2)), more = nf - g2FacCount();
   if (!confirm(`💥 초신성 환생을 할까요?\n\n필요: ⚡ ${fmt(cost)}\n받는 것: 💠 쿼크 +${g2QuarkGain()} (1개당 피해 +10% · 💠 쿼크 탭에서 영구 강화 구매)${more > 0 ? `\n새 생산 시설 ${more}종 추가` : ''}\n다음 우주: 원소 결합 에너지 증가율 ×${(g2Growth() + g2GrowStep()).toFixed(2)} (지금 ×${g2Growth().toFixed(2)})\n유지: 쿼크·쿼크 강화, 심은 씨앗, 원소 도감, 스킬, 임무${g2QLv('keeplab') ? ', 연구(🧠 연구 기억)' : ''}\n초기화: 에너지, 시설, 클릭 강화, ${g2QLv('keeplab') ? '' : '연구, '}진행 원소`)) return;
   const keep = { unlocked: true, k: G.k + 1, quarks: G.quarks + g2QuarkGain(), planted: G.planted, splits: G.splits, totalE: G.totalE, auto: G.auto, intro: true,
-    bestEver: 118, mis: G.mis, mlv: G.mlv, misDone: G.misDone, rerollAt: G.rerollAt, convH: G.convH, convC: G.convC, golds: G.golds, idleE: G.idleE, qSpent: G.qSpent, qup: G.qup };
+    bestEver: 118, mis: G.mis, mlv: G.mlv, misDone: G.misDone, rerollAt: G.rerollAt, convH: G.convH, convC: G.convC, golds: G.golds, idleE: G.idleE, qSpent: G.qSpent, qup: G.qup, hard: beta(1) };
   if (g2QLv('keeplab')) keep.lab = G.lab;
   S.g2 = Object.assign(g2Default(), keep);
   R.g2Buffs = {};
@@ -8002,7 +8004,7 @@ function g2Render(force) {
     $('#g2Reb').innerHTML = G.done
       ? `<b>💥 초신성 환생</b><small>⚡ ${fmt(cost)} 필요 · 💠 쿼크 +${g2QuarkGain()}${g2FacCount() < G2_FAC.length ? ` · 새 시설 ${G2_PER_REBIRTH}종` : ''} · 다음 우주는 더 단단해요</small>
          <button class="big-btn" data-g2="rebirth" ${G.e >= cost ? '' : 'disabled'}>💥 초신성 (${Math.min(100, Math.floor(G.e / cost * 100))}%)</button>`
-      : `<b>💥 초신성 환생</b><small>118번 오가네손(Og)까지 쪼개고 ⚡ ${fmt(cost)}를 모으면 다음 우주로 갈 수 있어요. 환생할 때마다 생산 시설 ${G2_PER_REBIRTH}종 추가 · 💠 쿼크(피해 +10%/개)</small>`;
+      : `<b>💥 초신성 환생</b><small>118번 오가네손(Og)까지 쪼개고 ⚡ ${fmt(cost)}를 모으면 다음 우주로 갈 수 있어요. 환생할 때마다 생산 시설 ${G2_PER_REBIRTH}종 추가 · 💠 쿼크(피해 +10%/개)${beta(1) && !G.hard ? '<br>⚠️ 다음 우주부터 난이도가 올라가요 (보스 체력 ×10 · 22초 · 재생, 원소가 더 단단해짐). 이번 우주는 예전 난이도 그대로!' : ''}</small>`;
   }
 }
 
