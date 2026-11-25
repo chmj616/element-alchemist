@@ -844,7 +844,7 @@ html.touch-input .pc{display:none}html.touch-input .touch{display:inline}
   .g2-strip i{height:12px;font-size:7px}
   .g2-energy{font-size:15px;margin-left:0;width:100%}
 }
-.g2-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;position:sticky;top:-10px;z-index:2;background:#0b0e1a;padding:4px 0}
+.g2-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;position:sticky;top:-10px;z-index:2;background:#0b0e1a;padding:4px 0}
 .g2-tabs .btn{padding:8px 2px;font-size:13px;position:relative}
 .g2-tabs .btn.on{background:#1971c2;color:#fff}
 .g2-dot{position:absolute;top:3px;right:5px;width:8px;height:8px;border-radius:50%;background:#ff6b6b;display:none}
@@ -1669,7 +1669,14 @@ const R = {
 // 공개 단계: 새 기능은 관리자 모드에서 먼저 보이고, 관리자가 「일반 사이트에 배포」를 누르면 모두에게 열림
 const RELEASE_ID = 1;
 const beta = () => !!R.admin || (R.release || 0) >= RELEASE_ID;
-function betaChanged() { R.sig = {}; R.g2Sig = null; R.g2TabSig = null; R.g2RebSig = null; R.rbHtml = null; }
+function betaChanged() {
+  R.sig = {}; R.g2Sig = null; R.g2TabSig = null; R.g2RebSig = null; R.rbHtml = null;
+  if (R.g2OffSec && beta()) {
+    const sec = R.g2OffSec; R.g2OffSec = 0;
+    const e2 = g2Offline(sec);
+    if (e2 > 0) toast(`⚛️ 원소 쪼개기 대기 발전: ⚡ <b>${fmt(e2)}</b>`, '', 6000);
+  }
+}
 
 function defaultState() {
   const counts = new Array(119).fill(0);
@@ -4079,7 +4086,7 @@ function adminPanelHtml() {
     <p class="admin-msg">테스트용 기능이에요. 처음 조작할 때 지금 진행 상황을 자동으로 백업해요.${has ? ' <b style="color:#8ce99a">백업 있음</b>' : ''}</p>
     <div class="admin-release"><b>📢 업데이트 공개 단계</b>
       <span>${(R.release || 0) >= RELEASE_ID ? '✅ 이번 업데이트가 <b>모두에게 공개</b>돼 있어요' : '🔒 이번 업데이트는 지금 <b>관리자 모드에서만</b> 보여요 (일반 사이트에는 숨김)'}</span>
-      <small>대상: 환생 강화 · 강화 수량 버튼 · 💎 코인 투자소 · 원소 쪼개기 연구/스킬/동위원소/임무/발전소/대기 발전/도감</small>
+      <small>대상: 환생 강화 · 강화 수량 버튼 · 💎 코인 투자소 · 원소 쪼개기 연구/스킬/동위원소/임무/발전소/대기 발전/도감/💠 쿼크 상점</small>
       ${(R.release || 0) >= RELEASE_ID ? '<button class="btn danger" data-admin="unpublish">🙈 다시 관리자 전용으로</button>' : '<button class="big-btn" data-admin="publish">📢 일반 사이트에 배포</button>'}</div>
     <div class="admin-grid">
       <button class="big-btn admin-main" data-admin="all">🚀 생명의 행성 프로젝트 체험 세팅<br><small>모든 원소 + 환생 7회 + 공허 완성 + 코인 + 신의 권능 해금</small></button>
@@ -6511,13 +6518,25 @@ const G2_MIS = {
   gold:  { icon: '✨', text: n => `불안정 동위원소 ${n}개 잡기`, goal: L => Math.min(6, 2 + Math.floor(L / 8)) },
   skill: { icon: '⚡', text: n => `스킬 ${n}번 쓰기`,          goal: L => Math.min(6, 2 + Math.floor(L / 6)) },
 };
+// 💠 쿼크 상점: 초신성 환생으로 얻은 쿼크를 써서 영구 강화 (쿼크 피해 보너스는 '얻은' 쿼크 기준이라 써도 줄지 않음)
+const G2_QUP = [
+  { id: 'energy', icon: '🔋', name: '에너지 증폭',   max: 20, base: 5,  grow: 1.6, desc: L => `얻는 에너지 ×${fmt(Math.pow(1.25, L))} (레벨마다 ×1.25)` },
+  { id: 'cheap',  icon: '🏷️', name: '시설 할인',     max: 10, base: 8,  grow: 1.7, desc: L => `생산 시설 가격 -${Math.round((1 - Math.pow(0.9, L)) * 100)}% (레벨마다 ×0.9)` },
+  { id: 'crit',   icon: '🎯', name: '조준 보정',     max: 10, base: 4,  grow: 1.5, desc: L => `치명타 확률 +${L * 2}%p` },
+  { id: 'boss',   icon: '⏱️', name: '보스 시간 연장', max: 6,  base: 6,  grow: 1.8, desc: L => `비활성 기체 보스 제한 시간 +${L * 5}초` },
+  { id: 'click',  icon: '🧤', name: '양자 장갑',     max: 15, base: 5,  grow: 1.6, desc: L => `클릭 피해 ×${fmt(Math.pow(2, L))} (레벨마다 ×2)` },
+  { id: 'keeplab', icon: '🧠', name: '연구 기억',     max: 1,  base: 60, grow: 1,   desc: L => (L ? '초신성 환생해도 연구가 그대로 남아요' : '초신성 환생해도 연구가 남게 돼요') },
+];
+const g2QLv = id => (beta() ? g2().qup[id] || 0 : 0);
+const g2QCost = (Q, L = g2().qup[Q.id] || 0) => Math.ceil(Q.base * Math.pow(Q.grow, L));
+const g2QLeft = () => Math.max(0, g2().quarks - g2().qSpent);
 const G2_REROLL_CD = 120;      // 임무 바꾸기 쿨타임(초, 게임 시간)
 const G2_CONV_CD = 600;        // 발전소 쿨타임(초, 게임 시간)
 
 function g2Default() {
   return { unlocked: false, z: 1, hp: -1, e: 0, clv: 0, own: G2_FAC.map(() => 0), k: 0, quarks: 0, done: false,
     farm: false, farmT: 0, bossT: 0, auto: true, intro: false, splits: 0, bestZ: 0, totalE: 0, planted: 0,
-    bestEver: 0, lab: {}, sk: {}, mis: [], mlv: 0, misDone: 0, rerollAt: 0, convH: 0, convC: 0, golds: 0, idleE: 0 };
+    bestEver: 0, lab: {}, sk: {}, mis: [], mlv: 0, misDone: 0, rerollAt: 0, convH: 0, convC: 0, golds: 0, idleE: 0, qSpent: 0, qup: {} };
 }
 function g2Normalize(v, num, int) {
   const o = v && typeof v === 'object' && !Array.isArray(v) ? v : {}, g = g2Default();
@@ -6534,6 +6553,8 @@ function g2Normalize(v, num, int) {
   g.own = G2_FAC.map((_, i) => int(Array.isArray(o.own) ? o.own[i] : 0, 0, 0, 1e5));
   g.done = o.done === true; g.farm = o.farm === true; g.auto = o.auto !== false; g.intro = o.intro === true || g.k > 0 || g.bestZ >= 3;
   for (const L of G2_LAB) if (obj(o.lab)[L.id] === true) g.lab[L.id] = true;
+  g.qSpent = Math.min(g.quarks, num(o.qSpent));
+  for (const Q of G2_QUP) { const v = int(obj(o.qup)[Q.id], 0, 0, Q.max); if (v) g.qup[Q.id] = v; }
   for (const s of G2_SKILLS) { const c = num(obj(o.sk)[s.id], 0, 0, s.cd); if (c) g.sk[s.id] = c; }
   if (Array.isArray(o.mis)) for (const m of o.mis.slice(0, 3)) {
     const t = obj(m).t;
@@ -6547,10 +6568,10 @@ const g2Growth = () => 1.30 + 0.12 * g2().k;                       // 우주가 
 const g2Base = z => (z === 1 ? 1 : 8 * Math.pow(g2Growth(), z - 1));
 const g2IsBoss = z => G2_NOBLE.has(z) && !g2().farm && !(z === 118 && g2().done);
 const g2MaxHp = z => g2Base(z) * (g2IsBoss(z) ? 6 : 1);
-const g2RewardMult = () => (g2Lab('recover') ? 2 : 1);
+const g2RewardMult = () => (g2Lab('recover') ? 2 : 1) * Math.pow(1.25, g2QLv('energy'));
 const g2Reward = z => (z === 1 ? 2 : g2Base(z) * 0.15 * (G2_NOBLE.has(z) ? 4 * (g2Lab('bounty') ? 5 : 1) : 1)) * g2RewardMult();
 const g2FacCount = () => Math.min(G2_FAC.length, G2_PER_REBIRTH * (g2().k + 1));
-const g2BossTime = () => G2_BOSS_TIME + (g2Lab('boss') ? 15 : 0);
+const g2BossTime = () => G2_BOSS_TIME + (g2Lab('boss') ? 15 : 0) + 5 * g2QLv('boss');
 // 영구 배율: 쿼크 1개당 +10%(연구 시 +15%), 심은 별의 씨앗 1개당 +1%, 원소 도감(역대 최고 원소) 1개당 +1%
 const g2QuarkMult = () => (1 + (g2Lab('quark') ? 0.15 : 0.1) * g2().quarks) * (1 + 0.01 * (g2().planted || 0)) * (beta() ? 1 + 0.01 * (g2().bestEver || 0) : 1);
 /* ---------- 일시 효과 (스킬 · 동위원소) ---------- */
@@ -6561,7 +6582,7 @@ function g2FacDps(i, n = g2().own[i]) { return n * G2_FAC[i].dps * Math.pow(2, M
 // 버프를 뺀 기본 초당 피해 (대기 발전 · 임무 보상 계산용)
 function g2DpsBase() { let s = 0; for (let i = 0; i < g2FacCount(); i++) s += g2FacDps(i); return s * g2QuarkMult() * (g2Lab('reson') ? 3 : 1); }
 function g2Dps() { return g2DpsBase() * g2BuffMult('dps'); }
-const g2ClickBase = () => { const L = g2().clv; return (1 + L) * Math.pow(2, Math.floor(L / 10)) * g2QuarkMult(); };
+const g2ClickBase = () => { const L = g2().clv; return (1 + L) * Math.pow(2, Math.floor(L / 10)) * g2QuarkMult() * Math.pow(2, g2QLv('click')); };
 function g2Click() { return g2ClickBase() + g2Dps() * (g2Lab('chain') ? 0.08 : 0.03); }
 // 초당 에너지 수입 (현재 원소를 계속 쪼갠다고 볼 때, 버프 제외)
 function g2Income() {
@@ -6570,12 +6591,13 @@ function g2Income() {
 }
 const g2IdleEff = () => (g2Lab('idle') ? 1 : 0.25);
 const g2ClickCost = () => 20 * Math.pow(1.55, g2().clv);
+const g2FacBase = i => G2_FAC[i].cost * Math.pow(0.9, g2QLv('cheap'));
 function g2FacCost(i, n = 1) {
-  const k = g2().own[i], c = G2_FAC[i].cost, r = G2_COST_GROW;
+  const k = g2().own[i], c = g2FacBase(i), r = G2_COST_GROW;
   return c * Math.pow(r, k) * (Math.pow(r, n) - 1) / (r - 1);
 }
 function g2FacMax(i) {
-  const k = g2().own[i], c = G2_FAC[i].cost * Math.pow(G2_COST_GROW, k), r = G2_COST_GROW;
+  const k = g2().own[i], c = g2FacBase(i) * Math.pow(G2_COST_GROW, k), r = G2_COST_GROW;
   return Math.max(0, Math.floor(Math.log(g2().e * (r - 1) / c + 1) / Math.log(r)));
 }
 const g2LabCost = L => g2Base(L.need) * L.mult;
@@ -6634,7 +6656,7 @@ function openG2() {
         <div class="btnrow g2-ctrl" id="g2Ctrl"></div>
       </div>
       <div class="g2-side" id="g2Side">
-        <div class="g2-tabs">${[['fac', '🏭 시설'], ['lab', '🔬 연구'], ['mis', '📜 임무'], ['gen', '⚡ 발전소']].map(([k, l]) => `<button class="btn" data-g2tab="${k}">${l}<i class="g2-dot" id="g2Dot${k}"></i></button>`).join('')}</div>
+        <div class="g2-tabs">${[['fac', '🏭 시설'], ['lab', '🔬 연구'], ['mis', '📜 임무'], ['gen', '⚡ 발전소'], ['q', '💠 쿼크']].map(([k, l]) => `<button class="btn" data-g2tab="${k}">${l}<i class="g2-dot" id="g2Dot${k}"></i></button>`).join('')}</div>
         <div id="g2TabBody"></div>
         <div class="g2-reb" id="g2Reb"></div>
       </div>
@@ -6787,7 +6809,8 @@ function g2Idle(dt) {
 }
 function g2Offline(sec) {
   const G = g2();
-  if (!G.unlocked || sec <= 10 || !beta()) return 0;
+  if (!G.unlocked || sec <= 10) return 0;
+  if (!beta()) { R.g2OffSec = sec; return 0; } // 관리자 로그인 전: 공개되면 지급
   const v = g2Income() * g2IdleEff() * sec;
   if (v > 0) { g2Gain(v); G.idleE += v; }
   return v;
@@ -6795,7 +6818,7 @@ function g2Offline(sec) {
 function g2ClickAtom(x, y) {
   const G = g2();
   SFX.init();
-  const crit = Math.random() < (g2Lab('aim') ? 0.16 : 0.08), dmg = g2Click() * (crit ? (g2Lab('crit') ? 8 : 4) : 1);
+  const crit = Math.random() < (g2Lab('aim') ? 0.16 : 0.08) + 0.02 * g2QLv('crit'), dmg = g2Click() * (crit ? (g2Lab('crit') ? 8 : 4) : 1);
   g2Float(x, y - 30, (crit ? '💥 ' : '-') + fmt(dmg), crit ? 'crit' : '');
   const atom = $('#g2Atom');
   if (atom) { atom.classList.remove('hit'); void atom.offsetWidth; atom.classList.add('hit'); }
@@ -6947,14 +6970,25 @@ function g2BuyLab(id) {
   toast(`${L.icon} <b>연구 완료: ${L.name}</b><br>${L.desc}`, 'disc', 3500);
   R.g2TabSig = null;
 }
+function g2BuyQ(id) {
+  const G = g2(), Q = G2_QUP.find(x => x.id === id);
+  if (!Q || !beta()) return;
+  const L = G.qup[id] || 0, c = g2QCost(Q);
+  if (L >= Q.max || g2QLeft() < c) return;
+  G.qSpent += c; G.qup[id] = L + 1;
+  SFX.ach();
+  toast(`<span>${Q.icon} <b>${Q.name} Lv.${L + 1}</b> · ${Q.desc(L + 1)}</span>`, 'disc', 3000);
+  R.g2TabSig = null; R.g2Sig = null;
+}
 function g2Rebirth() {
   const G = g2(), cost = g2RebirthCost();
   if (!G.done) return;
   if (G.e < cost) return toast(`⚡ 에너지가 부족해요 (${fmt(cost)} 필요)`);
   const nf = Math.min(G2_FAC.length, G2_PER_REBIRTH * (G.k + 2)), more = nf - g2FacCount();
-  if (!confirm(`💥 초신성 환생을 할까요?\n\n필요: ⚡ ${fmt(cost)}\n받는 것: 💠 쿼크 +${g2QuarkGain()} (쿼크 1개당 피해 +10%)${more > 0 ? `\n새 생산 시설 ${more}종 추가` : ''}\n다음 우주: 원소 결합 에너지 증가율 ×${(g2Growth() + 0.12).toFixed(2)} (지금 ×${g2Growth().toFixed(2)})\n유지: 쿼크, 심은 씨앗, 원소 도감, 스킬, 임무\n초기화: 에너지, 시설, 클릭 강화, 연구, 진행 원소`)) return;
+  if (!confirm(`💥 초신성 환생을 할까요?\n\n필요: ⚡ ${fmt(cost)}\n받는 것: 💠 쿼크 +${g2QuarkGain()} (1개당 피해 +10% · 💠 쿼크 탭에서 영구 강화 구매)${more > 0 ? `\n새 생산 시설 ${more}종 추가` : ''}\n다음 우주: 원소 결합 에너지 증가율 ×${(g2Growth() + 0.12).toFixed(2)} (지금 ×${g2Growth().toFixed(2)})\n유지: 쿼크·쿼크 강화, 심은 씨앗, 원소 도감, 스킬, 임무${g2QLv('keeplab') ? ', 연구(🧠 연구 기억)' : ''}\n초기화: 에너지, 시설, 클릭 강화, ${g2QLv('keeplab') ? '' : '연구, '}진행 원소`)) return;
   const keep = { unlocked: true, k: G.k + 1, quarks: G.quarks + g2QuarkGain(), planted: G.planted, splits: G.splits, totalE: G.totalE, auto: G.auto, intro: true,
-    bestEver: 118, mis: G.mis, mlv: G.mlv, misDone: G.misDone, rerollAt: G.rerollAt, convH: G.convH, convC: G.convC, golds: G.golds, idleE: G.idleE };
+    bestEver: 118, mis: G.mis, mlv: G.mlv, misDone: G.misDone, rerollAt: G.rerollAt, convH: G.convH, convC: G.convC, golds: G.golds, idleE: G.idleE, qSpent: G.qSpent, qup: G.qup };
+  if (g2QLv('keeplab')) keep.lab = G.lab;
   S.g2 = Object.assign(g2Default(), keep);
   R.g2Buffs = {};
   save();
@@ -6990,6 +7024,14 @@ function g2TabHtml(tab) {
       return `<div class="g2-row g2-mis ${done ? 'ready' : ''}"><div class="g2-ico">${M.icon}</div><div class="g2-info"><b>${M.text(m.goal)}</b>
         <div class="bar"><div class="fill ${done ? 'gold' : 'blue'}" id="g2MisF${i}" style="width:${m.prog / m.goal * 100}%"></div><span id="g2MisT${i}">${m.prog} / ${m.goal}</span></div></div>
         ${done ? `<button class="btn g2-buy" data-g2mis="${i}">🎁 받기</button>` : `<button class="btn g2-re" data-g2re="${i}" id="g2Re${i}" title="다른 임무로 바꾸기">🔄</button>`}</div>`;
+    }).join('');
+  }
+  if (tab === 'q') {
+    return `<div class="g2-note">💠 <b>쿼크 상점</b> · 쓸 수 있는 쿼크 <b id="g2QLeft"></b> (얻은 쿼크 ${fmt(G.quarks)}개)<br>
+      쿼크는 💥 초신성 환생으로 얻어요 (회차마다 20개씩 더 많이). 쿼크 피해 보너스(+${g2Lab('quark') ? 15 : 10}%/개)는 <b>얻은 쿼크</b> 기준이라 여기서 써도 줄지 않아요. 강화는 환생해도 영구 유지!</div>` + G2_QUP.map(Q => {
+      const L = G.qup[Q.id] || 0, maxed = L >= Q.max;
+      return `<div class="g2-row ${maxed ? 'owned' : ''}"><div class="g2-ico">${Q.icon}</div><div class="g2-info"><b>${Q.name} <span class="badge">${Q.max > 1 ? `Lv.${L}/${Q.max}` : L ? '보유' : ''}</span></b><small>${Q.desc(L)}${maxed ? '' : ` → ${Q.desc(L + 1)}`}</small></div>
+        ${maxed ? '<span class="g2-done">✅ 최대</span>' : `<button class="btn g2-buy" data-g2q="${Q.id}" id="g2Q${Q.id}">💠 ${fmt(g2QCost(Q))}</button>`}</div>`;
     }).join('');
   }
   // 발전소
@@ -7048,6 +7090,7 @@ function g2Render(force) {
   $('#g2Dotmis')?.classList.toggle('on', misReady);
   $('#g2Dotlab')?.classList.toggle('on', labReady);
   $('#g2Dotgen')?.classList.toggle('on', genReady);
+  $('#g2Dotq')?.classList.toggle('on', G2_QUP.some(Q => (G.qup[Q.id] || 0) < Q.max && g2QLeft() >= g2QCost(Q)));
 
   const sig = [z, G.farm, G.auto, G.done, G.k, G.bestZ, intro, R.g2Amt].join('|');
   if (force || R.g2Sig !== sig) {
@@ -7065,6 +7108,7 @@ function g2Render(force) {
   const tsig = tab + '|' + G.k + '|' + R.g2Amt + '|' + (tab === 'lab' ? G2_LAB.map(L => (G.lab[L.id] ? 2 : G.bestZ >= L.need ? 1 : 0)).join('')
     : tab === 'mis' ? G.mis.map(m => m.t + m.goal + (m.prog >= m.goal)).join()
     : tab === 'gen' ? [G.bestEver, G.quarks, G.planted, !!G.lab.idle, !!G.lab.quark].join()
+    : tab === 'q' ? [G.quarks, JSON.stringify(G.qup), !!G.lab.quark].join()
     : g2FacCount());
   if (R.g2TabSig !== tsig) {
     R.g2TabSig = tsig;
@@ -7087,6 +7131,9 @@ function g2Render(force) {
       setText('g2Buy' + i, `${n > 1 ? n + '대 ' : ''}⚡ ${fmt(c)}`);
       b.disabled = G.e < c;
     }
+  } else if (tab === 'q') {
+    setText('g2QLeft', fmt(g2QLeft()) + '개');
+    for (const Q of G2_QUP) { const b = $('#g2Q' + Q.id); if (b) b.disabled = g2QLeft() < g2QCost(Q); }
   } else if (tab === 'lab') {
     for (const L of G2_LAB) { const b = $('#g2Lab' + L.id); if (b) b.disabled = G.e < g2LabCost(L); }
   } else if (tab === 'mis') {
@@ -7135,6 +7182,7 @@ document.addEventListener('click', e => {
   if (!R.g2Open) return;
   if ((el = e.target.closest('[data-g2fac]'))) return g2BuyFac(+el.dataset.g2fac);
   if ((el = e.target.closest('[data-g2lab]'))) return g2BuyLab(el.dataset.g2lab);
+  if ((el = e.target.closest('[data-g2q]'))) return g2BuyQ(el.dataset.g2q);
   if ((el = e.target.closest('[data-g2mis]'))) return g2ClaimMission(+el.dataset.g2mis);
   if ((el = e.target.closest('[data-g2re]'))) return g2Reroll(+el.dataset.g2re);
   if ((el = e.target.closest('[data-g2conv]'))) return g2Convert(el.dataset.g2conv);
