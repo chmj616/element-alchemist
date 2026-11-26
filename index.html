@@ -1148,7 +1148,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
   .hstat .val{font-size:11.5px}
   #btnSound,#btnAcct{position:absolute;top:5px;height:28px;width:auto;min-width:34px;padding:0 8px;font-size:13px}
   #btnSound{right:8px}#btnAcct{right:50px;max-width:92px}
-  #coinInv .buybtn,.cinv .buybtn{flex:1 1 100%;flex-direction:row;justify-content:center;gap:8px}
+  #coinInv .buybtn,.cinv .buybtn,.hs-list .buybtn{flex:1 1 100%;flex-direction:row;justify-content:center;gap:8px}
   .help-moved{font-size:13px}
   .g-sec{padding:10px 12px}.g-sec ul{font-size:13px;padding-left:16px}
   .guide-toc{grid-template-columns:repeat(2,1fr)}
@@ -1230,6 +1230,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
         </div>
       </div>
       <div id="genList" class="list"></div>
+      <div id="hsBox"></div>
       <div class="sec-head"><h3>🔧 강화</h3></div>
       <div id="upgList" class="list"></div>
     </div>
@@ -1494,14 +1495,22 @@ const GENERATORS = [
   { name: '다중우주 엔진',   icon: '🌐', base: 2e17, rate: 2.5e11, desc: '평행 우주들의 수소를 끌어옵니다' },
   { name: '차원 균열',       icon: '✴️', base: 1e19, rate: 3e12,   desc: '다른 차원과 이어진 틈에서 물질이 새어 나옵니다' },
   { name: '창세의 용광로',   icon: '🔆', base: 6e20, rate: 4e13,   desc: '우주 창조의 불꽃 그 자체' },
+  // 2부 전용 (원소를 하나씩 캐야 해서 생산이 더 필요해요)
+  { name: '반물질 정제소',   icon: '⚗️', base: 4e22, rate: 6e14,   desc: '2부 전용 · 반물질을 걸러 순수한 수소로', p2: true },
+  { name: '블랙홀 발전기',   icon: '🕳️', base: 3e24, rate: 9e15,   desc: '2부 전용 · 사건의 지평선에서 물질을 뽑아내요', p2: true },
+  { name: '시공간 펌프',     icon: '⏳', base: 2e26, rate: 1.4e17, desc: '2부 전용 · 시간을 압축해 생산을 앞당겨요', p2: true },
+  { name: '진공 에너지 탭',  icon: '🫧', base: 1.5e28, rate: 2.2e18, desc: '2부 전용 · 텅 빈 공간의 에너지를 퍼 올려요', p2: true },
+  { name: '빅 립 역엔진',    icon: '🌀', base: 1e30, rate: 3.5e19, desc: '2부 전용 · 찢어지는 우주를 거꾸로 돌려 물질을 모아요', p2: true },
 ];
+const BASE_GENS = GENERATORS.filter(g => !g.p2).length;
+const genN = () => (P2W() ? GENERATORS.length : BASE_GENS);
 const REPEATS = [
   { id: 'clickLv', name: '양성자 가속 장갑', icon: '👆', cost: lv => 30 * Math.pow(1.8, lv),
     desc: lv => `클릭 기본 수소 +0.1 (현재 클릭당 ${((1 + lv) * 0.1).toFixed(1)})` },
   { id: 'atkLv', name: '이온 빔 증폭기', icon: '🗡️', cost: lv => 300 * Math.pow(2.5, lv),
-    desc: lv => `파티 공격력 ×1.5 (현재 ×${fmt(Math.pow(1.5, lv))})` },
+    desc: lv => `파티 공격력 ×1.5 (현재 ×${fmt(Math.min(1e200, Math.pow(1.5, lv)))})` },
   { id: 'hpLv', name: '전자기 보호막', icon: '🛡️', cost: lv => 300 * Math.pow(2.5, lv),
-    desc: lv => `파티 체력 ×1.5 (현재 ×${fmt(Math.pow(1.5, lv))})` },
+    desc: lv => `파티 체력 ×1.5 (현재 ×${fmt(Math.min(1e200, Math.pow(1.5, lv)))})` },
 ];
 const UPGRADES = [
   { id: 'autoclick', name: '자동 클릭 장치', icon: '🤖', cost: 2500, desc: '1초에 5번 자동으로 클릭합니다' },
@@ -1841,6 +1850,23 @@ function stageGrowth(stage, a, b, c) {
 }
 refreshSynthStages(0);
 const OFFLINE_CAP = 8 * 3600;
+// 오버플로 방지: 자바스크립트 숫자는 약 1.8e308을 넘으면 ∞가 되고 ∞-∞ = NaN 이 돼서 게임이 멈춤 → 1e300에서 멈추게
+const BIG = 1e300;
+const capB = v => (v > BIG ? BIG : v);
+// 별의 씨앗 효과: 1000개까지는 그대로, 그 뒤로는 점점 덜 늘어나게 (씨앗이 아무리 많아도 숫자가 폭주하지 않게)
+const SEED_SOFT = 1000;
+function seedEff(n) { return n <= SEED_SOFT ? n : SEED_SOFT + 300 * Math.log(1 + (n - SEED_SOFT) / 300); }
+function overflowGuard() {
+  const G = R.good || (R.good = { counts: S.counts.slice(), coins: 0, totalH: 0, totalCoins: 0, g2e: 0 });
+  const fix = (v, p) => (v !== v ? (p === p && isFinite(p) ? p : 0) : v > BIG ? BIG : v < 0 ? 0 : v);
+  for (let z = 1; z <= 118; z++) { S.counts[z] = fix(S.counts[z], G.counts[z]); G.counts[z] = S.counts[z]; }
+  for (const k of ['coins', 'totalH', 'totalCoins']) { S[k] = fix(S[k], G[k]); G[k] = S[k]; }
+  const B = S.battle;
+  if (!isFinite(B.maxHp)) B.maxHp = BIG;
+  if (B.hp !== B.hp || !isFinite(B.hp)) B.hp = B.maxHp;
+  if (R.enemy && R.enemy.hp !== R.enemy.hp) R.enemy.hp = 0; // 계산이 깨진 적은 처치로 처리
+  if (S.g2) { S.g2.e = fix(S.g2.e, G.g2e); G.g2e = S.g2.e; }
+}
 
 /* =====================================================================
  *  상태
@@ -1884,7 +1910,7 @@ function defaultState() {
     coins: 0, totalCoins: 0, elv: new Array(119).fill(0),
     void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false, e3: false, e4: false }, god: godDefault(), godCleared: 0, godAst: 0, misPaid: {}, godGrant: false, offFrom: 0, offPlayed: 0,
     arcade: { plays: 0, earned: 0, best: {} }, synthKills: 0, rareKills: 0, g2: g2Default(),
-    cinv: { prod: 0, atk: 0, hp: 0 }, warpAt: 0, goldBuyAt: 0,
+    cinv: { prod: 0, atk: 0, hp: 0 }, warpAt: 0, goldBuyAt: 0, hs: { star: 0, arms: 0, vault: 0, accel: 0 }, hexAt: 0,
     part: 1, crunch: { clearAt: 0, eventAt: 0, gone: false }, alt: null,
     weap: new Array(119).fill(0), wlv: new Array(119).fill(0), p2z: 1, p2talk: false, p2talk2: false,
   };
@@ -1921,6 +1947,8 @@ function normalizeSave(raw, nested) {
   s.g2 = g2Normalize(d.g2, num, int);
   for (const k in s.cinv) s.cinv[k] = int(obj(d.cinv)[k], 0, 0, 1e4);
   s.warpAt = num(d.warpAt); s.goldBuyAt = num(d.goldBuyAt);
+  for (const h of HSINK) s.hs[h.id] = int(obj(d.hs)[h.id], 0, 0, h.max);
+  s.hexAt = num(d.hexAt);
 
   const a = obj(d.arcade);
   s.arcade = { plays: int(a.plays), earned: num(a.earned), best: {}, recent: [] };
@@ -2117,11 +2145,12 @@ function prodMult() {
   m *= rebUpgMult('prod');
   m *= cinvMult('prod');
   if (S.part === 2) m *= P2_PROD;
-  return m;
+  m *= Math.pow(1.15, hsLv('star'));
+  return Math.min(1e200, m);
 }
 function buffMult(kind) { const b = R.buffs[kind]; return b && b.until > performance.now() ? b.mult : 1; }
 function comboMult() { return 1 + Math.min(R.combo, 50) * 0.02; }
-function baseRate() { return GENERATORS.reduce((s, g, i) => s + S.gens[i] * g.rate, 0) * prodMult() * buffMult('prod'); }
+function baseRate() { return capB(GENERATORS.reduce((s, g, i) => s + S.gens[i] * g.rate, 0) * prodMult() * buffMult('prod')); }
 function clickValue(withCombo = true) {
   let v = 0.1 * (1 + S.clickLv) * prodMult() * rebUpgMult('click'); // 기본: 클릭 10번에 수소 1개
   if (S.upg.quantum) v += baseRate() * 0.05;
@@ -2137,7 +2166,7 @@ function produceFor(sec) {
   return g;
 }
 function totalRate() { return baseRate() + (S.upg.autoclick ? clickValue(false) * 5 : 0); }
-function addH(v) { S.counts[1] += v; S.totalH += v; }
+function addH(v) { S.counts[1] = capB(S.counts[1] + v); S.totalH = capB(S.totalH + v); }
 function addEl(z, n) {
   S.counts[z] += n;
   if (!S.disc[z]) {
@@ -2226,14 +2255,15 @@ function checkAchs() {
 }
 /* ---------- 환생 (빅뱅) ---------- */
 // 별의 씨앗 1개당 생산 ×1.08, 전투력 ×1.06 (복리) — 높은 스테이지일수록 씨앗을 많이 받아 다음 회차가 빨라짐
-function prestigeProd() { return Math.pow(1.08, S.prestige ? S.prestige.seeds : 0); }
-function prestigeCombat() { return Math.pow(1.06, S.prestige ? S.prestige.seeds : 0); }
+function prestigeProd() { return Math.pow(1.08, seedEff(S.prestige ? S.prestige.seeds : 0)); }
+function prestigeCombat() { return Math.pow(1.06, seedEff(S.prestige ? S.prestige.seeds : 0)); }
 // 빅뱅 에너지(수소): 씨앗 보너스만큼 같이 커지고 환생할 때마다 ×3 — 회차가 쌓여도 환생이 쉬워지지 않게
-function rebirthCost(count = S.prestige.count) { return 1e13 * prestigeProd() * Math.pow(3, count); }
+function rebirthBase(count = S.prestige.count) { return 1e13 * prestigeProd() * Math.pow(3, Math.min(count, 200)); }
+function rebirthCost(count = S.prestige.count) { return rebirthBase(count) * Math.pow(0.9, hsLv('accel')); }
 function rebirthReady() { return discCount() >= 118; }
 function canRebirth() { return rebirthReady() && S.counts[1] >= rebirthCost(); }
-// 기본 10개 + 127스테이지 이후 3스테이지마다 1개 (첫 환생 300층 기준 67개)
-function seedsGain() { return 10 + Math.max(0, Math.floor((S.battle.maxStage - 127) / 3)); }
+// 기본 10개 + 127스테이지 이후 25스테이지마다 1개 (300층 16개 · 5000층 204개) — 워프로 수백 개가 한꺼번에 쌓이지 않게
+function seedsGain() { return 10 + Math.max(0, Math.floor((S.battle.maxStage - 127) / 25)); }
 function rebirth() {
   if (!rebirthReady()) return;
   if (!canRebirth()) return toast(`💧 빅뱅 에너지가 부족해요: 수소 ${fmt(rebirthCost())}개 필요 (보유 ${fmt(S.counts[1])})`);
@@ -2242,7 +2272,7 @@ function rebirth() {
   const keep = {
     misPaid: S.misPaid, godGrant: S.godGrant, lastSave: S.lastSave, offFrom: S.offFrom, offPlayed: S.offPlayed, ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, god: S.god, godCleared: S.godCleared, godAst: S.godAst, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills, g2: S.g2,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
-    part: S.part, alt: S.alt, crunch: S.crunch, p2talk: S.p2talk, p2talk2: S.p2talk2, weap: P2W() ? S.weap : new Array(119).fill(0),
+    hs: S.hs, hexAt: S.hexAt, part: S.part, alt: S.alt, crunch: S.crunch, p2talk: S.p2talk, p2talk2: S.p2talk2, weap: P2W() ? S.weap : new Array(119).fill(0),
     prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
   S = Object.assign(defaultState(), keep);
@@ -2262,7 +2292,7 @@ function renderRebirth() {
     <div class="rb-caps">🧪 인공 원소 보스: <b>${SYNTH_STAGE[43]}~${SYNTH_STAGE[118]}층 (고정)</b> · 🔒 도전 가능 스테이지: <b>${stageCap()}</b>${stageCap() < MAX_STAGE ? ` (환생 ${P.count + 1}회 → ${stageCap(P.count + 1)})` : ' (최종 5000)'} · 🏆 역대 최고: ${Math.max(P.best || 0, S.battle.maxStage)}</div>
     <div class="bar"><div class="fill ${ready ? 'red' : 'blue'}" style="width:${d / 118 * 100}%"></div><span>주기율표 ${d} / 118</span></div>
     <div class="bar"><div class="fill gold" id="rbEnergyFill"></div><span id="rbEnergyText"></span></div>
-    <div class="rb-foot">${ok ? `준비 완료! 지금 환생하면 수소 ${fmt(cost)}개를 쓰고 <b>별의 씨앗 +${seedsGain()}개</b> (127스테이지 이후 3스테이지마다 +1)`
+    <div class="rb-foot">${ok ? `준비 완료! 지금 환생하면 수소 ${fmt(cost)}개를 쓰고 <b>별의 씨앗 +${seedsGain()}개</b> (127스테이지 이후 25스테이지마다 +1)`
       : ready ? `118개 원소를 모두 모았어요! 빅뱅을 일으키려면 <b>💧 수소 ${fmt(cost)}개</b>가 더 필요해요 (씨앗 보너스만큼 커지고 환생할 때마다 ×3)`
       : `118개 원소를 모두 발견하고 <b>💧 수소 ${fmt(cost)}개</b>(빅뱅 에너지)를 모으면 환생할 수 있어요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06 (복리, 영구)`}
       <button class="big-btn" id="btnRebirth" ${ok ? '' : 'disabled'}>🌌 빅뱅 일으키기</button></div>${g2OfferHtml()}`;
@@ -2291,7 +2321,8 @@ function genCost(i, n) {
 }
 function genMaxAfford(i) {
   const k = S.gens[i], H = S.counts[1];
-  return Math.max(0, Math.floor(Math.log(H * (GEN_R - 1) / (GENERATORS[i].base * Math.pow(GEN_R, k)) + 1) / Math.log(GEN_R)));
+  const m = Math.floor(Math.log(H * (GEN_R - 1) / (GENERATORS[i].base * Math.pow(GEN_R, k)) + 1) / Math.log(GEN_R));
+  return isFinite(m) ? Math.max(0, Math.min(m, 1e5 - k)) : 0; // 한 번에 최대 보유 한도까지만
 }
 // ×10 · ×100: 그만큼 살 수 없으면 살 수 있는 만큼 (한 대도 못 사면 원래 수량 가격을 보여줌)
 function genBuyN(i) {
@@ -4509,11 +4540,12 @@ const WEAPONS = [null];
   }
 }
 const unitLabel = z => (P2W() ? WEAPONS[z].icon + EL[z].sym : EL[z].sym);
-// 제작 재료 (비싸요): 그 원소 ×100 + 절반 번호 원소 ×300 + 4분의 1 번호 원소 ×1000 · 첫 무기(수소)는 수소 200
+// 제작 재료 (비싸요): 그 원소 ×500 + 절반 번호 원소 ×1500 + 4분의 1 번호 원소 ×5000 · 첫 무기(수소)는 수소 1000
+// → 무거운 무기 하나가 그 원소를 해금하는 비용의 약 30배
 function weapRecipe(z) {
-  if (z === 1) return { 1: 200 };
+  if (z === 1) return { 1: 1000 };
   const need = {}, add = (k, n) => { need[k] = (need[k] || 0) + n; };
-  add(z, 100); add(Math.max(1, Math.floor(z / 2)), 300); add(Math.max(1, Math.floor(z / 4)), 1000);
+  add(z, 500); add(Math.max(1, Math.floor(z / 2)), 1500); add(Math.max(1, Math.floor(z / 4)), 5000);
   return need;
 }
 const canCraft = z => S.disc[z] && !S.weap[z] && Object.entries(weapRecipe(z)).every(([k, n]) => S.disc[k] && S.counts[k] >= n);
@@ -4588,7 +4620,7 @@ function renderP2Pick() {
 }
 function p2Goal() {
   const W1 = S.weap.some(Boolean);
-  if (!W1) return S.counts[1] >= 200 ? '🎯 <b>⚒️ 공방</b> 탭에서 첫 무기 「수소 마법봉」을 만들어 보세요!' : `🎯 수소 200개를 모아 첫 무기를 만들어요 (지금 ${fmt(Math.floor(S.counts[1]))}) · 2부는 원소가 아니라 <b>무기</b>로 싸워요!`;
+  if (!W1) return S.counts[1] >= 1000 ? '🎯 <b>⚒️ 공방</b> 탭에서 첫 무기 「수소 마법봉」을 만들어 보세요!' : `🎯 수소 1000개를 모아 첫 무기를 만들어요 (지금 ${fmt(Math.floor(S.counts[1]))}) · 2부는 원소가 아니라 <b>무기</b>로 싸워요!`;
   if (!S.party.slice(0, partySlots()).some(z => z && S.weap[z])) return '🎯 <b>전투</b> 탭에서 무기를 파티에 장착하세요!';
   const nz = p2NextZ();
   if (nz && S.battle.maxStage >= p2UnlockStage(nz)) return `🎯 ${EL[nz - 1].sym} ${fmt(p2UnlockCost(nz))}개를 모아 <b>${EL[nz].name}</b>을 해금하면 클릭으로 캘 수 있어요 (원자핵 아래 🔓)`;
@@ -5568,15 +5600,15 @@ function showEnding(n) {
   particles(innerWidth / 2, innerHeight / 2, 60, n === 1 ? '#c77dff' : '#4dabf7');
 }
 function sellPrice(z) { return EL_VALUE[z] * 0.01 * (1 + z / 50) * (SYNTHETIC.has(z) ? 3 : 1); }
-function elvMult(z) { return Math.pow(1.2, S.elv[z] || 0); }
+function elvMult(z) { return Math.min(1e60, Math.pow(1.2, S.elv[z] || 0)); }
 function elvCost(z) { return Math.max(5, sellPrice(z) * 20) * Math.pow(1.7, S.elv[z] || 0); }
 function sellEl(z, mode) {
   const have = Math.floor(S.counts[z]);
   let n = mode === 'half' ? Math.floor(have / 2) : Math.min(have, mode);
   if (n < 1) return false;
-  const gain = sellPrice(z) * rebUpgMult('coin') * n;
+  const gain = capB(sellPrice(z) * rebUpgMult('coin') * n);
   S.counts[z] -= n;
-  S.coins += gain; S.totalCoins += gain;
+  S.coins = capB(S.coins + gain); S.totalCoins = capB(S.totalCoins + gain);
   SFX.shop();
   const row = document.getElementById('shopRow' + z);
   if (row) { const [x, y] = centerOf(row); floatText(x, y, '+🪙' + fmt(gain), 'fuse'); }
@@ -5729,7 +5761,7 @@ function fusionMax(list) {
   const need = fusionNeeds(list);
   let m = Infinity;
   for (const k in need) m = Math.min(m, Math.floor(S.counts[k] / need[k]));
-  return m;
+  return isFinite(m) ? Math.min(m, 1e15) : 0;
 }
 function doFusion(n) {
   const list = fuseList(), m = fusionMax(list);
@@ -5830,8 +5862,8 @@ function pickFuse(z) {
 /* =====================================================================
  *  전투
  * ===================================================================== */
-function atkMult() { return Math.pow(1.5, S.atkLv) * prestigeCombat() * (1 + achBonus('combat')) * rebUpgMult('atk') * cinvMult('atk'); }
-function hpMult() { return Math.pow(1.5, S.hpLv) * prestigeCombat() * (1 + achBonus('combat')) * rebUpgMult('hp') * cinvMult('hp'); }
+function atkMult() { return Math.min(1e200, Math.pow(1.5, S.atkLv) * prestigeCombat() * (1 + achBonus('combat')) * rebUpgMult('atk') * cinvMult('atk') * Math.pow(1.15, hsLv('arms'))); }
+function hpMult() { return Math.min(1e200, Math.pow(1.5, S.hpLv) * prestigeCombat() * (1 + achBonus('combat')) * rebUpgMult('hp') * cinvMult('hp') * Math.pow(1.15, hsLv('arms'))); }
 function unitStats(z) {
   if (P2W()) {
     // 2부: 원소 대신 그 원소로 만든 무기가 싸워요 (계열 특성은 원소를 따름, 무기 종류별 보정 · 강화 1레벨마다 ×1.25)
@@ -6289,10 +6321,61 @@ function renderSide() {
 }
 
 /* ---------- 생산 탭 ---------- */
+/* ---------- 🌟 항성 공방: 5000층 + 공허 완성 뒤 남는 수소를 쓰는 곳 (환생해도 유지) ---------- */
+const HSINK = [
+  { id: 'star',  icon: '🌟', name: '항성 점화',     max: 1e4, f: 0.001, g: 3, desc: L => `수소 생산량 ×${fmt(Math.pow(1.15, L))} (레벨마다 ×1.15)` },
+  { id: 'arms',  icon: '⚔️', name: '성간 병기창',   max: 1e4, f: 0.001, g: 3, desc: L => `파티 공격력·체력 ×${fmt(Math.pow(1.15, L))} (레벨마다 ×1.15)` },
+  { id: 'vault', icon: '⏳', name: '시간의 저장고', max: 16,  f: 0.01,  g: 4, desc: L => `오프라인 생산 최대 ${8 + L / 2}시간 (레벨마다 +30분)` },
+  { id: 'accel', icon: '🌌', name: '빅뱅 가속기',   max: 10,  f: 0.05,  g: 4, desc: L => `빅뱅 에너지(환생에 드는 수소) ×${Math.pow(0.9, L).toFixed(2)} (레벨마다 ×0.9)` },
+];
+const HEX_PCT = 0.2, HEX_RATE = 0.05, HEX_CD = 600; // 수소 20% → 코인 (수소 1개당 0.05코인), 10분마다
+const hsLv = id => (S.hs && S.hs[id]) || 0;
+const hsOpen = () => S.endings.e1 && S.endings.e2;
+const hsCost = h => rebirthBase() * h.f * Math.pow(h.g, hsLv(h.id));
+function hsBuy(id) {
+  const h = HSINK.find(x => x.id === id);
+  if (!h || !hsOpen() || hsLv(id) >= h.max) return;
+  const c = hsCost(h);
+  if (!(S.counts[1] >= c)) return;
+  S.counts[1] -= c;
+  S.hs[id] = hsLv(id) + 1;
+  SFX.shop(true);
+  const b = document.getElementById('hsB' + id);
+  if (b) { const [x, y] = centerOf(b); floatText(x, y, `${h.icon} ${h.name} Lv.${S.hs[id]}`, 'crit'); particles(x, y, 14, '#ffd43b'); }
+}
+function hsExchange() {
+  if (!hsOpen() || S.playTime < S.hexAt || S.counts[1] < 1) return;
+  const spend = S.counts[1] * HEX_PCT, gain = capB(spend * HEX_RATE);
+  S.counts[1] -= spend; S.coins = capB(S.coins + gain); S.totalCoins = capB(S.totalCoins + gain);
+  S.hexAt = S.playTime + HEX_CD;
+  SFX.bonus();
+  toast(`<span>🪙 <b>수소 환전!</b> 💧${fmt(spend)} → 🪙${fmt(gain)}</span>`, 'disc', 3500);
+}
+function renderHs() {
+  const box = $('#hsBox');
+  if (!hsOpen()) { if (box.innerHTML) box.innerHTML = ''; return; }
+  if (!box.innerHTML) box.innerHTML = `<div class="sec-head"><h3>🌟 항성 공방</h3><small>5000층과 공허를 넘어선 연금술사의 수소 사용처 · 환생해도 유지 · 가격은 빅뱅 에너지에 비례</small></div>
+    <div class="list hs-list">${HSINK.map(h => `<div class="row"><div class="ricon">${h.icon}</div><div class="rinfo"><div class="rname">${h.name} <span class="badge" id="hsLv${h.id}"></span></div><div class="rdesc" id="hsD${h.id}"></div></div>
+      <button class="buybtn" data-hs="${h.id}" id="hsB${h.id}"><span id="hsA${h.id}"></span><span id="hsC${h.id}"></span></button></div>`).join('')}
+      <div class="row"><div class="ricon">🪙</div><div class="rinfo"><div class="rname">수소 환전소</div><div class="rdesc" id="hsXD"></div></div><button class="buybtn" data-hsx="1" id="hsX"></button></div></div>`;
+  for (const h of HSINK) {
+    const L = hsLv(h.id), maxed = L >= h.max, c = hsCost(h);
+    setText('hsLv' + h.id, h.max < 1e4 ? `Lv.${L}/${h.max}` : `Lv.${L}`);
+    setText('hsD' + h.id, h.desc(L) + (maxed ? '' : ` → 다음 ${h.desc(L + 1).split(' (')[0]}`));
+    setText('hsA' + h.id, maxed ? '✅ 최대' : '강화');
+    setText('hsC' + h.id, maxed ? '' : '💧' + fmt(c));
+    $('#hsB' + h.id).disabled = maxed || !(S.counts[1] >= c);
+  }
+  const left = Math.max(0, S.hexAt - S.playTime);
+  setText('hsXD', `가진 수소의 ${HEX_PCT * 100}%(💧${fmt(S.counts[1] * HEX_PCT)})를 🪙${fmt(S.counts[1] * HEX_PCT * HEX_RATE)}로 바꿔요 (원소 판매보다 5배 이득) · ${HEX_CD / 60}분에 한 번`);
+  setText('hsX', left > 0 ? `⏳ ${fmtTime(left)}` : '🪙 환전');
+  $('#hsX').disabled = left > 0 || S.counts[1] < 1;
+}
 function renderProd() {
+  renderHs();
   let vis = 2;
   S.gens.forEach((c, i) => { if (c > 0) vis = Math.max(vis, i + 2); });
-  vis = Math.min(vis, GENERATORS.length);
+  vis = Math.min(vis, genN());
   if (R.sig.gen !== vis) {
     R.sig.gen = vis;
     $('#genList').innerHTML = GENERATORS.slice(0, vis).map((g, i) => `
@@ -6304,7 +6387,7 @@ function renderProd() {
           <div class="rdesc2" id="gRate${i}"></div>
         </div>
         <button class="buybtn" data-gen="${i}" id="gBtn${i}"><span id="gBtnA${i}"></span><span id="gBtnB${i}"></span></button>
-      </div>`).join('') + (vis < GENERATORS.length ? `<div class="row locked">🔒 다음 시설은 이전 시설을 구매하면 공개됩니다</div>` : '');
+      </div>`).join('') + (vis < genN() ? `<div class="row locked">🔒 다음 시설은 이전 시설을 구매하면 공개됩니다</div>` : '');
   }
   const pm = prodMult();
   for (let i = 0; i < vis; i++) {
@@ -6703,6 +6786,8 @@ document.addEventListener('click', e => {
   if ((el = t.closest('[data-g2048]'))) return move2048(el.dataset.g2048);
   if (t.closest('[data-g2048-end]')) return end2048();
   if ((el = t.closest('[data-simon]'))) return clickSimon(+el.dataset.simon);
+  if ((el = t.closest('[data-hs]'))) return hsBuy(el.dataset.hs);
+  if (t.closest('[data-hsx]')) return hsExchange();
   if ((el = t.closest('[data-cinv]'))) return cinvBuy(el.dataset.cinv);
   if ((el = t.closest('[data-coinact]'))) return el.dataset.coinact === 'warp' ? coinWarp() : coinGolden();
   if ((el = t.closest('[data-sell]'))) { if (e.detail === 0) sellEl(+el.dataset.sell, R.sellAmt); return; }
@@ -7058,7 +7143,7 @@ async function api(action, body, keepalive) {
 /* ---------- 오프라인 보상: 서버 시간 기준 ---------- */
 function offlineGrant(now, cap = Infinity) {
   if (!S.offFrom) return;
-  const sec = Math.min(OFFLINE_CAP, cap, (now - S.offFrom) / 1000 - S.offPlayed);
+  const sec = Math.min(OFFLINE_CAP + 1800 * hsLv('vault'), cap, (now - S.offFrom) / 1000 - S.offPlayed);
   S.offFrom = 0; S.offPlayed = 0;
   if (sec > 10) {
     const gain = produceFor(sec);
@@ -8061,6 +8146,7 @@ document.addEventListener('keydown', e => {
  *  메인 루프
  * ===================================================================== */
 load();
+overflowGuard();
 refreshSynthStages(S.prestige.count);
 applyPartTheme();
 let last = performance.now(), uiAcc = 0, saveAcc = 0;
@@ -8078,6 +8164,7 @@ function tick() {
   battleAdvance(dt);
   uiAcc += dt;
   R.slowAcc += dt;
+  overflowGuard();
   if (uiAcc >= 0.1) {
     uiAcc = 0;
     R.slowTick = R.slowAcc >= 0.5;
