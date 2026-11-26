@@ -1678,7 +1678,7 @@ const E_BASE = [['동위원소', '☢️'], ['자유 라디칼', '👾'], ['플�
   ['양전자 유령', '👻'], ['중간자 벌레', '🐛'], ['감마선 박쥐', '🦇'], ['뮤온 오징어', '🦑'], ['타키온 거미', '🕷️'], ['글루온 해골', '☠️']];
 const BOSSES2 = [['붉은 거성의 망령', '👹'], ['빅 크런치의 파편', '🌘'], ['혼돈의 특이점', '🌀'], ['적색 왜성 군주', '🔴'],
   ['시간 포식자', '⏳'], ['고리 행성 파괴자', '🪐'], ['반물질 용', '🐲'], ['종말의 메아리', '📯']];
-const P2_HP = 8, P2_ATK = 4, P2_PROD = 2; // 2부: 적 체력 ×8 · 공격 ×4 · 대신 생산 ×2
+const P2_HP = 8, P2_ATK = 4, P2_PROD = 2, P2_LATE = 1.0035; // 2부: 적 체력 ×8 · 공격 ×4 · 대신 생산 ×2
 const P2W = () => S.part === 2 && beta(4); // 2부 무기 전투 · 원소 채굴
 const P2V = () => P2W() && beta(5);        // 2부 균열 봉인소 · 입자 충돌기
 const BOSSES = [['블랙홀', '🕳️'], ['반물질 군주', '😈'], ['엔트로피의 화신', '🌪️'], ['암흑물질 거인', '🗿'],
@@ -2142,7 +2142,7 @@ function normalizeSave(raw, nested) {
   s.col = { lv: int(oc.lv, 0, 0, 1000), auto: int(oc.auto, 0, 0, 60), parts: {}, shots: int(oc.shots, 0, 0, 1e12) };
   for (const P of PARTICLES) { const v = int(obj(oc.parts)[P.id], 0, 0, 1e9); if (v) s.col.parts[P.id] = v; }
   const cr = obj(d.crunch);
-  s.crunch = { clearAt: num(cr.clearAt), eventAt: num(cr.eventAt), gone: cr.gone === true };
+  s.crunch = { clearAt: num(cr.clearAt), eventAt: num(cr.eventAt), gone: cr.gone === true, fresh: cr.fresh === true };
   s.alt = null;
   if (!nested && d.alt && typeof d.alt === 'object' && !Array.isArray(d.alt)) {
     s.alt = normalizeSave(d.alt, true);
@@ -4463,6 +4463,11 @@ function pvAction(a) {
 
 /* ---------- 🏛️ 몬스터 전시장 · 🚨 빅 크런치 소실 · 🌘 2부 ---------- */
 const CRUNCH_DAY = 86400e3, CRUNCH_MIN = 3 * 3600e3, CRUNCH_SPREAD = 9 * 3600e3; // 깬 뒤 하루 + 3~12시간
+// 2부가 공개되기 전에 이미 엔딩 1을 본 계정: 공개 뒤 처음 들어온 때부터 1~2시간 뒤에 사건 발생
+// 2부가 공개된 뒤에 5000층을 깬 계정(fresh 표시): 원래대로 하루 + 3~12시간 뒤
+function crunchEventAt(now, fresh) {
+  return fresh ? now + CRUNCH_DAY + CRUNCH_MIN + Math.random() * CRUNCH_SPREAD : now + 3600e3 + Math.random() * 3600e3;
+}
 const p1Cleared = () => (S.part === 1 ? S.endings.e1 : !!(S.alt && S.alt.endings && S.alt.endings.e1));
 // 기기 시계를 바꿔도 안 되게: 서버 시각을 받은 뒤에만 (서버 없는 로컬 파일은 기기 시각)
 const crunchClock = () => (!HAS_SERVER ? Date.now() : R.srv ? srvNow() : 0);
@@ -4485,7 +4490,7 @@ function partTick() {
   document.body.classList.toggle('p2w', P2W());
   const C = S.crunch, now = crunchClock();
   if (beta(2) && S.part === 1 && S.endings.e1 && now) {
-    if (!C.clearAt) { C.clearAt = now; C.eventAt = now + CRUNCH_DAY + CRUNCH_MIN + Math.random() * CRUNCH_SPREAD; save(); }
+    if (!C.clearAt) { C.clearAt = now; C.eventAt = crunchEventAt(now, C.fresh); save(); }
     if (!C.gone && now >= C.eventAt && !$('#endModal').classList.contains('on')) { C.gone = true; save(); showCrunchEvent(); }
   }
   const mb = $('#museumBtn'), show = beta(2) && p1Cleared();
@@ -5183,12 +5188,16 @@ document.addEventListener('keydown', e => {
 /* ---------- 🌀 2부 균열 봉인소: 빅 립이 찢어 놓은 균열 118개를 무기로 봉인 ---------- */
 const RIFT_EFF = 1.03, RIFT_FULL = 2, COL_UNLOCK = 20;
 // 균열 N: 원소 N번으로 만든 무기를 갖고 있어야 하고, 원소 N을 ×1000 (+ 절반 번호 원소 ×3000) 바쳐 봉인
+// 그 원소 : 절반 번호 원소 = 1 : 3, 총량은 그 원소가 열리는 층의 예상 생산량 10분어치 (최소 1000 · 3000개)
+const RIFT_MIN = 10, RIFT_RCP = [];
 function riftNeed(n) {
+  if (RIFT_RCP[n]) return RIFT_RCP[n];
+  const h = Math.max(1, Math.floor(n / 2)), heq = EL_VALUE[n] + 3 * EL_VALUE[h];
+  const m = Math.max(1000, Math.pow(10, p2ProdLog(p2UnlockStage(n))) * RIFT_MIN * 60 / heq);
   const need = {};
-  need[n] = 1000;
-  const h = Math.max(1, Math.floor(n / 2));
-  need[h] = (need[h] || 0) + 3000;
-  return need;
+  need[n] = nice2(m);
+  need[h] = (need[h] || 0) + nice2(3 * m);
+  return (RIFT_RCP[n] = need);
 }
 const fmtM = v => (v < 100 ? (+v.toFixed(2)).toString() : fmt(v));
 const riftMult = () => Math.pow(RIFT_EFF, S.rift || 0) * ((S.rift || 0) >= 118 ? RIFT_FULL : 1);
@@ -5398,6 +5407,7 @@ document.addEventListener('click', e => {
   if (!A) return;
   switchTab(A.tab);
   if (A.tab === 'fusion' && A.list && !P2W()) { setFuse(A.list); SFX.buy(); }
+  if (A.stage) synthGoBack(A.stage);
   if (innerWidth <= 900) document.getElementById('tab-' + A.tab)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 document.addEventListener('click', e => {
@@ -6640,7 +6650,8 @@ function makeEnemy(stage) {
   const weak = keys[Math.floor(r() * keys.length)];
   // 일반 몹: 150에서 시작해 스테이지당 ×1.18 / 보스: 일반 몹의 20배 (스테이지는 끝없이 이어짐)
   const p2r = m => (S.part === 2 ? 1 + (m - 1) * Math.min(1, stage / 60) : 1); // 2부 배율은 60층까지 서서히
-  const hp = 150 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 20 : 1) * p2r(P2_HP);
+  const p2late = S.part === 2 ? Math.pow(P2_LATE, Math.max(0, stage - P2_CRUNCH)) : 1;  // 2부 후반(2500층~) 추가 성장
+  const hp = 150 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 20 : 1) * p2r(P2_HP) * p2late;
   const atk = 3 * stageGrowth(stage, 1.17, 1.048, 1.019) * (boss ? 1.6 : 1) * p2r(P2_ATK);
   const E = { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, timeLeft: boss ? 30 : Infinity, synth: 0 };
   const sz = boss ? synthBossFor(stage) : 0;
@@ -6866,6 +6877,7 @@ function victory() {
     setTimeout(() => showEnding(4), 900);
   } else if (E.stage >= MAX_STAGE && S.part !== 2 && !S.endings.e1) {
     S.endings.e1 = true;
+    if (beta(2)) S.crunch.fresh = true; // 2부 공개 뒤에 깬 것 → 소실 사건은 원래 일정(하루 + 3~12시간)
     blog('🏆 최종 보스 빅 크런치를 쓰러뜨렸습니다! 엔딩 1 달성!', 'boss');
     setTimeout(() => showEnding(1), 900);
   }
@@ -6873,6 +6885,13 @@ function victory() {
     if (E.stage + 1 > stageCap()) {
       if (E.stage < MAX_STAGE && !R.capWarned) { R.capWarned = true; blog(`🔒 스테이지 ${E.stage + 1}부터는 환생 ${S.prestige.count + 1}회 이상 필요해요. 현재 스테이지를 반복합니다.`, 'info'); }
     } else B.stage = E.stage + 1;
+  }
+  // 건너뛴 인공 원소 보스를 잡으러 내려왔으면: 다음 건너뛴 보스 또는 원래 층으로
+  if (R.synthBack && E.synth && !P2W()) {
+    const nx = SYNTH_ORDER.filter(z => !S.disc[z] && SYNTH_STAGE[z] < R.synthBack).sort((a, b) => SYNTH_STAGE[a] - SYNTH_STAGE[b])[0];
+    B.stage = nx ? SYNTH_STAGE[nx] : Math.min(R.synthBack, maxSelectable());
+    blog(nx ? `⏪ 다음 건너뛴 인공 원소 보스: 스테이지 ${B.stage}` : `⏩ 스테이지 ${B.stage}(으)로 돌아갑니다`, 'info');
+    if (!nx) R.synthBack = 0;
   }
   R.enemy = null;
   R.cooldown = 0.6;
@@ -6888,6 +6907,15 @@ function defeat(reason) {
   R.enemy = null;
   R.cooldown = 1.5;
   R.unitT = [0, 0, 0, 0, 0];
+}
+// 건너뛴 인공 원소 보스 층으로 이동 (잡으면 R.synthBack 층으로 복귀)
+function synthGoBack(st) {
+  const B = S.battle;
+  if (!R.synthBack || R.synthBack < B.stage) R.synthBack = B.stage;
+  B.stage = st; R.enemy = null;
+  if (B.active) { R.cooldown = 0.3; B.hp = B.maxHp; } else startBattle();
+  blog(`⏪ 스테이지 ${st} 인공 원소 보스에게 갑니다. 잡으면 스테이지 ${R.synthBack}(으)로 돌아와요.`, 'info');
+  SFX.buy();
 }
 function changeStage(delta) {
   const B = S.battle;
@@ -6931,6 +6959,11 @@ function nextGoal() {
     ? `🎯 <b>융합</b> 탭에서 H ×${FUSE_RATIO} + H ×${FUSE_RATIO} 으로 헬륨(He)을 만들어 보세요!`
     : `🎯 수소 ${FUSE_RATIO * 2}개를 모아 헬륨을 만들어 보세요! (클릭 10번 = 수소 1개, 생산 시설도 활용하세요)`;
   if (S.gens[0] === 0) { goTo('prod'); return '🎯 수소 45개로 <b>양성자 포집기</b>를 사서 자동 생산을 시작하세요!'; }
+  // 워프로 건너뛴 인공 원소 보스가 있으면 (환생에 필요) 그 안내가 먼저 — 누르면 그 층으로 갔다가 돌아와요
+  if (!rebirthReady()) {
+    const sk = SYNTH_ORDER.filter(z => !S.disc[z] && SYNTH_STAGE[z] < S.battle.stage && SYNTH_STAGE[z] <= S.battle.maxStage).sort((x, y) => SYNTH_STAGE[x] - SYNTH_STAGE[y])[0];
+    if (sk) { goTo('battle'); R.goalAct.stage = SYNTH_STAGE[sk]; return `⏪ 워프로 건너뛴 <b>스테이지 ${SYNTH_STAGE[sk]}</b> 인공 원소 보스 → ${EL[sk].name}(${EL[sk].sym}) 확정 · <b>눌러서 그 층으로</b> (잡으면 지금 층으로 돌아와요)`; }
+  }
   if (canRebirth() || rebirthReady() || (S.battle.maxStage >= stageCap() && stageCap() < MAX_STAGE)) goTo('table');
   if (canRebirth()) return '🌌 <b>빅뱅 준비 완료!</b> 주기율표 탭에서 <b>환생(빅뱅)</b>할 수 있어요!';
   if (rebirthReady()) return `🌌 <b>주기율표 완성!</b> 빅뱅 에너지로 수소 ${fmt(rebirthCost())}개를 모으면 환생할 수 있어요 (지금 ${fmt(S.counts[1])})`;
@@ -6950,8 +6983,10 @@ function nextGoal() {
   const ns = Object.keys(SYNTH_STAGE).map(Number).filter(z => !S.disc[z]).sort((x, y) => SYNTH_STAGE[x] - SYNTH_STAGE[y])[0];
   const parts = [];
   if (nt) parts.push(`🔓 스테이지 <b>${nt[0]}</b> 클리어 → ${nt[1]}번까지 조합법 해금`);
-  if (ns) parts.push(`🧪 스테이지 <b>${SYNTH_STAGE[ns]}</b> 보스 → 인공 원소 ${EL[ns].name}(${EL[ns].sym}) 확정`);
+  const skipped = ns && SYNTH_STAGE[ns] < S.battle.stage && SYNTH_STAGE[ns] <= S.battle.maxStage;
+  if (ns) parts.push(skipped ? `⏪ 워프로 건너뛴 <b>스테이지 ${SYNTH_STAGE[ns]}</b> 인공 원소 보스 → ${EL[ns].name}(${EL[ns].sym}) 확정 · <b>눌러서 그 층으로</b> (잡으면 지금 층으로 돌아와요)` : `🧪 스테이지 <b>${SYNTH_STAGE[ns]}</b> 보스 → 인공 원소 ${EL[ns].name}(${EL[ns].sym}) 확정`);
   goTo('battle');
+  if (skipped) R.goalAct.stage = SYNTH_STAGE[ns];
   return parts.length ? '🎯 ' + parts.join('<br>🎯 ') : '🏆 더 높은 스테이지에 도전하세요!';
 }
 function renderSide() {
