@@ -2007,7 +2007,7 @@ const RELEASE_NOTES = {
   2: '🏛️ 몬스터 전시장 · 🚨 빅 크런치 소실 이벤트 · 🌘 2부 (1부 보관 · 오가기)',
   3: '📖 게임 설명 탭 (엔딩 전 콘텐츠는 ???)',
   5: '🌀 2부 균열 봉인소 (2부의 공허: 무기로 균열 118개 봉인) · 💥 입자 충돌기 (2부의 원소 쪼개기: 표준모형 입자 17종 수집)',
-  4: '🌘 2부 개편: ⚒️ 무기 118종 제작·강화 전투 · ⛏️ 원소 채굴(해금한 원소를 클릭) · 🌑 2500층 빅 크런치와 대화 · 🏛️ 1부/2부 전시장',
+  4: '🌘 2부 개편: ⚒️ 무기 118종 제작·강화 전투 · ⛏️ 원소 채굴(해금한 원소를 클릭) · 🌑 2500층 빅 크런치와 대화 · 🏛️ 1부/2부 전시장 · 무기가 5000층까지 나눠 열림 · 2부 환생 200층부터',
   6: '🃏 2부 5000층 빅 립 카드 결투 (클릭 대결로 선공권 → 턴제 카드 배틀)',
 };
 const beta = (n = 1) => !!R.admin || (R.release || 0) >= n;
@@ -2390,7 +2390,12 @@ function prestigeCombat() { return Math.pow(1.06, seedEff(S.prestige ? S.prestig
 // 빅뱅 에너지(수소): 씨앗 보너스만큼 같이 커지고 환생할 때마다 ×3 — 회차가 쌓여도 환생이 쉬워지지 않게
 function rebirthBase(count = S.prestige.count) { return 1e13 * prestigeProd() * Math.pow(3, Math.min(count, 200)); }
 function rebirthCost(count = S.prestige.count) { return rebirthBase(count) * Math.pow(0.9, hsLv('accel')); }
-function rebirthReady() { return discCount() >= 118; }
+const P2_RB_MIN = 200; // 2부 환생 최소 층 (막히면 환생해서 씨앗으로 넘어가요)
+function rebirthReady() {
+  if (P2W()) { const nz = p2NextZ(); return S.battle.maxStage >= P2_RB_MIN && (!nz || p2UnlockStage(nz) > S.battle.maxStage); } // 2부: 300층 이상 + 지금까지 깬 층에서 열리는 원소를 모두 해금
+  return discCount() >= 118;
+}
+const rbNeedN = () => { if (!P2W()) return 118; let n = 0; for (let z = 1; z <= 118; z++) if (p2UnlockStage(z) <= Math.max(P2_RB_MIN, S.battle.maxStage)) n++; return n; };
 function canRebirth() { return rebirthReady() && S.counts[1] >= rebirthCost(); }
 // 기본 10개 + 127스테이지 이후 25스테이지마다 1개 (300층 16개 · 5000층 204개) — 워프로 수백 개가 한꺼번에 쌓이지 않게
 function seedsGain() { return 10 + Math.max(0, Math.floor((S.battle.maxStage - 127) / 25)); }
@@ -2419,12 +2424,12 @@ function rebirth() {
 function renderRebirth() {
   const d = discCount(), ready = rebirthReady(), ok = canRebirth(), P = S.prestige, cost = rebirthCost();
   const html = `<div class="rb-head"><b>🌌 환생 (빅뱅)</b> <span>환생 ${P.count}회 · 🌱 별의 씨앗 ${P.seeds}개 → 생산량 ×${fmt(prestigeProd())}, 전투력 ×${fmt(prestigeCombat())}</span></div>
-    <div class="rb-caps">🧪 인공 원소 보스: <b>${SYNTH_STAGE[43]}~${SYNTH_STAGE[118]}층 (고정)</b> · 🔒 도전 가능 스테이지: <b>${stageCap()}</b>${stageCap() < MAX_STAGE ? ` (환생 ${P.count + 1}회 → ${stageCap(P.count + 1)})` : ' (최종 5000)'} · 🏆 역대 최고: ${Math.max(P.best || 0, S.battle.maxStage)}</div>
-    <div class="bar"><div class="fill ${ready ? 'red' : 'blue'}" style="width:${d / 118 * 100}%"></div><span>주기율표 ${d} / 118</span></div>
+    <div class="rb-caps">${P2W() ? `⚒️ 다음 우주(${stageCap(P.count + 1)}층까지)에서 새로 열리는 무기: <b>${Math.max(0, (() => { let n = 0; for (let z = 1; z <= 118; z++) if (p2UnlockStage(z) <= stageCap(P.count + 1)) n++; return n; })() - rbNeedN())}종</b>` : `🧪 인공 원소 보스: <b>${SYNTH_STAGE[43]}~${SYNTH_STAGE[118]}층 (고정)</b>`} · 🔒 도전 가능 스테이지: <b>${stageCap()}</b>${stageCap() < MAX_STAGE ? ` (환생 ${P.count + 1}회 → ${stageCap(P.count + 1)})` : ' (최종 5000)'} · 🏆 역대 최고: ${Math.max(P.best || 0, S.battle.maxStage)}</div>
+    <div class="bar"><div class="fill ${ready ? 'red' : 'blue'}" style="width:${Math.min(1, d / rbNeedN()) * 100}%"></div><span>${P2W() ? `깬 층까지 열리는 원소 ${d} / ${rbNeedN()}${S.battle.maxStage < P2_RB_MIN ? ` · ${P2_RB_MIN}층 필요` : ''}` : `주기율표 ${d} / 118`}</span></div>
     <div class="bar"><div class="fill gold" id="rbEnergyFill"></div><span id="rbEnergyText"></span></div>
     <div class="rb-foot">${ok ? `준비 완료! 지금 환생하면 수소 ${fmt(cost)}개를 쓰고 <b>별의 씨앗 +${seedsGain()}개</b> (127스테이지 이후 25스테이지마다 +1)`
-      : ready ? `118개 원소를 모두 모았어요! 빅뱅을 일으키려면 <b>💧 수소 ${fmt(cost)}개</b>가 더 필요해요 (씨앗 보너스만큼 커지고 환생할 때마다 ×3)`
-      : `118개 원소를 모두 발견하고 <b>💧 수소 ${fmt(cost)}개</b>(빅뱅 에너지)를 모으면 환생할 수 있어요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06 (복리, 영구)`}
+      : ready ? `${P2W() ? `지금까지 깬 층의 원소(${rbNeedN()}종)를 모두 해금했어요!` : '118개 원소를 모두 모았어요!'} 빅뱅을 일으키려면 <b>💧 수소 ${fmt(cost)}개</b>가 더 필요해요 (씨앗 보너스만큼 커지고 환생할 때마다 ×3)`
+      : `${P2W() ? `${P2_RB_MIN}층 이상을 깨고, 지금까지 깬 층에서 열리는 원소 ${rbNeedN()}종을 모두 해금하고` : '118개 원소를 모두 발견하고'} <b>💧 수소 ${fmt(cost)}개</b>(빅뱅 에너지)를 모으면 환생할 수 있어요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06 (복리, 영구)`}
       <button class="big-btn" id="btnRebirth" ${ok ? '' : 'disabled'}>🌌 빅뱅 일으키기</button></div>${g2OfferHtml()}`;
   const el = $('#rebirth');
   if (R.rbHtml !== html || !el.firstChild) { el.innerHTML = html; R.rbHtml = html; }
@@ -4672,13 +4677,29 @@ const WEAPONS = [null];
   }
 }
 const unitLabel = z => (P2W() ? WEAPONS[z].icon + EL[z].sym : EL[z].sym);
-// 제작 재료 (비싸요): 그 원소 ×500 + 절반 번호 원소 ×1500 + 4분의 1 번호 원소 ×5000 · 첫 무기(수소)는 수소 1000
+// 제작 재료: 그 원소 + 절반 번호 원소 + 4분의 1 번호 원소 (1 : 3 : 10) · 첫 무기(수소)는 수소 1000
 // → 무거운 무기 하나가 그 원소를 해금하는 비용의 약 30배
+// 재료 비율은 그대로(그 원소 : 절반 번호 : 4분의 1 번호 = 1 : 3 : 10), 총량은 그 무기가 열리는 층의 예상 생산량 20분어치
+// → 앞쪽 무기가 수십 시간 걸리거나 뒤쪽 무기가 0.1초 만에 만들어지던 문제 수정 (2부 전체 시뮬레이션으로 맞춘 층별 생산량)
+const WEAP_MIN = 20;
+const P2_PROD_LOG = [[0, 1], [9, 3], [24, 4.3], [73, 9.1], [144, 11.7], [214, 13.1], [284, 14.4], [434, 17.6], [583, 20.5], [764, 23.8], [983, 28.1], [1219, 29.6], [1454, 32.5], [1804, 32.8], [2156, 36.3], [2634, 36.4], [2962, 40.9], [3529, 41], [3904, 41.1], [4233, 47], [4531, 47.1], [5000, 48]];
+function p2ProdLog(st) {
+  const P = P2_PROD_LOG;
+  for (let i = 1; i < P.length; i++) if (st <= P[i][0]) { const [a, la] = P[i - 1], [b, lb] = P[i]; return la + (lb - la) * (st - a) / (b - a); }
+  return P[P.length - 1][1];
+}
+const nice2 = n => { const e = Math.pow(10, Math.floor(Math.log10(n)) - 1); return Math.round(n / e) * e; };
+const WEAP_RCP = [];
 function weapRecipe(z) {
   if (z === 1) return { 1: 1000 };
-  const need = {}, add = (k, n) => { need[k] = (need[k] || 0) + n; };
-  add(z, 500); add(Math.max(1, Math.floor(z / 2)), 1500); add(Math.max(1, Math.floor(z / 4)), 5000);
-  return need;
+  if (WEAP_RCP[z]) return WEAP_RCP[z];
+  const base = {}, add = (k, n) => { base[k] = (base[k] || 0) + n; };
+  add(z, 1); add(Math.max(1, Math.floor(z / 2)), 3); add(Math.max(1, Math.floor(z / 4)), 10);
+  const heq = Object.entries(base).reduce((a, [k, n]) => a + n * EL_VALUE[k], 0);
+  const m = Math.pow(10, p2ProdLog(p2UnlockStage(z))) * WEAP_MIN * 60 / heq;
+  const need = {};
+  for (const [k, n] of Object.entries(base)) need[k] = Math.max(10 * n, nice2(n * m));
+  return (WEAP_RCP[z] = need);
 }
 const canCraft = z => S.disc[z] && !S.weap[z] && Object.entries(weapRecipe(z)).every(([k, n]) => S.disc[k] && S.counts[k] >= n);
 function craftWeapon(z) {
@@ -4709,7 +4730,18 @@ function p2Mine(hEq) {
   return n;
 }
 function p2NextZ() { for (let z = 2; z <= 118; z++) if (!S.disc[z]) return z; return 0; }
-const p2UnlockStage = z => (z <= 10 ? 0 : SYNTHETIC.has(z) ? SYNTH_STAGE[z] : tierStageFor(z));
+// 2부: 원소(=무기) 해금 층을 1~5000층에 나눠 배치 — 환생으로 층 상한이 열릴 때마다 새 무기가 몇 종씩 열려요 (300층에 118종이 다 열리던 문제)
+const P2_UNLOCK_PTS = [[10, 0], [50, 280], [70, 580], [92, 980], [100, 1450], [106, 2150], [111, 2950], [116, 3900], [118, 4500]];
+const P2_UNLOCK_ST = [0];
+for (let z = 1; z <= 118; z++) {
+  let st = 0;
+  for (let i = 1; i < P2_UNLOCK_PTS.length; i++) {
+    const [z1, s1] = P2_UNLOCK_PTS[i - 1], [z2, s2] = P2_UNLOCK_PTS[i];
+    if (z > z1 && z <= z2) { st = Math.round((s1 + (s2 - s1) * (z - z1) / (z2 - z1)) / 5) * 5; break; }
+  }
+  P2_UNLOCK_ST[z] = st;
+}
+const p2UnlockStage = z => P2_UNLOCK_ST[z] || 0;
 const p2UnlockCost = z => Math.ceil(20 * EL_VALUE[z] / EL_VALUE[z - 1]);
 function p2Unlock() {
   const z = p2NextZ();
@@ -4746,7 +4778,7 @@ function renderP2Pick() {
   setText('p2Have', fmtS(S.counts[z]) + (z > 1 ? ' · 시설 생산의 절반이 이 원소로' : ''));
   if (nz) {
     const cost = p2UnlockCost(nz), st = p2UnlockStage(nz), lockSt = S.battle.maxStage < st;
-    setText('p2NextT', lockSt ? `🔒 다음 ${EL[nz].sym} ${EL[nz].name}: 스테이지 ${st} 클리어 필요` : `다음 ${EL[nz].sym} ${EL[nz].name}: ${EL[nz - 1].sym} ${fmtS(S.counts[nz - 1])} / ${fmt(cost)}`);
+    setText('p2NextT', lockSt ? `🔒 다음 ${EL[nz].sym} ${EL[nz].name}: 스테이지 ${st} 클리어 필요${st > stageCap() ? ' (🌌 환생해서 층 상한을 여세요)' : ''}` : `다음 ${EL[nz].sym} ${EL[nz].name}: ${EL[nz - 1].sym} ${fmtS(S.counts[nz - 1])} / ${fmt(cost)}`);
     const b = $('#p2Unl'); if (b) b.disabled = lockSt || S.counts[nz - 1] < cost;
   }
 }
@@ -4757,6 +4789,7 @@ function p2Goal() {
   if (!S.party.slice(0, partySlots()).some(z => z && S.weap[z])) goTo('battle');
   if (!S.party.slice(0, partySlots()).some(z => z && S.weap[z])) return '🎯 <b>전투</b> 탭에서 무기를 파티에 장착하세요!';
   const nz = p2NextZ();
+  if (rebirthReady()) { goTo('table'); return canRebirth() ? '🌌 <b>환생 준비 완료!</b> 주기율표 탭에서 빅뱅을 일으키면 층 상한과 새 무기가 열려요' : `🌌 환생할 수 있어요! 수소 ${fmt(rebirthCost())}개를 모아 빅뱅을 일으키면 🌱 씨앗과 함께 <b>${stageCap(S.prestige.count + 1)}층</b>까지 열리고, 만든 무기는 그대로예요`; }
   if (nz && S.battle.maxStage >= p2UnlockStage(nz)) return `🎯 ${EL[nz - 1].sym} ${fmt(p2UnlockCost(nz))}개를 모아 <b>${EL[nz].name}</b>을 해금하면 클릭으로 캘 수 있어요 (원자핵 아래 🔓)`;
   goTo('battle');
   if (S.battle.maxStage < P2_CRUNCH) return '🎯 무기를 만들고 🏪 상점에서 강화해서 더 높은 층으로! <b>2500층</b>에서 누군가 기다리고 있어요…';
@@ -5456,6 +5489,8 @@ function guideSections() {
       beta(4) && '⚒️ <b>무기 전투</b>: 2부에선 원소가 직접 싸우지 않아요. 융합 탭 자리의 <b>공방</b>에서 원소를 조합해 무기(118종)를 만들고 전투에 장착해요. 무기는 원소 계열의 특성을 이어받아요.',
       beta(4) && '⛏️ <b>원소 채굴</b>: 수소를 모아 헬륨을 해금하면 헬륨을 클릭해서 캘 수 있고, 헬륨을 모아 리튬을 해금하면 리튬을… 원자핵 아래에서 캘 원소를 골라요. 생산 시설은 계속 수소를 만들어요.',
       beta(4) && '🎁 몹을 잡으면 해금한 원소가 나와요. 🏪 상점은 <b>무기 강화</b>(코인).',
+      beta(4) && '🔓 무거운 원소(=무기)는 <b>층을 올라갈수록</b> 열려요: 300층까지 1~50번 · 600층 ~70번 · 1000층 ~92번 · 1500층 ~100번 · 2200층 ~106번 · 3000층 ~111번 · 4000층 ~116번 · 오가네손은 4500층. 무기 재료는 열리는 시점의 생산량에 맞춰 커져요.',
+      beta(4) && '🌌 2부 <b>환생</b>: 200층 이상을 깨고, 지금까지 깬 층에서 열리는 원소를 모두 해금하면 할 수 있어요. 만든 무기는 그대로 (강화 레벨만 초기화) · 막히면 환생해서 씨앗으로 넘어가요.',
       beta(4) && '🌑 <b>2500층</b>에서 누군가 기다리고 있어요… 최종은 5000층.',
       beta(6) && '🃏 <b>5000층 최종 보스</b>는 카드 결투: 라운드마다 <b>3초 클릭 대결</b>(연타 · 스페이스바)로 선공권을 정하고, 손패 4장 중 1장을 내요. 선공 카드 ×1.5 (압도적이면 ×2) · 선공이면 ⚡반격·🌀교란이 통하고, 후공이면 빅 립의 카드를 보고 고를 수 있어요. 10라운드 안에 쓰러뜨리세요.',
       beta(5) && '🌀 <b>균열 봉인소</b> (2부의 공허 탭): 그 원소로 만든 무기를 가진 채 원소를 바쳐 균열 118개를 차례로 봉인 · 하나마다 생산·무기 ×1.03 (영구).',
@@ -6604,8 +6639,9 @@ function makeEnemy(stage) {
   const keys = weakPool(stage);
   const weak = keys[Math.floor(r() * keys.length)];
   // 일반 몹: 150에서 시작해 스테이지당 ×1.18 / 보스: 일반 몹의 20배 (스테이지는 끝없이 이어짐)
-  const hp = 150 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 20 : 1) * (S.part === 2 ? P2_HP : 1);
-  const atk = 3 * stageGrowth(stage, 1.17, 1.048, 1.019) * (boss ? 1.6 : 1) * (S.part === 2 ? P2_ATK : 1);
+  const p2r = m => (S.part === 2 ? 1 + (m - 1) * Math.min(1, stage / 60) : 1); // 2부 배율은 60층까지 서서히
+  const hp = 150 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 20 : 1) * p2r(P2_HP);
+  const atk = 3 * stageGrowth(stage, 1.17, 1.048, 1.019) * (boss ? 1.6 : 1) * p2r(P2_ATK);
   const E = { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, timeLeft: boss ? 30 : Infinity, synth: 0 };
   const sz = boss ? synthBossFor(stage) : 0;
   return sz ? applySynthBoss(E, sz, false) : E;
