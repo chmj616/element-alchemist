@@ -19,9 +19,8 @@ async function cloudSave(userId) {
 }
 
 // 공개 단계: 관리자가 「일반 사이트에 배포」를 누르기 전까지 새 기능은 관리자 모드에서만 보임
-async function ensureSettings() {
-  await L.db()`CREATE TABLE IF NOT EXISTS settings (key text PRIMARY KEY, value text NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())`;
-}
+// settings 테이블은 DB 소유자 계정으로 미리 만들어 두고 앱 계정(ea_app)에 SELECT·INSERT·UPDATE만 줘요
+// (앱 계정은 public 스키마에 테이블을 만들 권한이 없어서, 요청 중에 CREATE TABLE을 하면 42501 오류가 나요)
 async function getRelease() {
   try {
     const [row] = await L.db()`SELECT value FROM settings WHERE key = 'release'`;
@@ -47,8 +46,12 @@ const routes = {
     checkAdmin(body);
     const v = body.release;
     if (!Number.isInteger(v) || v < 0 || v > 1000) throw new L.HttpError(400, '공개 단계가 잘못됐어요.');
-    await ensureSettings();
-    await L.db()`INSERT INTO settings (key, value) VALUES ('release', ${String(v)}) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`;
+    try {
+      await L.db()`INSERT INTO settings (key, value) VALUES ('release', ${String(v)}) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`;
+    } catch (e) {
+      if (e.code === '42P01' || e.code === '42501') throw new L.HttpError(503, '공개 단계를 저장할 settings 테이블이 없거나 권한이 없어요. DB에 settings 테이블을 만들어 주세요.');
+      throw e;
+    }
     return { release: v };
   },
 
