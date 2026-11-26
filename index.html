@@ -402,6 +402,17 @@ body.p2mine .electron{border-radius:2px;background:var(--p2c,#ff6b8b);box-shadow
   .duel-tap{width:130px;height:130px}
   .duel-cd{font-size:70px}
 }
+#plModal{position:fixed;inset:0;z-index:4100;display:none;align-items:flex-start;justify-content:center;background:#000c;padding:16px;overflow:auto}
+#plModal.on{display:flex}
+.pl-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;width:min(1100px,100%)}
+.pl-box h2{margin:0 0 10px}.pl-box h2 small{font-size:12px;color:var(--muted,#aab)}
+.pl-wrap{overflow-x:auto}
+.pl-table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+.pl-table th,.pl-table td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+.pl-table th{position:sticky;top:0;background:var(--panel)}
+.pl-table tr[data-plrow]{cursor:pointer}.pl-table tr[data-plrow]:hover{background:#ffffff0d}
+.pl-detrow td{padding:0;border:0}
+.pl-det{white-space:normal;padding:8px 12px;margin:2px 0 8px;background:#ffffff08;border-radius:8px;font-size:12px;line-height:1.7}
 #storyModal{position:fixed;inset:0;z-index:4050;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#1a0526 0%,#000 75%);padding:16px}
 #storyModal.on{display:flex}
 .story-box{max-width:620px;text-align:center}
@@ -7851,6 +7862,44 @@ async function api(action, body, keepalive) {
   } finally { clearTimeout(timer); }
 }
 
+/* ---------- 📋 플레이어 기록 (admin 계정 전용 · 서버가 계정을 확인해요) ---------- */
+const fmtDur = sec => { sec = Math.max(0, Math.floor(sec || 0)); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return h ? `${h}시간 ${m}분` : `${m}분`; };
+const fmtAgo = t => { if (!t) return '-'; const m = Math.floor((Date.now() - t) / 60000); return m < 1 ? '방금' : m < 60 ? `${m}분 전` : m < 1440 ? `${Math.floor(m / 60)}시간 전` : `${Math.floor(m / 1440)}일 전`; };
+async function openPlayers() {
+  let m = $('#plModal');
+  if (!m) {
+    m = document.createElement('div'); m.id = 'plModal'; document.body.appendChild(m);
+    m.addEventListener('click', e => {
+      e.stopPropagation();
+      if (e.target === m || e.target.closest('[data-pl="close"]')) return m.classList.remove('on');
+      if (e.target.closest('[data-pl="reload"]')) return openPlayers();
+      const r = e.target.closest('[data-plrow]');
+      if (r) { const d = m.querySelector(`[data-pldet="${r.dataset.plrow}"]`); if (d) d.hidden = !d.hidden; }
+    });
+  }
+  m.innerHTML = '<div class="pl-box"><h2>📋 플레이어 기록</h2><p>불러오는 중…</p></div>';
+  m.classList.add('on');
+  const r = await api('players');
+  if (!r.ok) { m.innerHTML = `<div class="pl-box"><h2>📋 플레이어 기록</h2><p>❌ ${esc(r.error || '불러오지 못했어요')}</p><div class="btnrow"><button class="btn" data-pl="close">닫기</button></div></div>`; return; }
+  const P = r.players || [];
+  const end = s => s ? ['e1', 'e2', 'e3', 'e4'].filter(k => s.endings[k]).map(k => ({ e1: '1', e2: '2', e3: '3', e4: '2부' }[k])).join('·') || '-' : '-';
+  const crunch = s => { if (!s || !s.crunch) return '-'; const c = s.crunch; return c.gone ? '🚨 발생함' : c.eventAt ? `⏳ ${fmtDate(c.eventAt)}` : (s.endings.e1 || (s.other && s.other.endings && s.other.endings.e1)) ? '접속 대기' : '-'; };
+  const rows = P.map((p, i) => {
+    const s = p.s;
+    const det = s ? `<div class="pl-det" data-pldet="${i}" hidden>
+      <b>${esc(p.user)}</b> · 가입 ${fmtDate(p.created)} · 마지막 로그인 ${p.lastLogin ? fmtDate(p.lastLogin) : '-'} · 저장 ${p.rev}회 (${fmt(p.size)}바이트)<br>
+      지금 ${s.part}부 · 현재 층 ${s.stage} · 최고 ${s.maxStage} (역대 ${s.best}) · 환생 ${s.rebirths}회 · 🌱 씨앗 ${fmt(s.seeds)} · 원소 ${s.disc}/118<br>
+      💧 수소 ${fmt(s.h)} · 🪙 코인 ${fmt(s.coins)} · 플레이 ${fmtDur(s.playTime)} · 클릭 ${fmt(s.clicks)} · 처치 ${fmt(s.kills)} · 융합 ${fmt(s.fusions)}<br>
+      🕳️ 공허 ${s.voidDone}/118 · ⚛️ 원소 쪼개기 ${s.g2 ? s.g2 + '번째 우주' : '-'} · 🌟 항성 공방 Lv 합 ${s.hs} · ⚒️ 무기 ${s.weapons} · 🌀 균열 ${s.rift}<br>
+      🚨 빅 크런치: ${s.crunch.gone ? '사라짐 (2부 열림)' : s.crunch.eventAt ? `${fmtDate(s.crunch.eventAt)} 예정 (${s.crunch.fresh ? '공개 뒤 클리어' : '공개 전 클리어'})` : '아직 일정 없음'}${s.crunch.clearAt ? ` · 기록 시작 ${fmtDate(s.crunch.clearAt)}` : ''}
+      ${s.other ? `<br>📦 보관 중인 ${s.other.part}부: 최고 ${s.other.maxStage}층 · 환생 ${s.other.rebirths}회 · 엔딩 ${end({ endings: s.other.endings })}` : ''}</div>` : `<div class="pl-det" data-pldet="${i}" hidden>저장 데이터 없음 · 가입 ${fmtDate(p.created)}</div>`;
+    return `<tr data-plrow="${i}"><td><b>${esc(p.user)}</b></td><td>${s ? s.part + '부' : '-'}</td><td>${s ? s.maxStage : '-'}</td><td>${s ? s.rebirths : '-'}</td><td>${end(s)}</td><td>${s ? s.disc : '-'}</td><td>${s ? fmtDur(s.playTime) : '-'}</td><td>${fmtAgo(p.saved)}</td><td>${crunch(s)}</td></tr><tr class="pl-detrow"><td colspan="9">${det}</td></tr>`;
+  }).join('');
+  m.innerHTML = `<div class="pl-box"><h2>📋 플레이어 기록 <small>${P.length}명 · 줄을 누르면 자세히</small></h2>
+    <div class="pl-wrap"><table class="pl-table"><thead><tr><th>아이디</th><th>부</th><th>최고층</th><th>환생</th><th>엔딩</th><th>원소</th><th>플레이</th><th>마지막 저장</th><th>빅 크런치</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="btnrow"><button class="btn" data-pl="reload">🔄 새로고침</button><button class="btn" data-pl="close">닫기</button></div></div>`;
+}
+
 /* ---------- 오프라인 보상: 서버 시간 기준 ---------- */
 function offlineGrant(now, cap = Infinity) {
   if (!S.offFrom) return;
@@ -8015,7 +8064,7 @@ function acctOpen(view, data) {
       <div class="btnrow"><button class="btn" data-acct="${up ? 'login' : 'signup'}">${up ? '이미 계정이 있어요' : '계정 만들기'}</button><button class="btn" data-acct="guest">닫기</button></div>`;
   } else if (view === 'account') {
     h = `<h2>☁️ ${name}</h2><p id="acctMsg">${A.failed ? '마지막 클라우드 저장에 실패했어요.' : '클라우드에 자동 저장되고 있어요.'}</p>
-      <div class="acct-stack"><button class="big-btn" data-acct="push">☁️ 지금 저장</button><button class="btn" data-acct="logout">로그아웃</button><button class="btn" data-acct="close">닫기</button></div>
+      <div class="acct-stack">${A.user === 'admin' ? '<button class="big-btn alt" data-acct="players">📋 플레이어 기록</button>' : ''}<button class="big-btn" data-acct="push">☁️ 지금 저장</button><button class="btn" data-acct="logout">로그아웃</button><button class="btn" data-acct="close">닫기</button></div>
       <small class="acct-note">로그아웃하면 저장한 뒤 이 기기에서는 진행 상황이 지워져요.<br>다시 로그인하면 그대로 돌아와요.</small>`;
   } else if (view === 'conflict') {
     h = `<h2>어느 저장으로 이어갈까요?</h2><p><b>${name}</b> 계정과 이 기기의 진행이 달라요. 고르지 않은 쪽은 이 기기에 백업돼요.</p>
@@ -8032,6 +8081,7 @@ async function acctAction(a) {
   if (a === 'login' || a === 'signup') return acctOpen(a);
   if (a === 'guest') { localStorage.setItem(GUEST_KEY, '1'); return acctClose(); }
   if (a === 'close') return acctClose();
+  if (a === 'players') { acctClose(); return openPlayers(); }
   if (a === 'push') { setText('acctMsg', '저장 중…'); if (A.sending) await A.sending; return setText('acctMsg', (await acctPush()) ? '✅ 저장했어요.' : '❌ 저장하지 못했어요.'); }
   if (a === 'logout') {
     setText('acctMsg', '저장 중…');

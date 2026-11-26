@@ -36,7 +36,44 @@ function checkAdmin(body) {
   if (!crypto.timingSafeEqual(Buffer.from(L.sha(body.password)), Buffer.from(L.sha(want)))) throw new L.HttpError(401, '비밀번호가 틀렸어요.');
 }
 
+// 관리자 계정: 이 아이디로 로그인하면 플레이어 기록(진행 요약)을 볼 수 있어요
+const ADMIN_USERS = new Set(['admin']);
+const n0 = v => (typeof v === 'number' && isFinite(v) ? v : 0);
+function playerSummary(d) {
+  if (!d || typeof d !== 'object') return null;
+  const b = d.battle || {}, p = d.prestige || {}, e = d.endings || {}, c = d.crunch || {}, a = d.alt && typeof d.alt === 'object' ? d.alt : null;
+  const disc = Array.isArray(d.disc) ? d.disc.filter(Boolean).length : 0;
+  const part = d.part === 2 ? 2 : 1;
+  const side = x => x && { maxStage: n0(x.battle?.maxStage), rebirths: n0(x.prestige?.count), endings: x.endings || {} };
+  return {
+    part, maxStage: n0(b.maxStage), stage: n0(b.stage), rebirths: n0(p.count), seeds: n0(p.seeds), best: n0(p.best),
+    endings: { e1: !!e.e1, e2: !!e.e2, e3: !!e.e3, e4: !!e.e4 }, disc, h: n0(Array.isArray(d.counts) ? d.counts[1] : 0), coins: n0(d.coins),
+    playTime: n0(d.playTime), clicks: n0(d.totalClicks), kills: n0(d.kills), fusions: n0(d.totalFusions),
+    voidDone: Math.max(0, Math.min(118, n0(d.void?.idx) - 1)), g2: d.g2?.unlocked ? n0(d.g2.k) + 1 : 0, rift: n0(d.rift),
+    weapons: Array.isArray(d.weap) ? d.weap.filter(Boolean).length : 0, hs: d.hs ? Object.values(d.hs).reduce((s, v) => s + n0(v), 0) : 0,
+    crunch: { clearAt: n0(c.clearAt), eventAt: n0(c.eventAt), gone: !!c.gone, fresh: !!c.fresh },
+    other: a ? { part: a.part === 2 ? 2 : 1, ...side(a) } : null, lastSave: n0(d.lastSave),
+  };
+}
+
 const routes = {
+  'GET players': async req => {
+    const user = await L.currentUser(req);
+    if (!user || !ADMIN_USERS.has(user.username)) throw new L.HttpError(403, '관리자 계정만 볼 수 있어요.');
+    await L.limit('players:' + user.id, 30, 600);
+    const rows = await L.db()`SELECT u.username, u.created_at, s.data, s.rev, s.updated_at,
+      (SELECT max(created_at) FROM sessions WHERE user_id = u.id) AS last_login
+      FROM users u LEFT JOIN saves s ON s.user_id = u.id ORDER BY s.updated_at DESC NULLS LAST, u.created_at DESC LIMIT 500`;
+    return {
+      players: rows.map(r => {
+        let sum = null;
+        try { sum = r.data ? playerSummary(JSON.parse(r.data)) : null; } catch (e) { sum = null; }
+        const t = v => (v ? new Date(v).getTime() : 0);
+        return { user: r.username, created: t(r.created_at), saved: t(r.updated_at), lastLogin: t(r.last_login), rev: r.rev || 0, size: r.data ? r.data.length : 0, s: sum };
+      }),
+    };
+  },
+
   'GET time': async () => ({}),
 
   'GET release': async () => ({ release: await getRelease() }),
