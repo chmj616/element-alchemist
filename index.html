@@ -381,6 +381,10 @@ body:not(.p2v) #riftBox{display:none}
 .col-card .ic{font-size:24px}.col-card b{font-size:12px}.col-card small{font-size:10px;color:var(--dim)}
 .col-card.unknown{border-style:dashed;opacity:.6}
 @media (max-width:800px){.col-main{grid-template-columns:1fr}.col-grid{grid-template-columns:repeat(3,1fr)}}
+#nextGoal.goal-link{cursor:pointer;transition:border-color .15s,transform .1s}
+#nextGoal.goal-link:hover{border-color:var(--accent)}
+#nextGoal.goal-link:active{transform:scale(.98)}
+.goal-go{display:block;margin-top:4px;font-size:11px;color:var(--accent);font-weight:700}
 #endModal{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at center,#140c2c 0%,#000 75%);cursor:pointer}
 #endModal.on{display:flex;animation:fadein 1.2s}
 .end-box{text-align:center;max-width:640px;padding:30px;cursor:default}
@@ -4667,10 +4671,13 @@ function renderP2Pick() {
 }
 function p2Goal() {
   const W1 = S.weap.some(Boolean);
+  if (!W1) goTo('fusion');
   if (!W1) return S.counts[1] >= 1000 ? '🎯 <b>⚒️ 공방</b> 탭에서 첫 무기 「수소 마법봉」을 만들어 보세요!' : `🎯 수소 1000개를 모아 첫 무기를 만들어요 (지금 ${fmt(Math.floor(S.counts[1]))}) · 2부는 원소가 아니라 <b>무기</b>로 싸워요!`;
+  if (!S.party.slice(0, partySlots()).some(z => z && S.weap[z])) goTo('battle');
   if (!S.party.slice(0, partySlots()).some(z => z && S.weap[z])) return '🎯 <b>전투</b> 탭에서 무기를 파티에 장착하세요!';
   const nz = p2NextZ();
   if (nz && S.battle.maxStage >= p2UnlockStage(nz)) return `🎯 ${EL[nz - 1].sym} ${fmt(p2UnlockCost(nz))}개를 모아 <b>${EL[nz].name}</b>을 해금하면 클릭으로 캘 수 있어요 (원자핵 아래 🔓)`;
+  goTo('battle');
   if (S.battle.maxStage < P2_CRUNCH) return '🎯 무기를 만들고 🏪 상점에서 강화해서 더 높은 층으로! <b>2500층</b>에서 누군가 기다리고 있어요…';
   return '🎯 빅 크런치를 데려간 존재가 <b>5000층</b>에서 기다려요';
 }
@@ -4997,6 +5004,14 @@ async function installApp() {
     <button class="big-btn" data-install="close">확인</button></div>`;
   m.classList.add('on');
 }
+document.addEventListener('click', e => {
+  if (!e.target.closest || !e.target.closest('#nextGoal.goal-link')) return;
+  const A = R.goalAct;
+  if (!A) return;
+  switchTab(A.tab);
+  if (A.tab === 'fusion' && A.list && !P2W()) { setFuse(A.list); SFX.buy(); }
+  if (innerWidth <= 900) document.getElementById('tab-' + A.tab)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 document.addEventListener('click', e => {
   if (!e.target.closest) return;
   const el = e.target.closest('[data-install]');
@@ -5990,7 +6005,7 @@ function fusionMax(list) {
   const need = fusionNeeds(list);
   let m = Infinity;
   for (const k in need) m = Math.min(m, Math.floor(S.counts[k] / need[k]));
-  return isFinite(m) ? Math.min(m, 1e15) : 0;
+  return isFinite(m) ? m : 0;
 }
 function doFusion(n) {
   const list = fuseList(), m = fusionMax(list);
@@ -6512,22 +6527,28 @@ function renderHeader() {
   setText('clickVal', P2W() ? `⛏️ 클릭당 +${fmtS(clickValue() * P2_CLICK / EL_VALUE[p2Z()])} ${EL[p2Z()].sym}` : `클릭당 +${fmt(clickValue())} H`);
   $('#battleDot').classList.toggle('on', S.battle.active);
 }
+const goTo = (tab, list) => { R.goalAct = { tab, list: list || null }; };
 function nextGoal() {
+  R.goalAct = null;
   if (P2W()) return p2Goal();
+  if (!S.disc[2]) goTo(S.counts[1] >= FUSE_RATIO * 2 ? 'fusion' : 'prod', S.counts[1] >= FUSE_RATIO * 2 ? [1, 1] : null);
   if (!S.disc[2]) return S.counts[1] >= FUSE_RATIO * 2
     ? `🎯 <b>융합</b> 탭에서 H ×${FUSE_RATIO} + H ×${FUSE_RATIO} 으로 헬륨(He)을 만들어 보세요!`
     : `🎯 수소 ${FUSE_RATIO * 2}개를 모아 헬륨을 만들어 보세요! (클릭 10번 = 수소 1개, 생산 시설도 활용하세요)`;
-  if (S.gens[0] === 0) return '🎯 수소 45개로 <b>양성자 포집기</b>를 사서 자동 생산을 시작하세요!';
+  if (S.gens[0] === 0) { goTo('prod'); return '🎯 수소 45개로 <b>양성자 포집기</b>를 사서 자동 생산을 시작하세요!'; }
+  if (canRebirth() || rebirthReady() || (S.battle.maxStage >= stageCap() && stageCap() < MAX_STAGE)) goTo('table');
   if (canRebirth()) return '🌌 <b>빅뱅 준비 완료!</b> 주기율표 탭에서 <b>환생(빅뱅)</b>할 수 있어요!';
   if (rebirthReady()) return `🌌 <b>주기율표 완성!</b> 빅뱅 에너지로 수소 ${fmt(rebirthCost())}개를 모으면 환생할 수 있어요 (지금 ${fmt(S.counts[1])})`;
   if (S.battle.maxStage >= stageCap() && stageCap() < MAX_STAGE) return `🔒 스테이지 상한(${stageCap()}) 도달! 주기율표를 완성하고 환생하면 ${stageCap(S.prestige.count + 1)}까지 열려요.`;
+  if (S.battle.maxStage === 0) goTo('battle');
   if (S.battle.maxStage === 0) return '🎯 <b>전투</b> 탭에서 첫 전투에 도전하세요! 적이 강하니 10번 근처 원소까지 융합해 두면 좋아요.';
   const h = fusionHints(1)[0];
-  if (h) return `🎯 융합 가능: ${recipeText(h.list)} → <b>${EL[h.z].name}(${EL[h.z].sym})</b>`;
+  if (h) { goTo('fusion', h.list); return `🎯 융합 가능: ${recipeText(h.list)} → <b>${EL[h.z].name}(${EL[h.z].sym})</b>`; }
   let nz = 0;
   for (let z = 2; z <= fuseCap(); z++) if (!S.disc[z] && canFuse(z)) { nz = z; break; }
   if (nz) {
     const r = bestRecipe(nz);
+    goTo('fusion', r ? r.list : null);
     return `🎯 다음 목표: <b>${EL[nz].name}(${EL[nz].sym})</b> · ${nz}번` + (r ? `<br><small>${recipeText(r.list)} 재료를 더 모으세요</small>` : (inputsFor(nz) > 2 ? `<br><small>재료 ${inputsFor(nz)}종 합성이 필요해요</small>` : ''));
   }
   const nt = RECIPE_TIERS.find(([s]) => s > S.battle.maxStage);
@@ -6535,10 +6556,14 @@ function nextGoal() {
   const parts = [];
   if (nt) parts.push(`🔓 스테이지 <b>${nt[0]}</b> 클리어 → ${nt[1]}번까지 조합법 해금`);
   if (ns) parts.push(`🧪 스테이지 <b>${SYNTH_STAGE[ns]}</b> 보스 → 인공 원소 ${EL[ns].name}(${EL[ns].sym}) 확정`);
+  goTo('battle');
   return parts.length ? '🎯 ' + parts.join('<br>🎯 ') : '🏆 더 높은 스테이지에 도전하세요!';
 }
 function renderSide() {
-  $('#nextGoal').innerHTML = nextGoal();
+  const ng = $('#nextGoal'), gh = nextGoal(), A = R.goalAct;
+  const html = gh + (A ? `<span class="goal-go">👉 ${{ fusion: P2W() ? '공방' : '융합', prod: '생산', battle: '전투', table: '주기율표', shop: '상점' }[A.tab] || ''}으로</span>` : '');
+  if (ng.innerHTML !== html) ng.innerHTML = html;
+  ng.classList.toggle('goal-link', !!A);
   const B = S.battle, mini = $('#battleMini');
   if (B.active && R.tab !== 'battle') {
     const E = R.enemy;
