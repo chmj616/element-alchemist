@@ -345,6 +345,42 @@ body.p2mine .electron{border-radius:2px;background:var(--p2c,#ff6b8b);box-shadow
   .forge-row .buybtn,.wshop .buybtn{flex:1 1 100%;flex-direction:row;justify-content:center;gap:8px}
   .mus-tabs .btn{padding:4px 8px;font-size:12px}
 }
+/* 🌀 균열 봉인소 · 💥 입자 충돌기 */
+body.p2v #tab-void > :not(#riftBox){display:none}
+body:not(.p2v) #riftBox{display:none}
+.rift-wrap{display:flex;gap:14px;flex-wrap:wrap;align-items:stretch;margin-bottom:12px}
+.rift-stage{position:relative;flex:1 1 260px;min-height:220px;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 50%,#2a0a14,#050206 70%);border:1px solid #ff6b8b44}
+.rift-tear{position:absolute;left:50%;top:8%;bottom:8%;width:calc(8px + 120px * var(--k));transform:translateX(-50%) skewX(-12deg);background:linear-gradient(90deg,transparent,#ff3b5c 30%,#fff 50%,#ff3b5c 70%,transparent);filter:blur(2px) drop-shadow(0 0 20px #ff3b5c);clip-path:polygon(40% 0,60% 8%,45% 20%,65% 35%,40% 50%,62% 65%,42% 80%,58% 92%,50% 100%,35% 90%,52% 75%,30% 60%,55% 45%,32% 30%,50% 15%);animation:p2glow 1.4s ease-in-out infinite alternate}
+.rift-txt{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-weight:800;text-shadow:0 2px 6px #000}
+.rift-stage.seal .rift-tear{animation:riftSeal .8s ease-out}
+@keyframes riftSeal{0%{filter:brightness(3) blur(0)}100%{filter:blur(2px) drop-shadow(0 0 20px #ff3b5c)}}
+.rift-cur{flex:1 1 280px;display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:14px;background:var(--panel2);border:1px solid var(--line)}
+.rift-cur.done{justify-content:center;text-align:center}.rift-cur small{color:var(--dim);display:block}
+.rift-head{display:flex;gap:10px;align-items:center}
+.rift-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(30px,1fr));gap:3px}
+.rt{aspect-ratio:1;border-radius:5px;background:#1a0d14;border:1px solid #ff6b8b22;font-style:normal;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#ffffff55}
+.rt.sealed{background:color-mix(in srgb,var(--c) 35%,#111);border-color:var(--c);color:#fff}
+.rt.cur{border:2px dashed #ff6b8b;color:#ff8fab;animation:p2glow 1s ease-in-out infinite alternate}
+#colView{position:fixed;inset:0;z-index:3200;display:none;flex-direction:column;background:radial-gradient(ellipse at 50% 30%,#14223a 0%,#05070d 75%);padding:10px;overflow:auto}
+#colView.on{display:flex}
+.col-main{display:grid;grid-template-columns:1fr minmax(320px,440px);gap:14px;flex:1;min-height:0}
+.col-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.col-ring{position:relative;width:min(320px,70vw);aspect-ratio:1;border-radius:50%;border:10px solid #2b3a5c;box-shadow:inset 0 0 40px #4dabf733,0 0 40px #4dabf722}
+.col-ring i{position:absolute;top:50%;left:50%;width:14px;height:14px;margin:-7px;border-radius:50%}
+.col-ring .b1{background:#ff6b6b;box-shadow:0 0 14px #ff6b6b;animation:orbitA 1.6s linear infinite}
+.col-ring .b2{background:#4dabf7;box-shadow:0 0 14px #4dabf7;animation:orbitB 1.6s linear infinite}
+@keyframes orbitA{from{transform:rotate(0) translateX(calc(min(320px,70vw)/2 - 12px))}to{transform:rotate(360deg) translateX(calc(min(320px,70vw)/2 - 12px))}}
+@keyframes orbitB{from{transform:rotate(360deg) translateX(calc(min(320px,70vw)/2 - 12px))}to{transform:rotate(0) translateX(calc(min(320px,70vw)/2 - 12px))}}
+.col-core{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:.25;transition:opacity .2s}
+.col-ring.fire .col-core{animation:colBoom .6s ease-out}
+@keyframes colBoom{0%{opacity:1;transform:scale(.4)}60%{opacity:1;transform:scale(1.6)}100%{opacity:.25;transform:scale(1)}}
+.col-last{min-height:40px;text-align:center;font-size:14px;max-width:520px}
+.col-side{display:flex;flex-direction:column;gap:8px;overflow:auto}
+.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.col-card{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:10px;border:1px solid var(--c);background:color-mix(in srgb,var(--c) 12%,#0b0e1a);text-align:center}
+.col-card .ic{font-size:24px}.col-card b{font-size:12px}.col-card small{font-size:10px;color:var(--dim)}
+.col-card.unknown{border-style:dashed;opacity:.6}
+@media (max-width:800px){.col-main{grid-template-columns:1fr}.col-grid{grid-template-columns:repeat(3,1fr)}}
 #endModal{position:fixed;inset:0;z-index:4000;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at center,#140c2c 0%,#000 75%);cursor:pointer}
 #endModal.on{display:flex;animation:fadein 1.2s}
 .end-box{text-align:center;max-width:640px;padding:30px;cursor:default}
@@ -1323,6 +1359,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
 
     <!-- 공허 -->
     <div class="tab" id="tab-void">
+      <div id="riftBox"></div>
       <p class="tip">🕳️ <b>공허</b>에 주기율표 <b>순서대로</b>(수소 → 헬륨 → 리튬 …) 원소를 바치면 그 안에서 <b>새로운 우주</b>가 태어납니다.<br>
       💧 수소는 얻기 쉬우니 <b>왕창</b> 필요하고, 뒤로 갈수록 필요한 개수가 점점 줄어들어요. 🧪 인공 원소(28종)는 각 <b>1개</b> — 지정된 보스 층에 <b>인공 원소 보스</b>로 등장하고, 처치하면 1개 확정이에요.<br>
       📈 원소 하나를 다 채울 때마다 <b>수소 생산량 ×1.02</b> (복리, 영구 · 환생해도 유지). 118번까지 모두 채우면 <b>우주 창조 → 엔딩</b>! 그 우주의 불타는 행성 하나를 생명의 행성으로 바꿀 수 있어요.</p>
@@ -1559,6 +1596,7 @@ const BOSSES2 = [['붉은 거성의 망령', '👹'], ['빅 크런치의 파편'
   ['시간 포식자', '⏳'], ['고리 행성 파괴자', '🪐'], ['반물질 용', '🐲'], ['종말의 메아리', '📯']];
 const P2_HP = 8, P2_ATK = 4, P2_PROD = 2; // 2부: 적 체력 ×8 · 공격 ×4 · 대신 생산 ×2
 const P2W = () => S.part === 2 && beta(4); // 2부 무기 전투 · 원소 채굴
+const P2V = () => P2W() && beta(5);        // 2부 균열 봉인소 · 입자 충돌기
 const BOSSES = [['블랙홀', '🕳️'], ['반물질 군주', '😈'], ['엔트로피의 화신', '🌪️'], ['암흑물질 거인', '🗿'],
   ['진공 붕괴', '💀'], ['초대질량 퀘이사', '🌟'], ['우주 끈 히드라', '🐉'], ['열적 죽음', '🌑']];
 
@@ -1879,11 +1917,12 @@ const R = {
   sellAmt: 1, combo: 0, lastClick: 0, buffs: {}, goldenAt: 0, goldenUntil: 0, discQueue: [],
 };
 // 공개 단계: 새 기능은 관리자 모드에서 먼저 보이고, 관리자가 「일반 사이트에 배포」를 누르면 모두에게 열림
-const RELEASE_ID = 4; // 최신 단계
+const RELEASE_ID = 5; // 최신 단계
 const RELEASE_NOTES = {
   1: '환생 강화 · 강화 수량 버튼 · 💎 코인 투자소 · 📲 앱으로 다운로드 · 원소 쪼개기 업데이트(연구/스킬/동위원소/임무/발전소/대기 발전/도감/💠 쿼크 상점 · 난이도 상향: 원소 더 단단 · 보스 체력 ×10·22초·재생 · 초신성 비용 ×25)',
   2: '🏛️ 몬스터 전시장 · 🚨 빅 크런치 소실 이벤트 · 🌘 2부 (1부 보관 · 오가기)',
   3: '📖 게임 설명 탭 (엔딩 전 콘텐츠는 ???)',
+  5: '🌀 2부 균열 봉인소 (2부의 공허: 무기로 균열 118개 봉인) · 💥 입자 충돌기 (2부의 원소 쪼개기: 표준모형 입자 17종 수집)',
   4: '🌘 2부 개편: ⚒️ 무기 118종 제작·강화 전투 · ⛏️ 원소 채굴(해금한 원소를 클릭) · 🌑 2500층 빅 크런치와 대화 · 🏛️ 1부/2부 전시장',
 };
 const beta = (n = 1) => !!R.admin || (R.release || 0) >= n;
@@ -1913,6 +1952,7 @@ function defaultState() {
     cinv: { prod: 0, atk: 0, hp: 0 }, warpAt: 0, goldBuyAt: 0, hs: { star: 0, arms: 0, vault: 0, accel: 0 }, hexAt: 0,
     part: 1, crunch: { clearAt: 0, eventAt: 0, gone: false }, alt: null,
     weap: new Array(119).fill(0), wlv: new Array(119).fill(0), p2z: 1, p2talk: false, p2talk2: false,
+    rift: 0, col: { lv: 0, auto: 0, parts: {}, shots: 0 },
   };
 }
 /* ---------- 세이브 검사: 아는 항목만, 올바른 형식으로만 받아들임 ---------- */
@@ -2012,6 +2052,10 @@ function normalizeSave(raw, nested) {
   s.wlv = list(d.wlv, 119, v => int(v, 0, 0, 4000));
   s.p2z = int(d.p2z, 1, 1, 118); if (!s.disc[s.p2z]) s.p2z = 1;
   s.p2talk = d.p2talk === true; s.p2talk2 = d.p2talk2 === true;
+  s.rift = int(d.rift, 0, 0, 118);
+  const oc = obj(d.col);
+  s.col = { lv: int(oc.lv, 0, 0, 1000), auto: int(oc.auto, 0, 0, 60), parts: {}, shots: int(oc.shots, 0, 0, 1e12) };
+  for (const P of PARTICLES) { const v = int(obj(oc.parts)[P.id], 0, 0, 1e9); if (v) s.col.parts[P.id] = v; }
   const cr = obj(d.crunch);
   s.crunch = { clearAt: num(cr.clearAt), eventAt: num(cr.eventAt), gone: cr.gone === true };
   s.alt = null;
@@ -2146,6 +2190,7 @@ function prodMult() {
   m *= cinvMult('prod');
   if (S.part === 2) m *= P2_PROD;
   m *= Math.pow(1.15, hsLv('star'));
+  if (P2V()) m *= riftMult() * colMult('prod') * colHiggs();
   return Math.min(1e200, m);
 }
 function buffMult(kind) { const b = R.buffs[kind]; return b && b.until > performance.now() ? b.mult : 1; }
@@ -2272,7 +2317,7 @@ function rebirth() {
   const keep = {
     misPaid: S.misPaid, godGrant: S.godGrant, lastSave: S.lastSave, offFrom: S.offFrom, offPlayed: S.offPlayed, ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, god: S.god, godCleared: S.godCleared, godAst: S.godAst, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills, g2: S.g2,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
-    hs: S.hs, hexAt: S.hexAt, part: S.part, alt: S.alt, crunch: S.crunch, p2talk: S.p2talk, p2talk2: S.p2talk2, weap: P2W() ? S.weap : new Array(119).fill(0),
+    hs: S.hs, hexAt: S.hexAt, rift: S.rift, col: S.col, part: S.part, alt: S.alt, crunch: S.crunch, p2talk: S.p2talk, p2talk2: S.p2talk2, weap: P2W() ? S.weap : new Array(119).fill(0),
     prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
   S = Object.assign(defaultState(), keep);
@@ -2459,6 +2504,8 @@ function feedVoid(mode) {
   return true;
 }
 function renderVoid() {
+  document.body.classList.toggle('p2v', P2V());
+  if (P2V()) return renderRift();
   const V = S.void, done = voidDone(), z = Math.min(V.idx, 118), complete = V.idx > 118;
   const st = planetStage();
   const frac = complete ? 118 : done + V.fed / VOID_REQ[z];
@@ -4571,7 +4618,7 @@ function weapCard(z, opts = {}) {
 /* ⛏️ 원소 채굴: 해금한 원소를 골라 클릭하면 그 원소를 직접 캐요 */
 const p2Z = () => (S.disc[S.p2z] ? S.p2z : 1);
 function p2Mine(hEq) {
-  const z = p2Z(), n = hEq * P2_CLICK / EL_VALUE[z];
+  const z = p2Z(), n = hEq * P2_CLICK / EL_VALUE[z] * (P2V() ? colMult('mine') : 1);
   S.counts[z] += n;
   if (z === 1) S.totalH += n;
   return n;
@@ -4738,6 +4785,184 @@ document.addEventListener('click', e => {
   if (e.target.closest('[data-story="close"]')) { $('#storyModal').classList.remove('on'); R.storyPause = false; }
 });
 
+/* ---------- 🌀 2부 균열 봉인소: 빅 립이 찢어 놓은 균열 118개를 무기로 봉인 ---------- */
+const RIFT_EFF = 1.03, RIFT_FULL = 2, COL_UNLOCK = 20;
+// 균열 N: 원소 N번으로 만든 무기를 갖고 있어야 하고, 원소 N을 ×1000 (+ 절반 번호 원소 ×3000) 바쳐 봉인
+function riftNeed(n) {
+  const need = {};
+  need[n] = 1000;
+  const h = Math.max(1, Math.floor(n / 2));
+  need[h] = (need[h] || 0) + 3000;
+  return need;
+}
+const fmtM = v => (v < 100 ? (+v.toFixed(2)).toString() : fmt(v));
+const riftMult = () => Math.pow(RIFT_EFF, S.rift || 0) * ((S.rift || 0) >= 118 ? RIFT_FULL : 1);
+const canSeal = n => n <= 118 && S.weap[n] && Object.entries(riftNeed(n)).every(([k, v]) => S.counts[k] >= v);
+function sealRift() {
+  const n = (S.rift || 0) + 1;
+  if (!P2V() || !canSeal(n)) return;
+  for (const [k, v] of Object.entries(riftNeed(n))) S.counts[k] -= v;
+  S.rift = n;
+  SFX.discover();
+  const st = $('#riftStage');
+  if (st) { const [x, y] = centerOf(st); particles(x, y, 40, CATS[EL[n].cat].color); st.classList.remove('seal'); void st.offsetWidth; st.classList.add('seal'); }
+  toast(`<span>🌀 <b>${n}번째 균열 봉인!</b> ${WEAPONS[n].icon} ${WEAPONS[n].name}의 힘으로 ${EL[n].name}의 균열을 꿰맸어요 · 생산·무기 ×${fmtM(riftMult())}</span>`, 'disc', 4000);
+  if (n === COL_UNLOCK) toast('<span>💥 <b>입자 충돌기</b>가 열렸어요! 균열 탭 아래에서 찾아보세요</span>', 'disc', 6000);
+  if (n === 118) toast('<span>🌌 <b>모든 균열을 봉인했어요!</b> 찢어진 우주가 하나로 이어졌어요 · 생산·무기 추가 ×2</span>', 'disc', 8000);
+  R.riftSig = null;
+}
+function renderRift() {
+  const box = $('#riftBox'), n = (S.rift || 0) + 1, done = S.rift || 0;
+  const sig = done + '|' + S.weap.join() + '|' + (done >= COL_UNLOCK);
+  if (R.riftSig !== sig) {
+    R.riftSig = sig;
+    const tiles = [];
+    for (let k = 1; k <= 118; k++) tiles.push(`<i class="rt ${k <= done ? 'sealed' : k === n ? 'cur' : ''}" style="--c:${CATS[EL[k].cat].color}" title="${k}. ${EL[k].name}">${k <= done || k === n ? EL[k].sym : ''}</i>`);
+    const cur = n <= 118 ? `<div class="rift-cur"><div class="rift-head">${weapCard(n, { cls: S.weap[n] ? '' : 'unknown' })}<div><b>${n}번째 균열 · ${EL[n].name}(${EL[n].sym})의 균열</b>
+        <small>${S.weap[n] ? `✅ ${WEAPONS[n].icon} ${WEAPONS[n].name} 보유` : `❌ ${WEAPONS[n].icon} ${WEAPONS[n].name}이(가) 필요해요 (⚒️ 공방에서 제작)`}</small></div></div>
+        <div class="recipe">${Object.entries(riftNeed(n)).map(([k, v]) => `<span class="rq" id="rfq${k}" style="--c:${CATS[EL[k].cat].color}">${EL[k].sym} <b id="rfh${k}"></b>/${fmt(v)}</span>`).join('')}</div>
+        <button class="big-btn p2-go" data-rift="seal" id="riftBtn">🌀 균열 봉인</button></div>`
+      : '<div class="rift-cur done"><b>🌌 모든 균열을 봉인했어요!</b><small>찢어진 우주가 하나로 이어졌어요. 생산·무기 추가 ×2</small></div>';
+    box.innerHTML = `<p class="tip">🌀 <b>균열 봉인소</b> — 빅 립이 우주를 찢어 놓은 자리에 <b>균열 118개</b>가 남아 있어요. 주기율표 순서대로, 그 원소로 만든 <b>무기</b>를 가진 채 원소를 바쳐 꿰매세요.<br>
+      📈 균열 하나를 봉인할 때마다 <b>생산·무기 위력 ×${RIFT_EFF}</b> (복리, 영구 · 환생해도 유지) · 모두 봉인하면 추가 <b>×${RIFT_FULL}</b> · ${COL_UNLOCK}개를 봉인하면 <b>💥 입자 충돌기</b>가 열려요.</p>
+      <div class="rift-wrap"><div class="rift-stage" id="riftStage"><div class="rift-tear" style="--k:${1 - done / 118}"></div><div class="rift-txt">봉인 ${done} / 118</div></div>${cur}</div>
+      <div class="sec-head"><h3>📜 균열 지도</h3><small>생산·무기 ×${fmtM(riftMult())}</small></div>
+      <div class="rift-map">${tiles.join('')}</div>
+      ${done >= COL_UNLOCK ? `<div class="g2-offer done"><b>💥 입자 충돌기</b><span>수소로 입자를 충돌시켜 표준모형 입자 17종을 모아요 · 발견 ${PARTICLES.filter(P => S.col.parts[P.id]).length} / 17 · 빔 출력 Lv.${S.col.lv}</span><button class="big-btn g2-btn" data-col="open">💥 입자 충돌기 열기</button></div>`
+        : `<div class="g2-offer locked"><b>🔒 ???</b><span>균열을 ${COL_UNLOCK}개 봉인하면 새로운 무언가가 열려요… (지금 ${done}개)</span></div>`}`;
+  }
+  if (n <= 118) {
+    for (const [k, v] of Object.entries(riftNeed(n))) { setText('rfh' + k, fmtS(S.counts[k])); document.getElementById('rfq' + k)?.classList.toggle('ok', S.counts[k] >= v); }
+    const b = $('#riftBtn'); if (b) b.disabled = !canSeal(n);
+  }
+}
+
+/* ---------- 💥 2부 입자 충돌기: 수소를 써서 표준모형 입자 17종 수집 ---------- */
+// tier: 0 흔함 · 1 드묾 · 2 희귀 · 3 영웅 · 4 전설 / kind: weap(무기 공격·체력) · mine(채굴) · prod(생산) · higgs(모든 배율)
+const PARTICLES = [
+  { id: 'u', name: '업 쿼크', icon: '🔺', tier: 0, kind: 'weap' }, { id: 'd', name: '다운 쿼크', icon: '🔻', tier: 0, kind: 'weap' },
+  { id: 's', name: '스트레인지 쿼크', icon: '🌀', tier: 1, kind: 'weap' }, { id: 'c', name: '참 쿼크', icon: '💗', tier: 1, kind: 'weap' },
+  { id: 'b', name: '보텀 쿼크', icon: '🔽', tier: 2, kind: 'weap' }, { id: 't', name: '톱 쿼크', icon: '👑', tier: 3, kind: 'weap' },
+  { id: 'e', name: '전자', icon: '⚡', tier: 0, kind: 'mine' }, { id: 've', name: '전자 중성미자', icon: '👻', tier: 0, kind: 'mine' },
+  { id: 'mu', name: '뮤온', icon: '🌠', tier: 1, kind: 'mine' }, { id: 'vmu', name: '뮤온 중성미자', icon: '🫥', tier: 1, kind: 'mine' },
+  { id: 'tau', name: '타우', icon: '☄️', tier: 2, kind: 'mine' }, { id: 'vtau', name: '타우 중성미자', icon: '🌫️', tier: 2, kind: 'mine' },
+  { id: 'ph', name: '광자', icon: '💡', tier: 0, kind: 'prod' }, { id: 'gl', name: '글루온', icon: '🧷', tier: 0, kind: 'prod' },
+  { id: 'w', name: 'W 보손', icon: '🌊', tier: 2, kind: 'prod' }, { id: 'z', name: 'Z 보손', icon: '⭕', tier: 2, kind: 'prod' },
+  { id: 'h', name: '힉스 보손', icon: '🌟', tier: 4, kind: 'higgs' },
+];
+const COL_TIERS = [
+  { name: '흔함', color: '#adb5bd', w: 100, need: 0, eff: 0.02 }, { name: '드묾', color: '#69db7c', w: 30, need: 1, eff: 0.04 },
+  { name: '희귀', color: '#4dabf7', w: 8, need: 3, eff: 0.08 }, { name: '영웅', color: '#cc5de8', w: 2, need: 6, eff: 0.15 },
+  { name: '전설', color: '#ffd43b', w: 0.4, need: 10, eff: 0.5 },
+];
+const COL_CAP = 30; // 같은 입자는 30개까지 효과가 쌓여요 (전부 모아도 무기 약 ×145 · 생산 약 ×29)
+const colOpen = () => P2V() && (S.rift || 0) >= COL_UNLOCK;
+// 입자 효과: 종류별 (1 + 등급 효과 × min(보유, 30)) 를 곱함, 힉스는 모든 배율 × (1 + 0.5 × 보유, 최대 ×5)
+function colMult(kind) { let m = 1; for (const P of PARTICLES) if (P.kind === kind) m *= 1 + COL_TIERS[P.tier].eff * Math.min(COL_CAP, S.col.parts[P.id] || 0); return m; }
+const colHiggs = () => Math.min(5, 1 + 0.5 * (S.col.parts.h || 0));
+// 비용은 지금 생산량 기준 (충돌 1번 = 수소 생산 30초어치, 최소 1000)
+const colShotCost = () => Math.max(1000, baseRate() * 30);
+const colLvCost = () => Math.max(1e5, baseRate() * 600) * Math.pow(2, S.col.lv);
+const colAutoCost = () => Math.max(1e5, baseRate() * 900) * Math.pow(2.5, S.col.auto);
+function colRoll() {
+  const lv = S.col.lv, pool = PARTICLES.filter(P => lv >= COL_TIERS[P.tier].need);
+  const w = P => COL_TIERS[P.tier].w * (1 + lv * 0.25 * P.tier);
+  let r = Math.random() * pool.reduce((a, P) => a + w(P), 0);
+  for (const P of pool) { r -= w(P); if (r <= 0) return P; }
+  return pool[pool.length - 1];
+}
+function colFire(n = 1, auto) {
+  if (!colOpen()) return;
+  const c = colShotCost();
+  n = Math.min(n, Math.floor(S.counts[1] / c));
+  if (n < 1) { if (!auto) toast('💧 충돌에 쓸 수소가 부족해요'); return; }
+  S.counts[1] -= c * n;
+  const got = {};
+  for (let i = 0; i < n; i++) { const P = colRoll(); got[P.id] = (got[P.id] || 0) + 1; }
+  let best = null;
+  for (const id in got) {
+    const P = PARTICLES.find(x => x.id === id), first = !S.col.parts[id];
+    S.col.parts[id] = (S.col.parts[id] || 0) + got[id];
+    if (!best || P.tier > best.tier) best = P;
+    if (first) toast(`<span>${P.icon} <b>새 입자 발견: ${P.name}</b> (${COL_TIERS[P.tier].name})</span>`, 'disc', 4000);
+  }
+  S.col.shots += n;
+  R.colLast = Object.entries(got).map(([id, k]) => { const P = PARTICLES.find(x => x.id === id); return { P, k }; }).sort((a, b) => b.P.tier - a.P.tier);
+  if (!auto && R.colOpen) {
+    const ring = $('#colRing'); if (ring) { ring.classList.remove('fire'); void ring.offsetWidth; ring.classList.add('fire'); }
+    const [x, y] = ring ? centerOf(ring) : [innerWidth / 2, innerHeight / 2];
+    particles(x, y, 20 + best.tier * 10, COL_TIERS[best.tier].color);
+    SFX.tone(400 + best.tier * 150, 0.12, 'sawtooth', 0.05, 2);
+  }
+  R.colSig = null;
+}
+function colUp(which) {
+  if (!colOpen()) return;
+  const c = which === 'lv' ? colLvCost() : colAutoCost();
+  if (which === 'auto' && S.col.auto >= 60) return;
+  if (S.counts[1] < c) return;
+  S.counts[1] -= c;
+  S.col[which]++;
+  SFX.ach();
+  R.colSig = null;
+}
+// 자동 충돌: 레벨당 1분에 1번
+function colTick(dt) {
+  if (!colOpen() || !S.col.auto) return;
+  R.colAutoT = (R.colAutoT || 0) + dt * S.col.auto / 60;
+  if (R.colAutoT >= 1) { const k = Math.floor(R.colAutoT); R.colAutoT -= k; colFire(k, true); }
+}
+function openCol() {
+  if (!colOpen()) return;
+  let v = $('#colView');
+  if (!v) { v = document.createElement('div'); v.id = 'colView'; document.body.appendChild(v); }
+  R.colOpen = true; R.colSig = null;
+  v.innerHTML = `<div class="g2-top"><button class="btn" data-col="close">✕ 나가기</button><div class="g2-title">💥 입자 충돌기 <small>2부</small></div><div class="g2-energy">💧 <b id="colH"></b></div></div>
+    <div class="col-main"><div class="col-stage"><div class="col-ring" id="colRing"><i class="b1"></i><i class="b2"></i><div class="col-core">💥</div></div>
+      <div class="btnrow" style="justify-content:center"><button class="big-btn p2-go" data-col="fire" id="colF1"></button><button class="btn" data-col="fire10" id="colF10"></button></div>
+      <div class="col-last" id="colLast"></div></div>
+      <div class="col-side" id="colSide"></div></div>`;
+  v.classList.add('on');
+  document.body.classList.add('pv-lock');
+  renderCol();
+}
+function closeCol() { R.colOpen = false; $('#colView')?.classList.remove('on'); document.body.classList.remove('pv-lock'); }
+function renderCol() {
+  if (!R.colOpen) return;
+  const C = S.col, sc = colShotCost();
+  setText('colH', fmt(S.counts[1]));
+  setText('colF1', `💥 충돌 (💧${fmt(sc)})`);
+  setText('colF10', `×10 (💧${fmt(sc * 10)})`);
+  $('#colF1').disabled = S.counts[1] < sc; $('#colF10').disabled = S.counts[1] < sc * 10;
+  const sig = JSON.stringify(C.parts) + '|' + C.lv + '|' + C.auto + '|' + (R.colLast || []).length + '|' + C.shots;
+  if (R.colSig === sig) { const b1 = $('#colUpLv'), b2 = $('#colUpAuto'); if (b1) b1.disabled = S.counts[1] < colLvCost(); if (b2) b2.disabled = C.auto >= 60 || S.counts[1] < colAutoCost(); return; }
+  R.colSig = sig;
+  $('#colLast').innerHTML = R.colLast ? '이번 충돌: ' + R.colLast.map(({ P, k }) => `<span style="color:${COL_TIERS[P.tier].color}">${P.icon} ${P.name}${k > 1 ? ' ×' + k : ''}</span>`).join(' · ') : '충돌 버튼을 눌러 입자를 만들어 보세요! 빔 출력이 높을수록 희귀한 입자가 나와요.';
+  const kinds = [['weap', '🗡️ 무기 공격·체력'], ['mine', '⛏️ 채굴'], ['prod', '🏭 생산']];
+  const avail = t => C.lv >= COL_TIERS[t].need;
+  $('#colSide').innerHTML = `<div class="g2-note">📊 입자 효과: ${kinds.map(([k, l]) => `${l} ×${fmtM(colMult(k))}`).join(' · ')} · 🌟 힉스 모든 배율 ×${fmtM(colHiggs())}<br>충돌 ${fmt(C.shots)}번 · 같은 입자는 ${COL_CAP}개까지 효과가 쌓여요</div>
+    <div class="g2-row"><div class="g2-ico">🔋</div><div class="g2-info"><b>빔 출력 Lv.${C.lv}</b><small>희귀한 입자가 더 자주 나와요 · ${COL_TIERS.filter((t, i) => !avail(i)).map(t => `Lv.${t.need}에 ${t.name} 등급`).join(' · ') || '모든 등급 해금'}</small></div><button class="btn g2-buy" data-col="lv" id="colUpLv">💧 ${fmt(colLvCost())}</button></div>
+    <div class="g2-row"><div class="g2-ico">🤖</div><div class="g2-info"><b>자동 충돌 Lv.${C.auto}</b><small>1분에 ${C.auto}번 자동 충돌 (수소 소모) · 레벨마다 +1번</small></div><button class="btn g2-buy" data-col="auto" id="colUpAuto" ${C.auto >= 60 ? 'disabled' : ''}>${C.auto >= 60 ? '최대' : '💧 ' + fmt(colAutoCost())}</button></div>
+    <div class="sec-head"><h3>🧬 입자 도감</h3><small>${PARTICLES.filter(P => C.parts[P.id]).length} / 17</small></div>
+    <div class="col-grid">${PARTICLES.map(P => { const n = C.parts[P.id] || 0, T = COL_TIERS[P.tier];
+      return n ? `<div class="col-card" style="--c:${T.color}"><span class="ic">${P.icon}</span><b>${P.name}</b><small>${T.name} · ×${fmt(n)}</small><small>${P.kind === 'higgs' ? `모든 배율 ×${fmt(colHiggs())}` : `+${Math.round(T.eff * Math.min(COL_CAP, n) * 100)}%`}</small></div>`
+        : `<div class="col-card unknown" style="--c:${T.color}"><span class="ic">❔</span><b>???</b><small>${T.name}${avail(P.tier) ? '' : ` · 빔 Lv.${T.need}`}</small></div>`; }).join('')}</div>`;
+  const b1 = $('#colUpLv'), b2 = $('#colUpAuto'); if (b1) b1.disabled = S.counts[1] < colLvCost(); if (b2) b2.disabled = C.auto >= 60 || S.counts[1] < colAutoCost();
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest) return;
+  if (e.target.closest('[data-rift="seal"]')) return sealRift();
+  const el = e.target.closest('[data-col]');
+  if (!el) return;
+  const a = el.dataset.col;
+  if (a === 'open') return openCol();
+  if (a === 'close') return closeCol();
+  if (a === 'fire') return colFire(1);
+  if (a === 'fire10') return colFire(10);
+  if (a === 'lv' || a === 'auto') return colUp(a);
+});
+document.addEventListener('keydown', e => { if (R.colOpen && e.key === 'Escape') closeCol(); });
+
 /* ---------- 📲 앱으로 다운로드 ---------- */
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 function installState() {
@@ -4861,7 +5086,9 @@ function guideSections() {
       beta(4) && '⚒️ <b>무기 전투</b>: 2부에선 원소가 직접 싸우지 않아요. 융합 탭 자리의 <b>공방</b>에서 원소를 조합해 무기(118종)를 만들고 전투에 장착해요. 무기는 원소 계열의 특성을 이어받아요.',
       beta(4) && '⛏️ <b>원소 채굴</b>: 수소를 모아 헬륨을 해금하면 헬륨을 클릭해서 캘 수 있고, 헬륨을 모아 리튬을 해금하면 리튬을… 원자핵 아래에서 캘 원소를 골라요. 생산 시설은 계속 수소를 만들어요.',
       beta(4) && '🎁 몹을 잡으면 해금한 원소가 나와요. 🏪 상점은 <b>무기 강화</b>(코인).',
-      beta(4) && '🌑 <b>2500층</b>에서 누군가 기다리고 있어요… 최종은 5000층.') },
+      beta(4) && '🌑 <b>2500층</b>에서 누군가 기다리고 있어요… 최종은 5000층.',
+      beta(5) && '🌀 <b>균열 봉인소</b> (2부의 공허 탭): 그 원소로 만든 무기를 가진 채 원소를 바쳐 균열 118개를 차례로 봉인 · 하나마다 생산·무기 ×1.03 (영구).',
+      beta(5) && '💥 <b>입자 충돌기</b> (균열 20개 봉인 후): 수소로 입자를 충돌시켜 표준모형 입자 17종(쿼크·렙톤·보손·힉스)을 수집 · 빔 출력을 올리면 희귀 입자 · 입자마다 무기·채굴·생산 보너스.') },
     { id: 'account', icon: '👤', title: '계정 · 저장 · 앱', body: L(
       '오른쪽 위 <b>👤</b>에서 아이디와 비밀번호로 가입하면 클라우드에 저장돼 다른 기기에서 이어 할 수 있어요. 이메일을 받지 않으니 비밀번호는 꼭 기억하세요.',
       '로그인 없이 게스트로도 할 수 있어요 (이 브라우저에만 저장).',
@@ -4915,6 +5142,7 @@ function adminPanelHtml() {
       <button class="btn" data-admin="crunchnow">🚨 빅 크런치 소실 이벤트 지금</button>
       <button class="btn" data-admin="p2kit">⛏️ 2부: 원소 118종 해금 + 각 1000만 개</button>
       <button class="btn" data-admin="p2weap">⚒️ 2부: 해금한 원소의 무기 모두 제작 (+30강)</button>
+      <button class="btn" data-admin="p2rift">🌀 2부: 균열 20개 봉인 (입자 충돌기 열기) + 수소</button>
       <button class="btn" data-admin="p2crunch">🌑 2부: 2500층 빅 크런치 앞으로</button>
       <button class="btn" data-admin="partswap">🔁 ${S.part === 1 ? '2부로 전환' : '1부로 전환'} (지금 ${S.part}부)</button>
       <div class="admin-sec">🎁 지급</div>
@@ -5005,6 +5233,7 @@ async function adminAction(a) {
     save(); m.classList.remove('on'); return partTick();
   }
   if (a === 'p2kit') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); for (let z = 1; z <= 118; z++) { S.disc[z] = true; S.counts[z] = Math.max(S.counts[z], 1e7); } R.discQueue = []; S.battle.maxStage = Math.max(S.battle.maxStage, 300); }
+  if (a === 'p2rift') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.rift = Math.max(S.rift || 0, COL_UNLOCK); for (let z = 1; z <= 21; z++) { S.disc[z] = true; S.weap[z] = 1; } S.counts[1] = Math.max(S.counts[1], 1e15); R.riftSig = null; }
   if (a === 'p2crunch') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.prestige.count = Math.max(S.prestige.count, 5); S.battle.maxStage = Math.max(S.battle.maxStage, P2_CRUNCH - 1); S.battle.stage = P2_CRUNCH; S.p2talk = false; S.p2talk2 = false; R.enemy = null; }
   if (a === 'p2weap') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); for (let z = 1; z <= 118; z++) if (S.disc[z]) { S.weap[z] = 1; S.wlv[z] = Math.max(S.wlv[z], 30); } }
   if (a === 'elements') doEl();
@@ -5868,7 +6097,7 @@ function unitStats(z) {
   if (P2W()) {
     // 2부: 원소 대신 그 원소로 만든 무기가 싸워요 (계열 특성은 원소를 따름, 무기 종류별 보정 · 강화 1레벨마다 ×1.25)
     if (!z || !S.weap[z]) return null;
-    const e = EL[z], c = CATS[e.cat], W = WEAPONS[z], lv = S.wlv[z] || 0, m = 4 * Math.pow(WLV_EFF, lv);
+    const e = EL[z], c = CATS[e.cat], W = WEAPONS[z], lv = S.wlv[z] || 0, m = 4 * Math.pow(WLV_EFF, lv) * (P2V() ? riftMult() * colMult('weap') * colHiggs() : 1);
     return { z, cat: e.cat, speed: c.speed * W.s, atk: (2 + Math.pow(z, 1.6)) * c.atk * W.a * m * atkMult(), hp: (10 + 4 * Math.pow(z, 1.4)) * c.hp * W.h * m * hpMult(), lv, weapon: true };
   }
   if (!z || S.counts[z] < 1) return null;
@@ -6277,7 +6506,7 @@ function renderHeader() {
   setText('hMult', '×' + fmt(prodMult()));
   setText('hDisc', discCount() + '/118');
   setText('hStage', S.battle.maxStage);
-  const vtab = document.querySelector('.tabbtn[data-tab="void"]'), vlbl = S.void.idx > 118 && S.endings.e2 ? '🌍 행성' : '🕳️ 공허';
+  const vtab = document.querySelector('.tabbtn[data-tab="void"]'), vlbl = P2V() ? '🌀 균열' : S.void.idx > 118 && S.endings.e2 ? '🌍 행성' : '🕳️ 공허';
   if (vtab && vtab.textContent !== vlbl) vtab.textContent = vlbl;
   setText('hCoins', '🪙 ' + fmt(S.coins));
   setText('clickVal', P2W() ? `⛏️ 클릭당 +${fmtS(clickValue() * P2_CLICK / EL_VALUE[p2Z()])} ${EL[p2Z()].sym}` : `클릭당 +${fmt(clickValue())} H`);
@@ -8164,6 +8393,7 @@ function tick() {
   battleAdvance(dt);
   uiAcc += dt;
   R.slowAcc += dt;
+  if (S.part === 2) colTick(dt);
   overflowGuard();
   if (uiAcc >= 0.1) {
     uiAcc = 0;
@@ -8172,6 +8402,7 @@ function tick() {
     renderHeader();
     renderTab();
     if (R.slowTick) partTick();
+    if (R.colOpen) renderCol();
     updateCounts();
     renderBuffs();
     if (R.pvOpen) renderPlanetView();
