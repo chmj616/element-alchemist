@@ -4951,9 +4951,9 @@ function p2Goal() {
   if (nz && p2Reach() >= p2UnlockStage(nz)) return `🎯 ${EL[nz - 1].sym} ${fmt(p2UnlockCost(nz))}개를 모아 <b>${EL[nz].name}</b>을 해금하면 클릭으로 캘 수 있어요 (원자핵 아래 🔓)`;
   if (P2F() && S.battle.maxStage >= P2_CRUNCH - 1 && S.battle.maxStage < P2_CRUNCH) {
     goTo('battle');
-    if (S.frag >= FRAG_NEED) { R.goalAct.go = P2_CRUNCH; return `🌑 파편 ${S.frag}/${FRAG_NEED} — <b>2500층에서 빅 크런치를 불러내세요!</b>`; }
+    if (S.frag >= fragNeed()) { R.goalAct.go = P2_CRUNCH; return `🌑 파편 ${S.frag}/${fragNeed()} — <b>2500층에서 빅 크런치를 불러내세요!</b>`; }
     R.goalAct.go = fragFloor(S.battle.maxStage); R.goalAct.farm = true;
-    return `🌑 빅 크런치 파편 <b>${S.frag}/${FRAG_NEED}</b> — 눌러서 파편 보스(${fragFloor(S.battle.maxStage)}층)로`;
+    return `🌑 빅 크런치 파편 <b>${S.frag}/${fragNeed()}</b> — 눌러서 파편 보스(${fragFloor(S.battle.maxStage)}층)로`;
   }
   goTo('battle');
   if (S.battle.maxStage < P2_CRUNCH) return '🎯 무기를 만들고 🏪 상점에서 강화해서 더 높은 층으로! <b>2500층</b>에서 누군가 기다리고 있어요…';
@@ -5253,7 +5253,7 @@ function gravEnd(win, why) {
     if (R.enemy !== G.E) return;
     if (win) { G.E.hp = 0; victory(); }
     else {
-      if (P2F()) { const back = Math.floor(FRAG_NEED * FRAG_REFUND); S.frag = Math.min(999, S.frag + back); blog(`🌑 흩어진 파편 ${back}개를 되찾았어요 (지금 ${S.frag}/${FRAG_NEED})`, 'info'); }
+      if (P2F()) { const back = Math.floor(fragNeed() * FRAG_REFUND); S.frag = Math.min(999, S.frag + back); blog(`🌑 흩어진 파편 ${back}개를 되찾았어요 (지금 ${S.frag}/${fragNeed()})`, 'info'); }
       bossFallback(100, 150, `빅 크런치의 중력 붕괴에서 패배! ${G.why}`);
     }
   });
@@ -6109,7 +6109,7 @@ function guideSections() {
       beta(4) && '🔓 무거운 원소(=무기)는 <b>층을 올라갈수록</b> 열려요: 300층까지 1~50번 · 600층 ~70번 · 1000층 ~92번 · 1500층 ~100번 · 2200층 ~106번 · 3000층 ~111번 · 4000층 ~116번 · 오가네손은 4500층. 무기 재료는 열리는 시점의 생산량에 맞춰 커져요.',
       beta(4) && '🌌 2부 <b>환생</b>: 200층 이상을 깨고, 지금까지 깬 층에서 열리는 원소를 모두 해금하면 할 수 있어요. 만든 무기는 그대로 (강화 레벨만 초기화) · 막히면 환생해서 씨앗으로 넘어가요.',
       beta(4) && '🌑 <b>2500층</b>에서 누군가 기다리고 있어요… 최종은 5000층.',
-      beta(11) && '🌑 <b>빅 크런치 파편</b>: 「빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 40% 확률로 파편. 2500층에서 빅 크런치를 불러내려면 파편 100개가 필요해요 (불러낼 때 소모 · 지면 절반 돌려받음). 부족하면 「파편 모으러 가기」 · 전시장에서 보스를 눌러 「⚔️ 이 층으로」도 돼요. 빅 크런치·빅 립은 싸우는 동안 체력을 회복해요.',
+      beta(11) && '🌑 <b>빅 크런치 파편</b>: 「빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 40% 확률로 파편. 2500층에서 빅 크런치를 불러내려면 파편 100개가 필요해요 (한 번 잡은 뒤 다시 싸우려면 50개 · 불러낼 때 소모 · 지면 절반 돌려받음). 부족하면 「파편 모으러 가기」 · 전시장에서 보스를 눌러 「⚔️ 이 층으로」도 돼요. 빅 크런치·빅 립은 싸우는 동안 체력을 회복해요.',
       beta(10) && '⚔️ 2부에선 <b>무기 강화가 핵심</b>: 이온 빔 증폭기·전자기 보호막은 레벨당 ×1.2뿐이라 수소만으로는 보스를 못 넘어요. 🪙 코인은 원소 판매 · 몹 처치(보스는 3배) · 상점 「코인 투자소」 탭의 수소 환전소(10분마다)에서 모아요.',
       beta(9) && '🃏 <b>5000층 카드 결투</b>: 라운드마다 선공 미니게임이 ⚡ 연타 · 🚦 반응 속도 · 🎯 조준으로 바뀌어요. 이기면 🌟 필살 게이지가 차고, 100%면 「원소 대폭발」(×3, 보호막 무시)! 빅 립은 체력 66%·33%에서 강해지는 3페이즈예요.',
       beta(8) && '🌑 <b>2500층 「중력 붕괴」</b>: 매 턴 🎲 중력 주사위(블랙홀 ×3 · 역회전 · 가속 · 평온 · 확장 · 행운)로 조건이 정해지고, 회전하는 바늘을 초록(좋아요)·금색(완벽 ×2) 구역에서 멈춰 공격해요. 빗나가면 🕳️ 흡입 +25% — 100%가 되거나 12턴이 지나면 패배해서 <b>100~150층 뒤로</b> 밀려나요. 5000층 결투에서 지면 <b>150~250층 뒤로</b>.',
@@ -7292,13 +7292,13 @@ function spawnEnemy() {
   R.enemyT = 0;
   const E0 = R.enemy;
   if (E0.stage === P2_CRUNCH && P2F() && !R.grav) {
-    if (S.frag < FRAG_NEED) {
+    if (S.frag < fragNeed()) {
       R.enemy = null; S.battle.stage = P2_CRUNCH - 1; S.battle.auto = false; R.cooldown = 0.5;
-      blog(`🌑 빅 크런치를 불러내려면 파편 ${FRAG_NEED}개가 필요해요 (지금 ${S.frag}개)`, 'boss');
+      blog(`🌑 빅 크런치를 불러내려면 파편 ${fragNeed()}개가 필요해요 (지금 ${S.frag}개)`, 'boss');
       return showFragNeed();
     }
-    S.frag -= FRAG_NEED;
-    blog(`🌑 파편 ${FRAG_NEED}개가 하나로 모이며 빅 크런치가 깨어났어요! (남은 파편 ${S.frag})`, 'boss');
+    S.frag -= fragNeed();
+    blog(`🌑 파편 ${fragNeed()}개가 하나로 모이며 빅 크런치가 깨어났어요! (남은 파편 ${S.frag})`, 'boss');
   }
   if (E0.stage === P2_CRUNCH && P2W()) p2CrunchTalk(1);
   if (E0.boss && !E0.synth && E0.stage < MAX_STAGE && !P2W() && Math.random() < SYNTH_RARE_CHANCE) {
@@ -7604,14 +7604,15 @@ document.addEventListener('input', e => {
 
 /* ---------- 🌑 11단계: 빅 크런치 파편 · 2500층 소환 · 최고 층 · 보스 회복 ---------- */
 const P2F = () => P2W() && beta(11);
-const FRAG_NEED = 100, FRAG_CHANCE = 0.4, FRAG_REFUND = 0.5; // 파편 100개로 소환 · 지면 절반을 돌려받아요
+const FRAG_FIRST = 100, FRAG_AGAIN = 50, FRAG_CHANCE = 0.4, FRAG_REFUND = 0.5; // 처음 100개 · 한 번 잡은 뒤 다시 싸우려면 50개 · 지면 절반 돌려받음
+const fragNeed = () => (S.crunch && S.crunch.back ? FRAG_AGAIN : FRAG_FIRST);
 // 파편 보스 층: 2부 보스 순서상 「빅 크런치의 파편」은 10층부터 40층마다 (10 · 50 · 90 …)
 const fragFloor = st => Math.max(10, Math.floor((Math.min(st, P2_CRUNCH - 1) - 10) / 40) * 40 + 10);
 function fragDrop(E) {
   if (!P2F() || !E.frag || S.frag >= 999 || Math.random() >= FRAG_CHANCE) return '';
   S.frag++;
-  if (S.frag === FRAG_NEED || S.frag % 10 === 0) toast(`🌑 <b>빅 크런치 파편</b> ${S.frag}/${FRAG_NEED}${S.frag === FRAG_NEED ? '<br>2500층에서 빅 크런치를 불러낼 수 있어요!' : ''}`, 'disc', 3500); // 10개마다만 알림
-  return ` · 🌑 파편! (${S.frag}/${FRAG_NEED})`;
+  if (S.frag === fragNeed() || S.frag % 10 === 0) toast(`🌑 <b>빅 크런치 파편</b> ${S.frag}/${fragNeed()}${S.frag === fragNeed() ? '<br>2500층에서 빅 크런치를 불러낼 수 있어요!' : ''}`, 'disc', 3500); // 10개마다만 알림
+  return ` · 🌑 파편! (${S.frag}/${fragNeed()})`;
 }
 function goStage(st, auto) {
   const B = S.battle;
@@ -7625,8 +7626,8 @@ function showFragNeed() {
   if (!m) { m = document.createElement('div'); m.id = 'fragModal'; document.body.appendChild(m); }
   const f = fragFloor(S.battle.maxStage);
   m.innerHTML = `<div class="install-box"><div style="font-size:56px">🌑</div><h2>빅 크런치를 불러내려면</h2>
-    <p>흩어진 <b>빅 크런치의 파편 ${FRAG_NEED}개</b>가 필요해요. 지금 <b>${S.frag}/${FRAG_NEED}</b></p>
-    <p class="install-note">파편은 「🌘 빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 ${Math.round(FRAG_CHANCE * 100)}% 확률로 나와요. 불러낼 때 ${FRAG_NEED}개를 쓰고, 지면 ${Math.floor(FRAG_NEED * FRAG_REFUND)}개를 돌려받아요.</p>
+    <p>흩어진 <b>빅 크런치의 파편 ${fragNeed()}개</b>가 필요해요. 지금 <b>${S.frag}/${fragNeed()}</b></p>
+    <p class="install-note">파편은 「🌘 빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 ${Math.round(FRAG_CHANCE * 100)}% 확률로 나와요. 불러낼 때 ${fragNeed()}개를 쓰고, 지면 ${Math.floor(fragNeed() * FRAG_REFUND)}개를 돌려받아요.</p>
     <div class="btnrow" style="justify-content:center"><button class="big-btn" data-frag="go">🌘 파편 모으러 가기 (${f}층)</button><button class="btn" data-frag="close">닫기</button></div></div>`;
   m.classList.add('on');
 }
@@ -8009,7 +8010,7 @@ function renderBattle() {
   setText('stTop', `⏫ 최고 층 ${topSt}`);
   const fl = $('#fragLbl');
   fl.style.display = P2F() && (S.frag > 0 || B.maxStage >= 1000) && B.maxStage < P2_CRUNCH + 1 ? '' : 'none';
-  setText('fragLbl', `🌑 파편 ${S.frag}/${FRAG_NEED}`);
+  setText('fragLbl', `🌑 파편 ${S.frag}/${fragNeed()}`);
   const capTxt = B.stage >= stageCap() && stageCap() < MAX_STAGE ? `🔒 다음 스테이지는 환생 ${S.prestige.count + 1}회 필요` : (B.stage >= MAX_STAGE ? '🏁 최종 스테이지' : '');
   setText('stageCapLbl', capTxt);
   $('#autoAdv').checked = B.auto;
