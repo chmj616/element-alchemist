@@ -300,7 +300,7 @@ body.p2w #tab-shop > .tip:not(.p2only){display:none}
 body.p2w .shop-row [data-elup]{display:none}
 .p2shop-nav{margin:0 0 12px;flex-wrap:wrap}
 body.p2w .p2shop-nav{display:flex}
-body.p2w.p2s-weap #coinInv,body.p2w.p2s-weap #sellHead,body.p2w.p2s-weap #shopList{display:none}
+body.p2w.p2s-weap #coinInv,body.p2w.p2s-weap #sellHead,body.p2w.p2s-weap #shopList,body.p2w.p2s-weap #p2Hex,body.p2w.p2s-sell #p2Hex{display:none}
 body.p2w.p2s-inv #weapShop,body.p2w.p2s-inv #sellHead,body.p2w.p2s-inv #shopList{display:none}
 body.p2w.p2s-sell #weapShop,body.p2w.p2s-sell #coinInv{display:none}
 .wcat-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
@@ -326,6 +326,17 @@ body.p2mine .nucleus::before{content:'';position:absolute;inset:-12%;z-index:-1;
 body.p2mine .nucleus::after{content:'';position:absolute;inset:-34%;z-index:-2;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--p2c,#ff6b8b) 55%,transparent),transparent 65%);animation:p2glow 2s ease-in-out infinite alternate}
 body.p2mine .orbit{border-radius:22%;border-style:dashed;border-color:color-mix(in srgb,var(--p2c,#ff6b8b) 60%,transparent)}
 body.p2mine .electron{border-radius:2px;background:var(--p2c,#ff6b8b);box-shadow:0 0 8px var(--p2c,#ff6b8b)}
+.srch{width:min(220px,100%);box-sizing:border-box;padding:6px 10px;border-radius:9px;border:1px solid var(--line);background:#00000066;color:inherit;font:inherit;font-size:13px;outline:none}
+.srch:focus{border-color:var(--accent)}
+.srch-empty{font-size:12px;color:#ff8787;margin-left:6px}
+.srch-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 8px}
+body:not(.b7) .b7only{display:none!important}
+/* 7단계: 2부 원소 고르기 버튼 크게, 오른쪽 여백 없이 꽉 채우기 */
+body.b7 .p2pick{width:100%;padding:10px}
+body.b7 .p2-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:5px;max-height:162px;padding:0;scrollbar-width:none}
+body.b7 .p2-chips::-webkit-scrollbar{display:none}
+body.b7 .p2chip{min-width:0;min-height:40px;padding:6px 2px;font-size:15px;border-radius:10px}
+body.b7 .p2pick .srch{width:100%;margin-bottom:6px}
 .p2pick{width:min(300px,100%);margin:8px auto 0;box-sizing:border-box;padding:8px;border-radius:12px;background:#ff3b5c12;border:1px solid #ff6b8b44;font-size:12px;text-align:left}
 .p2-cur{margin-bottom:6px}
 .p2-chips{display:flex;flex-wrap:wrap;gap:4px;max-height:98px;overflow-y:auto;padding:2px;scrollbar-width:thin}
@@ -1500,7 +1511,9 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
       <div class="seg p2shop-nav p2only" id="p2ShopNav"><button data-p2shop="weap" class="on">⚔️ 무기 강화</button><button data-p2shop="inv">💎 코인 투자소</button><button data-p2shop="sell">🏪 원소 판매</button></div>
       <div id="weapShop"></div>
       <div id="coinInv"></div>
+      <div id="p2Hex"></div>
       <div class="sec-head" id="sellHead"><h3>🏪 원소 상점</h3><div class="seg" id="sellAmt"><button data-sell-amt="1" class="on" title="판매·강화 수량">×1</button><button data-sell-amt="10">×10</button><button data-sell-amt="100">×100</button><button data-sell-amt="half" title="판매: 보유량 절반 · 강화: 코인 절반까지">절반</button></div></div>
+      <div class="srch-row b7only"><input class="srch" type="search" data-search="shop" placeholder="🔎 원소 이름 · 기호 · 번호" autocomplete="off"><span class="srch-empty" data-search-empty="shop" hidden>검색 결과가 없어요</span></div>
       <div id="shopList" class="list"></div>
     </div>
 
@@ -1702,9 +1715,9 @@ const REPEATS = [
   { id: 'clickLv', name: '양성자 가속 장갑', icon: '👆', g: 1.8, cost: lv => 30 * Math.pow(1.8, lv),
     desc: lv => `클릭 기본 수소 +0.1 (현재 클릭당 ${((1 + lv) * 0.1).toFixed(1)})` },
   { id: 'atkLv', name: '이온 빔 증폭기', icon: '🗡️', g: 2.5, cost: lv => 300 * Math.pow(2.5, lv),
-    desc: lv => `파티 공격력 ×1.5 (현재 ×${fmt(Math.min(1e200, Math.pow(1.5, lv)))})` },
+    desc: lv => `파티 공격력 ×${repEff()} (현재 ×${fmt(Math.min(1e200, Math.pow(repEff(), lv)))})${P2C() ? ' · 2부는 ⚔️ 무기 강화가 핵심' : ''}` },
   { id: 'hpLv', name: '전자기 보호막', icon: '🛡️', g: 2.5, cost: lv => 300 * Math.pow(2.5, lv),
-    desc: lv => `파티 체력 ×1.5 (현재 ×${fmt(Math.min(1e200, Math.pow(1.5, lv)))})` },
+    desc: lv => `파티 체력 ×${repEff()} (현재 ×${fmt(Math.min(1e200, Math.pow(repEff(), lv)))})` },
 ];
 const UPGRADES = [
   { id: 'autoclick', name: '자동 클릭 장치', icon: '🤖', cost: 2500, desc: '1초에 5번 자동으로 클릭합니다' },
@@ -2093,7 +2106,7 @@ const R = {
   sellAmt: 1, combo: 0, lastClick: 0, buffs: {}, goldenAt: 0, goldenUntil: 0, discQueue: [],
 };
 // 공개 단계: 새 기능은 관리자 모드에서 먼저 보이고, 관리자가 「일반 사이트에 배포」를 누르면 모두에게 열림
-const RELEASE_ID = 8; // 최신 단계
+const RELEASE_ID = 10; // 최신 단계
 const RELEASE_NOTES = {
   1: '환생 강화 · 강화 수량 버튼 · 💎 코인 투자소 · 📲 앱으로 다운로드 · 원소 쪼개기 업데이트(연구/스킬/동위원소/임무/발전소/대기 발전/도감/💠 쿼크 상점 · 난이도 상향: 원소 더 단단 · 보스 체력 ×10·22초·재생 · 초신성 비용 ×25)',
   2: '🏛️ 몬스터 전시장 · 🚨 빅 크런치 소실 이벤트 · 🌘 2부 (1부 보관 · 오가기)',
@@ -2101,8 +2114,10 @@ const RELEASE_NOTES = {
   5: '🌀 2부 균열 봉인소 (2부의 공허: 무기로 균열 118개 봉인) · 💥 입자 충돌기 (2부의 원소 쪼개기: 표준모형 입자 17종 수집)',
   4: '🌘 2부 개편: ⚒️ 무기 118종 제작·강화 전투 · ⛏️ 원소 채굴(해금한 원소를 클릭) · 🌑 2500층 빅 크런치와 대화 · 🏛️ 1부/2부 전시장 · 무기가 5000층까지 나눠 열림 · 2부 환생 200층부터',
   6: '🃏 2부 5000층 빅 립 카드 결투 (클릭 대결로 선공권 → 턴제 카드 배틀)',
-  7: '🌑 2부 2500층 빅 크런치 「중력 붕괴」 (주사위 + 타이밍) · 2500층 패배 시 100~150층, 5000층 패배 시 150~250층 뒤로',
-  8: '🃏 5000층 카드 결투 개편: 선공 미니게임 3종(연타·반응속도·조준) · 빅 립 3페이즈 · 🌟 필살 게이지와 원소 대폭발 · 더 어렵게',
+  7: '[6.5] 🔎 검색 (원소 상점·공방·무기 강화·융합 결과 고르기) · ⛏️ 2부 원소 고르기 버튼 크게',
+  8: '🌑 2부 2500층 빅 크런치 「중력 붕괴」 (주사위 + 타이밍) · 2500층 패배 시 100~150층, 5000층 패배 시 150~250층 뒤로',
+  9: '🃏 5000층 카드 결투 개편: 선공 미니게임 3종(연타·반응속도·조준) · 빅 립 3페이즈 · 🌟 필살 게이지와 원소 대폭발 · 더 어렵게',
+  10: '⚔️ 2부 무기 강화 중심: 이온 빔·보호막 강화 ×1.5 → ×1.2 · 🪙 몹 처치 코인 · 🪙 2부 수소 환전소',
 };
 const beta = (n = 1) => !!R.admin || (R.release || 0) >= n;
 function betaChanged() {
@@ -4599,6 +4614,7 @@ function partTick() {
   const ft = $('.tabbtn[data-tab="fusion"]'), fl = P2W() ? '⚒️ 공방' : '🔥 융합';
   if (ft && ft.textContent !== fl) ft.textContent = fl;
   document.body.classList.toggle('p2w', P2W());
+  document.body.classList.toggle('b7', beta(7));
   const C = S.crunch, now = crunchClock();
   if (beta(2) && S.part === 1 && S.endings.e1 && now) {
     if (!C.clearAt) { C.clearAt = now; C.eventAt = crunchEventAt(now, C.fresh); save(); }
@@ -4884,10 +4900,12 @@ function renderP2Pick() {
     $('.nucleus').textContent = EL[z].sym;
     $('#core').style.setProperty('--p2c', c.color);
     const chips = [];
-    for (let k = 1; k <= 118; k++) if (S.disc[k]) chips.push(`<button class="p2chip ${k === z ? 'on' : ''}" style="--c:${CATS[EL[k].cat].color}" data-p2z="${k}" title="${EL[k].name}">${EL[k].sym}</button>`);
+    for (let k = 1; k <= 118; k++) if (S.disc[k]) chips.push(`<button class="p2chip ${k === z ? 'on' : ''}" style="--c:${CATS[EL[k].cat].color}" data-p2z="${k}" data-sz="${k}" title="${EL[k].name}">${EL[k].sym}</button>`);
     box.innerHTML = `<div class="p2pick"><div class="p2-cur">⛏️ 채굴 중: <b style="color:${c.color}">${EL[z].sym} ${EL[z].name}</b> · 보유 <b id="p2Have"></b></div>
+      ${beta(7) && chips.length > 14 ? searchBox('p2', '캘 원소 찾기 (이름 · 기호 · 번호)') : ''}
       <div class="p2-chips">${chips.join('')}</div>
       ${nz ? `<div class="p2-next"><span id="p2NextT"></span><button class="btn" data-p2unlock="1" id="p2Unl">🔓 해금</button></div>` : '<div class="p2-next done">✅ 118개 원소를 모두 해금했어요</div>'}</div>`;
+    applySearch('p2');
     const on = box.querySelector('.p2chip.on'), ch = box.querySelector('.p2-chips');
     if (on && ch) ch.scrollTop = on.offsetTop - ch.offsetTop - 30;
   }
@@ -4923,7 +4941,7 @@ function renderForge() {
       const W = WEAPONS[z], c = CATS[EL[z].cat], lv = S.wlv[z] || 0, m = 4 * Math.pow(WLV_EFF, lv);
       const atk = (2 + Math.pow(z, 1.6)) * c.atk * W.a * m * atkMult(), hp = (10 + 4 * Math.pow(z, 1.4)) * c.hp * W.h * m * hpMult();
       const rec = Object.entries(weapRecipe(z)).map(([k, n]) => `<span class="rq" id="rq${z}_${k}" style="--c:${CATS[EL[k].cat].color}">${EL[k].sym} <b id="rqh${z}_${k}"></b>/${fmt(n)}</span>`).join('');
-      rows.push(`<div class="row forge-row ${S.weap[z] ? 'owned' : ''}" id="fr${z}">${weapCard(z)}
+      rows.push(`<div class="row forge-row ${S.weap[z] ? 'owned' : ''}" id="fr${z}" data-sz="${z}">${weapCard(z)}
         <div class="rinfo"><div class="rname">${W.icon} ${W.name} <span class="badge" style="background:${c.color}33;color:${c.color}">${c.name}</span></div>
           <div class="rdesc">⚔️ 공격 ${fmt(atk)} · ❤️ 체력 ${fmt(hp)} · 공속 ×${+(c.speed * W.s).toFixed(2)} · ${c.trait.split(':')[0]}</div>
           ${S.weap[z] ? '' : `<div class="rdesc2 recipe">${rec}</div>`}</div>
@@ -4936,7 +4954,9 @@ function renderForge() {
       🗡️ 원소마다 무기가 하나씩, 모두 <b>118종</b> (계열에 따라 단검·대검·지팡이·방패·대포 …). 무기는 그 원소 계열의 특성(약점 2배 등)을 그대로 이어받아요.<br>
       ⛏️ 재료 원소는 원자핵 아래에서 원소를 골라 <b>클릭</b>하거나, 몹을 잡아 얻어요. 강화는 🏪 상점에서!</p>
       <div class="sec-head"><h3>⚒️ 무기 제작</h3><small>보유 ${made} / 118종</small></div>
+      ${beta(7) ? `<div class="srch-row">${searchBox('forge', '원소 · 무기 이름 · 번호 · 계열')}</div>` : ''}
       <div class="list">${rows.join('')}${next.join('')}${rest > 0 ? `<div class="row locked">🔒 ??? 무기 ${rest}종 더 — 원소를 해금하면 하나씩 공개돼요</div>` : ''}</div>`;
+    applySearch('forge');
   }
   for (const z of disc) {
     if (S.weap[z]) continue;
@@ -4948,12 +4968,15 @@ function renderForge() {
   }
 }
 /* 🏪 2부 상점: 무기 강화 */
-const wlvCost = (z, n = 1) => Math.max(20, sellPrice(z) * 100) * Math.pow(WLV_GROW, S.wlv[z] || 0) * (Math.pow(WLV_GROW, n) - 1) / (WLV_GROW - 1);
+// 9단계: 무기 강화가 핵심이라 레벨당 가격 증가를 ×1.7 → ×P2_WGROW로 완만하게
+const P2_WGROW = 1.4;
+const wlvGrow = () => (typeof P2C === 'function' && P2C() ? P2_WGROW : WLV_GROW);
+const wlvCost = (z, n = 1) => { const g = wlvGrow(); return Math.max(20, sellPrice(z) * 100) * Math.pow(g, S.wlv[z] || 0) * (Math.pow(g, n) - 1) / (g - 1); };
 function wlvBuyN(z) {
   const room = 4000 - (S.wlv[z] || 0);
   if (room < 1) return 0;
   const budget = R.sellAmt === 'half' ? S.coins / 2 : S.coins, first = wlvCost(z);
-  const aff = Math.max(0, Math.floor(Math.log(budget * (WLV_GROW - 1) / first + 1) / Math.log(WLV_GROW)));
+  const g = wlvGrow(), aff = Math.max(0, Math.floor(Math.log(budget * (g - 1) / first + 1) / Math.log(g)));
   const want = R.sellAmt === 'half' ? Math.max(1, aff) : R.sellAmt;
   return Math.min(room, aff >= 1 ? Math.min(want, aff) : 1);
 }
@@ -4969,6 +4992,18 @@ function upgradeWeapon(z) {
 function renderWeapShop() {
   const box = $('#weapShop');
   if (!P2W()) { if (box.innerHTML) box.innerHTML = ''; return; }
+  const hx = $('#p2Hex');
+  if (hx) {
+    if (!P2C()) { if (hx.innerHTML) hx.innerHTML = ''; }
+    else {
+      if (!hx.innerHTML) hx.innerHTML = `<div class="sec-head"><h3>🪙 수소 환전소</h3><small>2부는 🪙 코인으로 무기를 강화해야 강해져요 · 몹을 잡아도 코인이 나와요</small></div>
+        <div class="list"><div class="row"><div class="ricon">💧</div><div class="rinfo"><div class="rname">수소 → 코인</div><div class="rdesc" id="p2HexD"></div></div><button class="buybtn" data-p2hex="1" id="p2HexB"></button></div></div>`;
+      const left = Math.max(0, (S.hexAt || 0) - S.playTime), spend = S.counts[1] * P2_HEX_PCT;
+      setText('p2HexD', `가진 수소의 ${P2_HEX_PCT * 100}%를 코인으로 (수소 1개당 ${P2_HEX_RATE}코인) · ${P2_HEX_CD / 60}분마다`);
+      const b = $('#p2HexB');
+      if (b) { b.innerHTML = left > 0 ? `<span>⏳ ${Math.ceil(left / 60)}분</span><span>대기</span>` : `<span>환전</span><span>🪙 ${fmt(spend * P2_HEX_RATE)}</span>`; b.disabled = left > 0 || spend < 1; }
+    }
+  }
   document.body.classList.toggle('p2s-weap', (R.p2shop || 'weap') === 'weap');
   document.body.classList.toggle('p2s-inv', R.p2shop === 'inv');
   document.body.classList.toggle('p2s-sell', R.p2shop === 'sell');
@@ -4986,9 +5021,11 @@ function renderWeapShop() {
     const chip = (k, label, c) => `<button data-wcat="${k}" class="${wc === k ? 'on' : ''}"${c ? ` style="--c:${c}"` : ''}>${label}</button>`;
     box.innerHTML = `<div class="sec-head"><h3>⚔️ 무기 강화</h3><small>강화 1레벨마다 공격력·체력 ×${WLV_EFF} · 수량 버튼(×1·×10·×100·절반) 적용</small></div>
       ${all.length ? `<div class="wcat-chips">${chip('party', `⚔️ 장착 중 ${party.length}`)}${chip('all', `전체 ${all.length}`)}${cats.map(c => chip(c, `${CATS[c].name} ${all.filter(z => EL[z].cat === c).length}`, CATS[c].color)).join('')}</div>` : ''}
-      <div class="list wshop">${own.length ? own.map(z => `<div class="row">${weapCard(z)}<div class="rinfo"><div class="rname">${WEAPONS[z].icon} ${WEAPONS[z].name} <span class="badge" id="wuLv${z}"></span></div><div class="rdesc" id="wuD${z}"></div></div>
+      ${beta(7) && all.length > 6 ? `<div class="srch-row">${searchBox('wshop', '무기 · 원소 이름 · 번호')}</div>` : ''}
+      <div class="list wshop">${own.length ? own.map(z => `<div class="row" data-sz="${z}">${weapCard(z)}<div class="rinfo"><div class="rname">${WEAPONS[z].icon} ${WEAPONS[z].name} <span class="badge" id="wuLv${z}"></span></div><div class="rdesc" id="wuD${z}"></div></div>
         <button class="buybtn" data-wup="${z}" id="wuB${z}"><span id="wuA${z}"></span><span id="wuC${z}"></span></button></div>`).join('')
         : all.length ? '<div class="row locked">이 분류에 해당하는 무기가 없어요</div>' : '<div class="row locked">⚒️ 아직 무기가 없어요. 융합 탭 자리의 <b>⚒️ 공방</b>에서 먼저 만들어 보세요!</div>'}</div>`;
+    applySearch('wshop');
   }
   for (const z of own) {
     const lv = S.wlv[z] || 0, n = wlvBuyN(z), c = wlvCost(z, n);
@@ -5038,7 +5075,7 @@ document.addEventListener('click', e => {
 /* ---------- 🌑 2부 2500층: 빅 크런치 「중력 붕괴」 ----------
    매 턴 🎲 중력 주사위(운)로 그 턴의 조건이 정해지고, 회전하는 바늘을 안전 구역(초록)·완벽 구역(금색)에 멈춰(실력) 공격해요.
    빗나가면 빅 크런치가 더 세게 때리고 🕳️ 흡입 게이지가 크게 차요. 게이지 100% 또는 12턴이 지나면 패배 → 100~150층 뒤로. */
-const P2G = () => P2W() && beta(7);
+const P2G = () => P2W() && beta(8);
 const GRAV_TURNS = 12, GRAV_SEC = 2.5; // 카드 1장 = 일반 전투 2.5초어치
 const GRAV_DICE = [null,
   { icon: '🕳️', name: '블랙홀',  safe: 40,  perf: 9,  spd: 1.1, mult: 3,   desc: '구역이 아주 좁지만 피해 ×3' },
@@ -5231,7 +5268,7 @@ document.addEventListener('keydown', e => {
    ② 손패 4장 중 1장을 내요. 선공이면 빅 립의 카드는 뒤집힌 채라 모르고 내지만 반격·교란을 쓸 수 있고,
    후공이면 빅 립의 카드를 먼저 맞고 나서 보고 고를 수 있어요. 10라운드 안에 쓰러뜨려야 해요. */
 const P2D = () => P2W() && beta(6);
-const DUEL2 = () => beta(8); // 결투 개편: 선공 미니게임 3종 · 3페이즈 · 필살 게이지
+const DUEL2 = () => beta(9); // 결투 개편: 선공 미니게임 3종 · 3페이즈 · 필살 게이지
 const DUEL_ROUNDS = 10, DUEL_CLICK = 3, DUEL_SEC = 4; // 라운드 수 · 클릭 대결 초 · 카드 1장 = 일반 전투 4초어치
 const DUEL_CARDS = {
   atk:     { w: 4,   icon: '⚔️', name: '일격',      cls: 'a' },
@@ -5944,8 +5981,9 @@ function guideSections() {
       beta(4) && '🔓 무거운 원소(=무기)는 <b>층을 올라갈수록</b> 열려요: 300층까지 1~50번 · 600층 ~70번 · 1000층 ~92번 · 1500층 ~100번 · 2200층 ~106번 · 3000층 ~111번 · 4000층 ~116번 · 오가네손은 4500층. 무기 재료는 열리는 시점의 생산량에 맞춰 커져요.',
       beta(4) && '🌌 2부 <b>환생</b>: 200층 이상을 깨고, 지금까지 깬 층에서 열리는 원소를 모두 해금하면 할 수 있어요. 만든 무기는 그대로 (강화 레벨만 초기화) · 막히면 환생해서 씨앗으로 넘어가요.',
       beta(4) && '🌑 <b>2500층</b>에서 누군가 기다리고 있어요… 최종은 5000층.',
-      beta(8) && '🃏 <b>5000층 카드 결투</b>: 라운드마다 선공 미니게임이 ⚡ 연타 · 🚦 반응 속도 · 🎯 조준으로 바뀌어요. 이기면 🌟 필살 게이지가 차고, 100%면 「원소 대폭발」(×3, 보호막 무시)! 빅 립은 체력 66%·33%에서 강해지는 3페이즈예요.',
-      beta(7) && '🌑 <b>2500층 「중력 붕괴」</b>: 매 턴 🎲 중력 주사위(블랙홀 ×3 · 역회전 · 가속 · 평온 · 확장 · 행운)로 조건이 정해지고, 회전하는 바늘을 초록(좋아요)·금색(완벽 ×2) 구역에서 멈춰 공격해요. 빗나가면 🕳️ 흡입 +25% — 100%가 되거나 12턴이 지나면 패배해서 <b>100~150층 뒤로</b> 밀려나요. 5000층 결투에서 지면 <b>150~250층 뒤로</b>.',
+      beta(10) && '⚔️ 2부에선 <b>무기 강화가 핵심</b>: 이온 빔 증폭기·전자기 보호막은 레벨당 ×1.2뿐이라 수소만으로는 보스를 못 넘어요. 🪙 코인은 원소 판매 · 몹 처치(보스는 3배) · 상점 「코인 투자소」 탭의 수소 환전소(10분마다)에서 모아요.',
+      beta(9) && '🃏 <b>5000층 카드 결투</b>: 라운드마다 선공 미니게임이 ⚡ 연타 · 🚦 반응 속도 · 🎯 조준으로 바뀌어요. 이기면 🌟 필살 게이지가 차고, 100%면 「원소 대폭발」(×3, 보호막 무시)! 빅 립은 체력 66%·33%에서 강해지는 3페이즈예요.',
+      beta(8) && '🌑 <b>2500층 「중력 붕괴」</b>: 매 턴 🎲 중력 주사위(블랙홀 ×3 · 역회전 · 가속 · 평온 · 확장 · 행운)로 조건이 정해지고, 회전하는 바늘을 초록(좋아요)·금색(완벽 ×2) 구역에서 멈춰 공격해요. 빗나가면 🕳️ 흡입 +25% — 100%가 되거나 12턴이 지나면 패배해서 <b>100~150층 뒤로</b> 밀려나요. 5000층 결투에서 지면 <b>150~250층 뒤로</b>.',
       beta(6) && '🃏 <b>5000층 최종 보스</b>는 카드 결투: 라운드마다 <b>3초 클릭 대결</b>(연타 · 스페이스바)로 선공권을 정하고, 손패 4장 중 1장을 내요. 선공 카드 ×1.5 (압도적이면 ×2) · 선공이면 ⚡반격·🌀교란이 통하고, 후공이면 빅 립의 카드를 보고 고를 수 있어요. 10라운드 안에 쓰러뜨리세요.',
       beta(5) && '🌀 <b>균열 봉인소</b> (2부의 공허 탭): 그 원소로 만든 무기를 가진 채 원소를 바쳐 균열 118개를 차례로 봉인 · 하나마다 생산·무기 ×1.03 (영구).',
       beta(5) && '💥 <b>입자 충돌기</b> (균열 20개 봉인 후): 수소로 입자를 충돌시켜 표준모형 입자 17종(쿼크·렙톤·보손·힉스)을 수집 · 빔 출력을 올리면 희귀 입자 · 입자마다 무기·채굴·생산 보너스.') },
@@ -6811,13 +6849,15 @@ function renderCoinInv() {
 function renderShop() {
   renderCoinInv();
   renderWeapShop();
+  if (R.shopRebuilt) { R.shopRebuilt = false; applySearch('shop'); }
   const disc = [];
   for (let z = 1; z <= 118; z++) if (S.disc[z]) disc.push(z);
   const sig = disc.join();
   if (R.sig.shop !== sig) {
     R.sig.shop = sig;
+    R.shopRebuilt = true;
     $('#shopList').innerHTML = disc.map(z => `
-      <div class="row shop-row" id="shopRow${z}">
+      <div class="row shop-row" id="shopRow${z}" data-sz="${z}">
         ${elCard(z)}
         <div class="rinfo">
           <div class="rname">${EL[z].name} (${EL[z].sym}) <span class="badge" id="shLv${z}"></span>${SYNTHETIC.has(z) ? ' <span class="badge" style="background:#5f3dc4">🧪 인공</span>' : ''}</div>
@@ -6935,11 +6975,12 @@ function openTargetPicker() {
     const label = !r ? `<small class="pk-no">재료 미발견${k > 2 ? ` (${k}종)` : ''}</small>`
       : r.m > 0 ? `<small class="pk-ok">${recipeText(r.list)} · ${fmt(r.m)}회</small>`
       : `<small class="pk-lack">${recipeText(r.list)} · 재료 부족</small>`;
-    h += `<div class="pick-item ${r ? '' : 'dis'}" data-target="${z}">${elCard(z, { cls: S.disc[z] ? '' : 'unknown', count: false })}${label}</div>`;
+    h += `<div class="pick-item ${r ? '' : 'dis'}" data-target="${z}" data-sz="${z}">${elCard(z, { cls: S.disc[z] ? '' : 'unknown', count: false })}${label}</div>`;
   }
   const nt = RECIPE_TIERS.find(([s]) => s > S.battle.maxStage);
   $('#pickModal').innerHTML = `<div class="pick-box">
     <div class="pick-head"><b>🎯 만들 원소 선택</b><span>해금된 원소: 2 ~ ${cap}번${nt ? ` · 스테이지 ${nt[0]} 클리어 시 ${nt[1]}번까지` : ''} · 55번부터 3종, 81번부터 4종 합성</span><button class="btn pick-close">✕ 닫기</button></div>
+    ${beta(7) ? `<div class="srch-row" style="padding:0 6px">${searchBox('pick', '원소 이름 · 기호 · 번호')}</div>` : ''}
     <div class="pick-grid">${h}</div>
     <div class="pick-foot">✅ 초록색: 지금 만들 수 있음 · 🟧 재료 부족 · 회색: 재료 원소를 아직 발견하지 못함 (🧪 인공 원소는 전투 보상으로만 획득)</div>
   </div>`;
@@ -6961,8 +7002,11 @@ function pickFuse(z) {
 /* =====================================================================
  *  전투
  * ===================================================================== */
-function atkMult() { return Math.min(1e200, Math.pow(1.5, S.atkLv) * prestigeCombat() * (1 + achBonus('combat')) * rebUpgMult('atk') * cinvMult('atk') * Math.pow(1.15, hsLv('arms'))); }
-function hpMult() { return Math.min(1e200, Math.pow(1.5, S.hpLv) * prestigeCombat() * (1 + achBonus('combat')) * rebUpgMult('hp') * cinvMult('hp') * Math.pow(1.15, hsLv('arms'))); }
+// 2부(9단계): 이온 빔 증폭기·전자기 보호막은 레벨당 ×1.2 — 수소만으로는 보스를 못 넘고 🪙 무기 강화가 꼭 필요하게
+const P2C = () => P2W() && beta(10);
+const repEff = () => (P2C() ? 1.2 : 1.5);
+function atkMult() { return Math.min(1e200, Math.pow(repEff(), S.atkLv) * prestigeCombat() * (1 + achBonus('combat')) * rebUpgMult('atk') * cinvMult('atk') * Math.pow(1.15, hsLv('arms'))); }
+function hpMult() { return Math.min(1e200, Math.pow(repEff(), S.hpLv) * prestigeCombat() * (1 + achBonus('combat')) * rebUpgMult('hp') * cinvMult('hp') * Math.pow(1.15, hsLv('arms'))); }
 function unitStats(z) {
   if (P2W()) {
     // 2부: 원소 대신 그 원소로 만든 무기가 싸워요 (계열 특성은 원소를 따름, 무기 종류별 보정 · 강화 1레벨마다 ×1.25)
@@ -7285,6 +7329,8 @@ function victory() {
     const n = Math.max(1, reward * (E.boss ? 2 : 1) / EL_VALUE[z]);
     addEl(z, n);
     msg = `✅ ${E.name} 처치! 🎁 ${EL[z].name}(${EL[z].sym}) ×${fmt(n)}`;
+    const cg = p2KillCoins(E.stage, E.boss);
+    if (cg) { S.coins = capB(S.coins + cg); S.totalCoins = capB(S.totalCoins + cg); msg += ` · 🪙 +${fmt(cg)}`; }
     if (E.stage === P2_CRUNCH) setTimeout(() => p2CrunchTalk(2), 700);
   } else {
     addH(reward);
@@ -7381,6 +7427,40 @@ function adminP2Spec(st) {
   R.unitT = [0, 0, 0, 0, 0];
   return { st, n, lv: hi, ttk: r.result.ttk };
 }
+// 2부(9단계) 코인: 몹 처치 보상의 3% (보스 ×3) · 🪙 수소 환전소(수소 20% → 1개당 0.02코인, 10분마다)
+const P2_KILL_COIN = 0.03, P2_HEX_PCT = 0.2, P2_HEX_RATE = 0.02, P2_HEX_CD = 600;
+function p2KillCoins(stage, boss) {
+  if (!P2C()) return 0;
+  return 10 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 5 : 1) * (S.upg.gravity ? 5 : 1) * P2_KILL_COIN * (boss ? 3 : 1);
+}
+function p2Exchange() {
+  if (!P2C() || S.playTime < (S.hexAt || 0) || S.counts[1] < 1) return 0;
+  const spend = S.counts[1] * P2_HEX_PCT, gain = capB(spend * P2_HEX_RATE);
+  S.counts[1] -= spend; S.coins = capB(S.coins + gain); S.totalCoins = capB(S.totalCoins + gain);
+  S.hexAt = S.playTime + P2_HEX_CD;
+  return gain;
+}
+/* ---------- 🔎 검색 (7단계 · 6.5): 이름 · 기호 · 원자 번호 · 무기 이름 ---------- */
+R.q = {};
+const SEARCH_SEL = { shop: '#shopList [data-sz]', forge: '#forgeBox [data-sz]', wshop: '#weapShop [data-sz]', pick: '#pickModal [data-sz]', p2: '#p2Pick [data-sz]' };
+function elMatch(z, q) {
+  q = (q || '').trim().toLowerCase();
+  if (!q) return true;
+  const e = EL[z];
+  return e.name.includes(q) || e.sym.toLowerCase().startsWith(q) || String(z) === q || (WEAPONS[z] && WEAPONS[z].name.includes(q)) || (CATS[e.cat] && CATS[e.cat].name.includes(q));
+}
+function applySearch(key) {
+  const q = R.q[key] || '';
+  let n = 0;
+  document.querySelectorAll(SEARCH_SEL[key]).forEach(el => { const ok = elMatch(+el.dataset.sz, q); el.style.display = ok ? '' : 'none'; if (ok) n++; });
+  const em = document.querySelector(`[data-search-empty="${key}"]`);
+  if (em) em.hidden = !q || n > 0;
+}
+const searchBox = (key, ph) => (beta(7) ? `<input class="srch" type="search" data-search="${key}" placeholder="🔎 ${ph}" value="${esc(R.q[key] || '')}" autocomplete="off"><span class="srch-empty" data-search-empty="${key}" hidden>검색 결과가 없어요</span>` : '');
+document.addEventListener('input', e => {
+  const k = e.target.dataset && e.target.dataset.search;
+  if (k) { R.q[k] = e.target.value; applySearch(k); }
+});
 function synthGoBack(st) {
   const B = S.battle;
   if (!R.synthBack || R.synthBack < B.stage) R.synthBack = B.stage;
@@ -7950,6 +8030,7 @@ document.addEventListener('click', e => {
   if (t.closest('[data-g2048-end]')) return end2048();
   if ((el = t.closest('[data-simon]'))) return clickSimon(+el.dataset.simon);
   if ((el = t.closest('[data-hs]'))) return hsBuy(el.dataset.hs);
+  if (t.closest('[data-p2hex]')) { const g = p2Exchange(); if (g) { SFX.bonus(); toast(`<span>🪙 <b>수소 환전!</b> 🪙 +${fmt(g)}</span>`, 'disc', 3000); } return; }
   if ((el = t.closest('[data-wcat]'))) { R.wcat = el.dataset.wcat; R.sig.wshop = null; return renderWeapShop(); }
   if ((el = t.closest('[data-p2shop]'))) { R.p2shop = el.dataset.p2shop; $$('[data-p2shop]').forEach(b => b.classList.toggle('on', b === el)); return renderWeapShop(); }
   if (t.closest('[data-hsx]')) return hsExchange();
@@ -8036,7 +8117,8 @@ window.addEventListener('pointerup', () => { if (holdTouch && !holdTouch.held) h
 ['pointerup', 'pointercancel', 'blur'].forEach(ev => window.addEventListener(ev, stopHold));
 window.addEventListener('scroll', () => { if (holdTouch) stopHold(); }, true);
 document.addEventListener('pointerout', e => { if (holdEl && e.target.closest && e.target.closest('[data-sell], [data-elup], [data-void]') === holdEl && !holdEl.contains(e.relatedTarget)) stopHold(); });
-document.addEventListener('contextmenu', e => { if (e.target.closest('[data-sell], [data-elup], [data-void]')) e.preventDefault(); });
+// 게임 안에서는 우클릭 메뉴가 뜨지 않게 (글자를 입력하는 칸만 예외)
+document.addEventListener('contextmenu', e => { if (!(e.target.closest && e.target.closest('input, textarea, [contenteditable="true"]'))) e.preventDefault(); });
 $('#stPrev').onclick = () => changeStage(-1);
 $('#stNext').onclick = () => changeStage(1);
 $('#stWarp').onclick = () => {
