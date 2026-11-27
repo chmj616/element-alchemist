@@ -4896,12 +4896,14 @@ for (let z = 1; z <= 118; z++) {
   P2_UNLOCK_ST[z] = st;
 }
 const p2UnlockStage = z => P2_UNLOCK_ST[z] || 0;
+// 환생 후 워프할 수 있는 층(역대 최고의 절반)까지는 이미 깬 것으로 보고 원소 해금 (워프로 건너뛴 층 때문에 막히지 않게)
+const p2Reach = () => Math.max(S.battle.maxStage, warpStage());
 const p2UnlockCost = z => Math.ceil(20 * EL_VALUE[z] / EL_VALUE[z - 1]);
 function p2Unlock() {
   const z = p2NextZ();
   if (!P2W() || !z) return;
   const c = p2UnlockCost(z), st = p2UnlockStage(z);
-  if (S.battle.maxStage < st) return toast(`🔒 스테이지 ${st}을(를) 깨야 ${EL[z].name}을(를) 해금할 수 있어요`);
+  if (p2Reach() < st) return toast(`🔒 스테이지 ${st}을(를) 깨야 ${EL[z].name}을(를) 해금할 수 있어요`);
   if (S.counts[z - 1] < c) return;
   S.counts[z - 1] -= c;
   addEl(z, 0);
@@ -4933,7 +4935,7 @@ function renderP2Pick() {
   }
   setText('p2Have', fmtS(S.counts[z]) + (z > 1 ? ' · 시설 생산의 절반이 이 원소로' : ''));
   if (nz) {
-    const cost = p2UnlockCost(nz), st = p2UnlockStage(nz), lockSt = S.battle.maxStage < st;
+    const cost = p2UnlockCost(nz), st = p2UnlockStage(nz), lockSt = p2Reach() < st;
     setText('p2NextT', lockSt ? `🔒 다음 ${EL[nz].sym} ${EL[nz].name}: 스테이지 ${st} 클리어 필요${st > stageCap() ? ' (🌌 환생해서 층 상한을 여세요)' : ''}` : `다음 ${EL[nz].sym} ${EL[nz].name}: ${EL[nz - 1].sym} ${fmtS(S.counts[nz - 1])} / ${fmt(cost)}`);
     const b = $('#p2Unl'); if (b) b.disabled = lockSt || S.counts[nz - 1] < cost;
   }
@@ -4946,7 +4948,7 @@ function p2Goal() {
   if (!S.party.slice(0, partySlots()).some(z => z && S.weap[z])) return '🎯 <b>전투</b> 탭에서 무기를 파티에 장착하세요!';
   const nz = p2NextZ();
   if (rebirthReady()) { goTo('table'); return canRebirth() ? '🌌 <b>환생 준비 완료!</b> 주기율표 탭에서 빅뱅을 일으키면 층 상한과 새 무기가 열려요' : `🌌 환생할 수 있어요! 수소 ${fmt(rebirthCost())}개를 모아 빅뱅을 일으키면 🌱 씨앗과 함께 <b>${stageCap(S.prestige.count + 1)}층</b>까지 열리고, 만든 무기는 그대로예요`; }
-  if (nz && S.battle.maxStage >= p2UnlockStage(nz)) return `🎯 ${EL[nz - 1].sym} ${fmt(p2UnlockCost(nz))}개를 모아 <b>${EL[nz].name}</b>을 해금하면 클릭으로 캘 수 있어요 (원자핵 아래 🔓)`;
+  if (nz && p2Reach() >= p2UnlockStage(nz)) return `🎯 ${EL[nz - 1].sym} ${fmt(p2UnlockCost(nz))}개를 모아 <b>${EL[nz].name}</b>을 해금하면 클릭으로 캘 수 있어요 (원자핵 아래 🔓)`;
   if (P2F() && S.battle.maxStage >= P2_CRUNCH - 1 && S.battle.maxStage < P2_CRUNCH) {
     goTo('battle');
     if (S.frag >= FRAG_NEED) { R.goalAct.go = P2_CRUNCH; return `🌑 파편 ${S.frag}/${FRAG_NEED} — <b>2500층에서 빅 크런치를 불러내세요!</b>`; }
