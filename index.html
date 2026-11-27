@@ -8916,11 +8916,13 @@ setInterval(acctTick, 5000);
 /* ---------- 🆕 자동 업데이트: 배포하면 켜져 있는 앱·탭도 알아서 새 버전으로 ----------
    3분마다(그리고 앱으로 돌아올 때) ① 공개 단계를 다시 확인해 바로 반영하고
    ② 사이트 파일(ETag)이 바뀌었으면 저장한 뒤 새로고침 — 보스전·이야기·엔딩·오락실 중이면 끝난 뒤에 */
-const UPD_EVERY = 180e3;
+const UPD_EVERY = 60e3; // 1분마다 새 배포 확인 (공개 단계는 3분마다)
 async function updCheck() {
   if (!HAS_SERVER || !navigator.onLine) return;
   try {
-    const rel = await api('release');
+    const doRel = performance.now() - (R.updRelAt || -1e9) > 170e3;
+    const rel = doRel ? await api('release') : {};
+    if (doRel) R.updRelAt = performance.now();
     if (rel.ok && typeof rel.release === 'number' && rel.release !== R.release) { R.release = rel.release; betaChanged(); toast('📢 새 업데이트가 공개됐어요!', 'disc', 3500); }
     const h = await fetch('/', { method: 'HEAD', cache: 'no-store' });
     const tag = h.ok ? h.headers.get('etag') : null;
@@ -8940,6 +8942,9 @@ async function updApply() {
   setTimeout(() => location.reload(), 1200);
 }
 setTimeout(updCheck, 8000);
+// 화면을 켤 때와 10분마다 서비스 워커 새 버전도 확인 (새 sw.js가 있으면 설치 → 열려 있는 화면을 새로 열어요)
+setTimeout(() => navigator.serviceWorker?.getRegistration().then(r => r?.update()).catch(() => {}), 15000);
+setInterval(() => navigator.serviceWorker?.getRegistration().then(r => r?.update()).catch(() => {}), 600e3);
 setInterval(updCheck, UPD_EVERY);
 setInterval(updApply, 5000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden && performance.now() - (R.updLast || 0) > 30e3) { R.updLast = performance.now(); updCheck(); } });
