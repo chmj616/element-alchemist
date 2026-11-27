@@ -332,7 +332,8 @@ body.p2mine .electron{border-radius:2px;background:var(--p2c,#ff6b8b);box-shadow
 .srch-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 8px}
 body:not(.b7) .b7only{display:none!important}
 /* 7단계: 2부 원소 고르기 버튼 크게, 오른쪽 여백 없이 꽉 채우기 */
-body.b7 .p2pick{width:100%;padding:10px}
+body.b7 .p2pick{width:100%;padding:8px}
+@media (min-width:901px){body.b7.p2w main{grid-template-columns:370px 1fr}body.b7 .p2-chips{grid-template-columns:repeat(6,1fr);max-height:196px}}
 body.b7 .p2-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:5px;max-height:162px;padding:0;scrollbar-width:none}
 body.b7 .p2-chips::-webkit-scrollbar{display:none}
 body.b7 .p2chip{min-width:0;min-height:40px;padding:6px 2px;font-size:15px;border-radius:10px}
