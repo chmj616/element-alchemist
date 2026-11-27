@@ -7615,7 +7615,10 @@ function fragDrop(E) {
   const r = Math.random(), k = 1 + (r < 0.3 ? 1 : 0) + (r < 0.08 ? 1 : 0); // 1~3개 (평균 약 1.4개)
   const before = S.frag;
   S.frag = Math.min(999, S.frag + k);
-  if (before < fragNeed() && S.frag >= fragNeed() && S.battle.maxStage >= P2_CRUNCH - 1) setTimeout(showFragReady, 400);
+  if (before < fragNeed() && S.frag >= fragNeed()) {
+    if (S.battle.maxStage >= P2_CRUNCH - 1) setTimeout(showFragReady, 400);
+    else toast(`🌑 <b>파편 ${fragNeed()}개를 모두 모았어요!</b><br>2500층에 도착하면 바로 빅 크런치를 불러내요 (파편은 그대로 보관 · 999개까지 더 모여요)`, 'disc', 6000);
+  }
   if (Math.floor(S.frag / 10) > Math.floor(before / 10) && S.frag < fragNeed()) toast(`🌑 <b>빅 크런치 파편</b> ${S.frag}/${fragNeed()}${S.frag === fragNeed() ? '<br>2500층에서 빅 크런치를 불러낼 수 있어요!' : ''}`, 'disc', 3500); // 10개마다만 알림
   return ` · 🌑 파편 +${k}! (${S.frag}/${fragNeed()})`;
 }
