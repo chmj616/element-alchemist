@@ -55,6 +55,7 @@ header{display:flex;align-items:center;justify-content:space-between;flex-wrap:w
 .logo{font-size:22px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(90deg,#5cc8ff,#c77dff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .logo-icon{color:#fff;-webkit-text-fill-color:#fff}
 .hstats{display:flex;gap:8px;flex-wrap:wrap}
+.hstat.hmine{border-color:var(--mc,#ffd43b)}.hstat.hmine .val{color:var(--mc,#ffd43b)}.hstat[hidden]{display:none!important}
 .hstat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 12px;display:flex;flex-direction:column;min-width:86px}
 .hstat .lbl{font-size:11px;color:var(--dim)}
 .hstat .val{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
@@ -421,6 +422,29 @@ body.p2mine .electron{border-radius:2px;background:var(--p2c,#ff6b8b);box-shadow
 .pl-table tr[data-plrow]{cursor:pointer}.pl-table tr[data-plrow]:hover{background:#ffffff0d}
 .pl-detrow td{padding:0;border:0}
 .pl-det{white-space:normal;padding:8px 12px;margin:2px 0 8px;background:#ffffff08;border-radius:8px;font-size:12px;line-height:1.7}
+#gravModal{position:fixed;inset:0;z-index:4040;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#1a0b33 0%,#07020f 60%,#000 100%);padding:10px;overflow:auto}
+#gravModal.on{display:flex}
+#gravModal .duel-side.boss{border-color:#9775fa66;background:linear-gradient(135deg,#25104a88,#0a041588)}
+#gravModal .duel-side.boss .duel-em{filter:drop-shadow(0 0 14px #9775fa)}
+.grav-pull{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:54px}
+.grav-pull small{font-size:11px;color:#d0bfff}
+.gp-bar{width:18px;height:70px;border-radius:9px;background:#00000099;border:1px solid #9775fa66;display:flex;align-items:flex-end;overflow:hidden}
+.gp-bar i{display:block;width:100%;background:linear-gradient(0deg,#7048e8,#e64980);transition:height .4s}
+.grav-play{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
+.grav-die{display:flex;align-items:center;gap:10px;font-size:13px;color:#e5dbff}
+.grav-die span{font-size:34px}
+.grav-dial{width:min(240px,62vw);height:auto;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.gd-ring{fill:none;stroke:#ffffff22;stroke-width:16}
+.gd-safe{fill:none;stroke:#40c057;stroke-width:16;stroke-linecap:butt}
+.gd-perf{fill:none;stroke:#ffd43b;stroke-width:18;filter:drop-shadow(0 0 6px #ffd43b)}
+.gd-core{fill:#12051f;stroke:#9775fa;stroke-width:2}
+.gd-txt{font-size:26px}
+.gd-needle{stroke:#fff;stroke-width:4;stroke-linecap:round}
+.gd-tip{fill:#ff8787;filter:drop-shadow(0 0 6px #ff6b6b)}
+.grav-dial.live .gd-core{animation:gpulse 1s infinite alternate}
+@keyframes gpulse{to{stroke:#e64980;stroke-width:4}}
+.grav-btn{width:120px;height:56px;border-radius:14px;font-size:18px;background:radial-gradient(circle,#9775fa,#5f3dc4);border-color:#d0bfff;box-shadow:0 0 20px #7048e8}
+.grav-btn:disabled{opacity:.45}
 #storyModal{position:fixed;inset:0;z-index:4050;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#1a0526 0%,#000 75%);padding:16px}
 #storyModal.on{display:flex}
 .story-box{max-width:620px;text-align:center}
@@ -1315,6 +1339,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
   <div class="logo"><span class="logo-icon">⚛️</span> 원소 연금술사</div>
   <div class="hstats">
     <div class="hstat"><span class="lbl">수소 (H)</span><span class="val" id="hCount">0</span></div>
+    <div class="hstat hmine" id="hMineBox" hidden><span class="lbl" id="hMineL">채굴 중</span><span class="val" id="hMine">0</span></div>
     <div class="hstat"><span class="lbl">초당 생산</span><span class="val" id="hRate">0/s</span></div>
     <div class="hstat"><span class="lbl">생산 배율</span><span class="val" id="hMult">×1</span></div>
     <div class="hstat"><span class="lbl">발견한 원소</span><span class="val" id="hDisc">1/118</span></div>
@@ -2040,7 +2065,7 @@ const R = {
   sellAmt: 1, combo: 0, lastClick: 0, buffs: {}, goldenAt: 0, goldenUntil: 0, discQueue: [],
 };
 // 공개 단계: 새 기능은 관리자 모드에서 먼저 보이고, 관리자가 「일반 사이트에 배포」를 누르면 모두에게 열림
-const RELEASE_ID = 6; // 최신 단계
+const RELEASE_ID = 7; // 최신 단계
 const RELEASE_NOTES = {
   1: '환생 강화 · 강화 수량 버튼 · 💎 코인 투자소 · 📲 앱으로 다운로드 · 원소 쪼개기 업데이트(연구/스킬/동위원소/임무/발전소/대기 발전/도감/💠 쿼크 상점 · 난이도 상향: 원소 더 단단 · 보스 체력 ×10·22초·재생 · 초신성 비용 ×25)',
   2: '🏛️ 몬스터 전시장 · 🚨 빅 크런치 소실 이벤트 · 🌘 2부 (1부 보관 · 오가기)',
@@ -2048,6 +2073,7 @@ const RELEASE_NOTES = {
   5: '🌀 2부 균열 봉인소 (2부의 공허: 무기로 균열 118개 봉인) · 💥 입자 충돌기 (2부의 원소 쪼개기: 표준모형 입자 17종 수집)',
   4: '🌘 2부 개편: ⚒️ 무기 118종 제작·강화 전투 · ⛏️ 원소 채굴(해금한 원소를 클릭) · 🌑 2500층 빅 크런치와 대화 · 🏛️ 1부/2부 전시장 · 무기가 5000층까지 나눠 열림 · 2부 환생 200층부터',
   6: '🃏 2부 5000층 빅 립 카드 결투 (클릭 대결로 선공권 → 턴제 카드 배틀)',
+  7: '🌑 2부 2500층 빅 크런치 「중력 붕괴」 (주사위 + 타이밍) · 2500층 패배 시 100~150층, 5000층 패배 시 150~250층 뒤로',
 };
 const beta = (n = 1) => !!R.admin || (R.release || 0) >= n;
 function betaChanged() {
@@ -4979,6 +5005,197 @@ document.addEventListener('click', e => {
 });
 
 
+
+/* ---------- 🌑 2부 2500층: 빅 크런치 「중력 붕괴」 ----------
+   매 턴 🎲 중력 주사위(운)로 그 턴의 조건이 정해지고, 회전하는 바늘을 안전 구역(초록)·완벽 구역(금색)에 멈춰(실력) 공격해요.
+   빗나가면 빅 크런치가 더 세게 때리고 🕳️ 흡입 게이지가 크게 차요. 게이지 100% 또는 12턴이 지나면 패배 → 100~150층 뒤로. */
+const P2G = () => P2W() && beta(7);
+const GRAV_TURNS = 12, GRAV_SEC = 2.5; // 카드 1장 = 일반 전투 2.5초어치
+const GRAV_DICE = [null,
+  { icon: '🕳️', name: '블랙홀',  safe: 40,  perf: 9,  spd: 1.1, mult: 3,   desc: '구역이 아주 좁지만 피해 ×3' },
+  { icon: '🔄', name: '역회전',  safe: 70,  perf: 15, spd: 1,   mult: 1,   rev: true, desc: '바늘이 도중에 거꾸로 돌아요' },
+  { icon: '⚡', name: '가속',    safe: 70,  perf: 15, spd: 1.6, mult: 1.3, desc: '바늘이 빨라요 · 피해 ×1.3' },
+  { icon: '🌑', name: '평온',    safe: 70,  perf: 15, spd: 1,   mult: 1,   desc: '보통' },
+  { icon: '🌌', name: '확장',    safe: 100, perf: 22, spd: 1,   mult: 1,   desc: '구역이 넓어요' },
+  { icon: '🍀', name: '행운',    safe: 85,  perf: 28, spd: 0.9, mult: 1,   heal: true, desc: '완벽하면 체력 15% 회복' },
+];
+function bossFallback(lo, hi, why) {
+  const B = S.battle, back = lo + Math.floor(Math.random() * (hi - lo + 1));
+  const to = Math.max(1, (R.enemy ? R.enemy.stage : B.stage) - back);
+  B.stage = to; B.maxStage = Math.min(B.maxStage, to); B.auto = true; B.hp = B.maxHp;
+  R.enemy = null; R.cooldown = 2; R.unitT = [0, 0, 0, 0, 0];
+  blog(`💀 ${why} 우주에 밀려 <b>${back}층</b> 뒤 스테이지 ${to}(으)로 떨어졌어요. 다시 올라가세요! (자동 진행 켜짐)`, 'lose');
+  toast(`💀 <b>${back}층 뒤로 밀려났어요</b><br>스테이지 ${to}부터 다시 올라가요`, 'disc', 5000);
+  SFX.lose();
+}
+function startGrav() {
+  const E = R.enemy, units = partyUnits(), ev = evalTeam(units, E), nobleRed = Math.min(0.6, 0.15 * units.filter(u => u.cat === 'noble').length);
+  E.timeLeft = Infinity;
+  R.grav = { E, turn: 0, pMax: ev.maxHp, pHp: ev.maxHp, pd: Math.max(1, ev.dps * GRAV_SEC), bd: E.atk / 1.5 * (1 - nobleRed) * GRAV_SEC,
+    pull: 0, phase: 'intro', dice: 0, ang: 0, dir: 1, msg: [], hits: { p: 0, g: 0, m: 0 } };
+  blog('🌑 빅 크런치가 주변의 모든 것을 끌어당기기 시작했어요! 「중력 붕괴」', 'boss');
+  SFX.boss();
+  renderGrav();
+}
+function gravLater(ms, fn) { const G = R.grav; setTimeout(() => { if (R.grav === G) fn(); }, ms); }
+function gravSay(t) { const G = R.grav; G.msg.push(t); if (G.msg.length > 3) G.msg.shift(); }
+function gravNextTurn() {
+  const G = R.grav;
+  G.turn++;
+  if (G.turn > GRAV_TURNS) return gravEnd(false, `${GRAV_TURNS}턴 안에 쓰러뜨리지 못했어요…`);
+  G.phase = 'roll'; G.dice = 0; G.res = null;
+  renderGrav();
+  // 🎲 주사위 굴리기 연출
+  let k = 0;
+  const roll = () => {
+    if (R.grav !== G) return;
+    G.dice = 1 + Math.floor(Math.random() * 6);
+    setText('gravDie', GRAV_DICE[G.dice].icon);
+    SFX.tone(300 + k * 40, 0.04, 'square', 0.03);
+    if (++k < 12) return setTimeout(roll, 50 + k * 12);
+    const D = GRAV_DICE[G.dice], en = G.E.hp < G.E.maxHp * 0.5;
+    // 구역 위치는 랜덤, 체력 50% 아래(광폭)면 구역이 조금 좁아지고 빨라져요
+    const safe = D.safe * (en ? 0.85 : 1), perf = D.perf * (en ? 0.85 : 1);
+    G.zone = { s: Math.random() * 360, w: safe };
+    G.perf = { s: G.zone.s + (safe - perf) * (0.2 + Math.random() * 0.6), w: perf };
+    G.spd = (200 + G.turn * 14) * D.spd * (en ? 1.15 : 1);
+    G.ang = (G.zone.s + 180 + Math.random() * 60) % 360; G.dir = Math.random() < 0.5 ? 1 : -1;
+    G.revAt = D.rev ? 0.4 + Math.random() * 0.8 : 0; G.spun = 0;
+    gravSay(`🎲 <b>${D.icon} ${D.name}</b> — ${D.desc}`);
+    G.phase = 'spin'; G.t0 = performance.now(); G.last = G.t0;
+    renderGrav();
+    const step = now => {
+      if (R.grav !== G || G.phase !== 'spin') return;
+      const dt = (now - G.last) / 1000; G.last = now;
+      const dA = G.spd * dt;
+      G.ang = (G.ang + G.dir * dA + 360) % 360; G.spun += dA;
+      if (G.revAt && G.spun / 360 > G.revAt) { G.dir *= -1; G.revAt = 0; SFX.tone(200, 0.08, 'sawtooth', 0.04); }
+      const nd = $('#gravNeedle'); if (nd) nd.setAttribute('transform', `rotate(${G.ang} 120 120)`);
+      if (G.spun >= 720) return gravStop(true); // 두 바퀴 안에 못 멈추면 빗나감
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  gravLater(400, roll);
+}
+const angIn = (a, z) => { const d = ((a - z.s) % 360 + 360) % 360; return d <= z.w; };
+function gravStop(timeout) {
+  const G = R.grav;
+  if (!G || G.phase !== 'spin') return;
+  const D = GRAV_DICE[G.dice];
+  G.phase = 'hit';
+  const res = timeout ? 'm' : angIn(G.ang, G.perf) ? 'p' : angIn(G.ang, G.zone) ? 'g' : 'm';
+  G.res = res; G.hits[res]++;
+  if (res === 'm') {
+    G.pull = Math.min(100, G.pull + 25);
+    gravSay(timeout ? '⌛ 너무 늦었어요! <b>빗나감</b> — 흡입 +25%' : '❌ <b>빗나감</b> — 흡입 +25%');
+    SFX.hurt(); gravShake();
+  } else {
+    const crit = res === 'p' && Math.random() < 0.25;
+    const d = G.pd * (res === 'p' ? 2 : 1) * D.mult * (crit ? 1.5 : 1);
+    G.E.hp -= d;
+    gravFx('gravBoss', (crit ? '💥' : '') + '-' + fmt(d), res === 'p' ? '#ffd43b' : '#ff8787');
+    if (res === 'p' && D.heal) { const h = Math.min(G.pMax * 0.15, G.pMax - G.pHp); G.pHp += h; gravFx('gravMe', '+' + fmt(h), '#69db7c'); }
+    G.pull = Math.min(100, G.pull + (res === 'p' ? 0 : 8));
+    gravSay(res === 'p' ? `✨ <b>완벽!</b>${crit ? ' 💥치명타' : ''} 피해 ${fmt(d)}${res === 'p' && D.heal ? ' · 체력 회복' : ''}` : `✅ <b>좋아요</b> 피해 ${fmt(d)} · 흡입 +8%`);
+    SFX.hit(res === 'p');
+  }
+  renderGrav();
+  if (G.E.hp <= 0) return gravLater(900, () => gravEnd(true));
+  if (G.pull >= 100) return gravLater(900, () => gravEnd(false, '🕳️ 흡입 게이지가 가득 차 사건의 지평선에 빨려 들어갔어요…'));
+  // 빅 크런치의 반격: 완벽하면 절반, 빗나가면 1.5배
+  gravLater(800, () => {
+    const d = G.bd * (res === 'p' ? 0.5 : res === 'g' ? 1 : 1.5) * (G.E.hp < G.E.maxHp * 0.5 ? 1.3 : 1);
+    G.pHp -= d;
+    gravFx('gravMe', '-' + fmt(d), '#ff6b6b'); SFX.hurt();
+    gravSay(`🌑 빅 크런치의 중력 당김 — 피해 ${fmt(d)}`);
+    renderGrav();
+    if (G.pHp <= 0) return gravLater(900, () => gravEnd(false, '중력에 짓눌려 쓰러졌어요…'));
+    gravLater(1000, gravNextTurn);
+  });
+}
+function gravEnd(win, why) {
+  const G = R.grav;
+  if (!G) return;
+  G.phase = 'end'; G.win = win; G.why = why || '';
+  if (win) SFX.discover(); else SFX.lose();
+  renderGrav();
+  gravLater(2200, () => {
+    R.grav = null; renderGrav();
+    if (R.enemy !== G.E) return;
+    if (win) { G.E.hp = 0; victory(); }
+    else bossFallback(100, 150, `빅 크런치의 중력 붕괴에서 패배! ${G.why}`);
+  });
+}
+function gravFx(id, text, color) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const f = document.createElement('div');
+  f.className = 'duel-fx'; f.textContent = text; f.style.color = color; f.style.left = (30 + Math.random() * 40) + '%';
+  el.appendChild(f); setTimeout(() => f.remove(), 1100);
+  el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit');
+}
+function gravShake() { const b = $('#gravBox'); if (b) { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); } }
+// 원호 경로 (SVG, 12시 방향이 0°)
+function arcPath(cx, cy, r, a0, w) {
+  const p = a => { const t = (a - 90) * Math.PI / 180; return [cx + r * Math.cos(t), cy + r * Math.sin(t)]; };
+  const [x1, y1] = p(a0), [x2, y2] = p(a0 + w);
+  return `M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${w > 180 ? 1 : 0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+}
+function renderGrav() {
+  const G = R.grav;
+  let m = $('#gravModal');
+  if (!m) { m = document.createElement('div'); m.id = 'gravModal'; document.body.appendChild(m); }
+  if (!G) { m.classList.remove('on'); m.innerHTML = ''; return; }
+  m.classList.add('on');
+  const E = G.E, bp = Math.max(0, E.hp / E.maxHp * 100), pp = Math.max(0, G.pHp / G.pMax * 100), en = E.hp < E.maxHp * 0.5;
+  const D = G.dice ? GRAV_DICE[G.dice] : null;
+  let mid;
+  if (G.phase === 'intro') mid = `<div class="duel-intro"><h2>🌑 중력 붕괴</h2>
+      <p>「연금술사여… 나를 끌고 간 그 힘이 아직 내 안에서 날뛴다. 버텨 봐라.」</p>
+      <ul><li>🎲 매 턴 <b>중력 주사위</b>가 그 턴의 조건을 정해요 (블랙홀 ×3 · 역회전 · 가속 · 평온 · 확장 · 행운)</li>
+      <li>🎯 회전하는 바늘을 <b>초록(좋아요)</b>·<b>금색(완벽 ×2)</b> 구역에서 멈추세요 — 탭 · 버튼 · 스페이스바</li>
+      <li>❌ 빗나가면 반격 ×1.5 + 🕳️ <b>흡입 +25%</b> · 좋아요 +8% · 완벽은 반격 절반</li>
+      <li>흡입 100% 또는 ${GRAV_TURNS}턴이 지나면 패배 → <b>100~150층 뒤로</b> 밀려나요</li></ul>
+      <div class="btnrow" style="justify-content:center"><button class="big-btn" data-grav="start">🌑 맞선다</button><button class="btn" data-grav="flee">🏳️ 후퇴</button></div></div>`;
+  else if (G.phase === 'end') mid = `<div class="duel-banner ${G.win ? 'win' : 'lose'}">${G.win ? '🏆 중력을 이겨냈어요!' : '💀 패배…'}</div><div class="duel-hint">${G.win ? `완벽 ${G.hits.p} · 좋아요 ${G.hits.g} · 빗나감 ${G.hits.m}` : G.why + ' · 100~150층 뒤로 밀려나요'}</div>`;
+  else {
+    const z = G.zone, pf = G.perf, live = G.phase === 'spin';
+    mid = `<div class="grav-play">
+      <div class="grav-die"><span id="gravDie">${D ? D.icon : '🎲'}</span><small>${G.phase === 'roll' ? '중력 주사위…' : D ? `${D.name} · ${D.desc}` : ''}</small></div>
+      <svg class="grav-dial ${live ? 'live' : ''}" id="gravDial" viewBox="0 0 240 240" data-grav="stop">
+        <circle cx="120" cy="120" r="100" class="gd-ring"/>
+        ${z ? `<path d="${arcPath(120, 120, 100, z.s, z.w)}" class="gd-safe"/><path d="${arcPath(120, 120, 100, pf.s, pf.w)}" class="gd-perf"/>` : ''}
+        <circle cx="120" cy="120" r="34" class="gd-core"/><text x="120" y="128" text-anchor="middle" class="gd-txt">${G.res === 'p' ? '✨' : G.res === 'g' ? '✅' : G.res === 'm' ? '❌' : '🌑'}</text>
+        <g id="gravNeedle" transform="rotate(${G.ang} 120 120)"><line x1="120" y1="120" x2="120" y2="12" class="gd-needle"/><circle cx="120" cy="12" r="6" class="gd-tip"/></g>
+      </svg>
+      <button class="duel-tap grav-btn" data-grav="stop" ${live ? '' : 'disabled'}>🛑 멈춰!</button>
+      <div class="duel-log">${G.msg.map(t => `<div>${t}</div>`).join('')}</div></div>`;
+  }
+  m.innerHTML = `<div class="duel-box" id="gravBox">
+    <div class="duel-top"><span class="duel-round">TURN ${Math.max(1, G.turn)} / ${GRAV_TURNS}</span>${G.phase !== 'end' && G.phase !== 'intro' ? '<button class="btn duel-flee" data-grav="flee">🏳️ 후퇴</button>' : ''}</div>
+    <div class="duel-side boss ${en ? 'enr' : ''}" id="gravBoss"><div class="duel-who"><span class="duel-em">🌑</span><div class="duel-info"><b>빅 크런치</b>${en ? ' <span class="duel-tag">폭주</span>' : ''}
+      <div class="duel-hp"><i style="width:${bp}%"></i></div><small>❤️ ${fmt(Math.max(0, E.hp))} / ${fmt(E.maxHp)}</small></div></div>
+      <div class="grav-pull"><small>🕳️ 흡입</small><div class="gp-bar"><i style="height:${G.pull}%"></i></div><b>${G.pull}%</b></div></div>
+    <div class="duel-mid">${mid}</div>
+    <div class="duel-side me" id="gravMe"><div class="duel-who"><span class="duel-em">🧪</span><div class="duel-info"><b>연금술사</b>
+      <div class="duel-hp me"><i style="width:${pp}%"></i></div><small>❤️ ${fmt(Math.max(0, G.pHp))} / ${fmt(G.pMax)}</small></div></div></div></div>`;
+}
+document.addEventListener('pointerdown', e => {
+  if (R.grav && R.grav.phase === 'spin' && e.target.closest && e.target.closest('[data-grav="stop"]')) { e.preventDefault(); gravStop(false); }
+});
+document.addEventListener('click', e => {
+  if (!R.grav || !e.target.closest) return;
+  const a = e.target.closest('[data-grav]');
+  if (!a) return;
+  if (a.dataset.grav === 'start' && R.grav.phase === 'intro') gravNextTurn();
+  if (a.dataset.grav === 'flee' && confirm('🏳️ 후퇴할까요? (패배로 처리돼 100~150층 뒤로 밀려나요)')) gravEnd(false, '후퇴했어요.');
+});
+document.addEventListener('keydown', e => {
+  if (!R.grav) return;
+  if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat && R.grav.phase === 'spin') gravStop(false); }
+}, true);
+
 /* ---------- 🃏 2부 5000층: 빅 립과의 카드 결투 ----------
    라운드마다 ① 3초 클릭 대결 → 이긴 쪽이 선공권 (선공 카드 ×1.5, 압도적이면 ×2)
    ② 손패 4장 중 1장을 내요. 선공이면 빅 립의 카드는 뒤집힌 채라 모르고 내지만 반격·교란을 쓸 수 있고,
@@ -5171,6 +5388,7 @@ function duelEnd(win, why) {
     R.duel = null; renderDuel();
     if (R.enemy !== D.E) return;
     if (win) { D.E.hp = 0; victory(); S.battle.active = false; R.enemy = null; blog('🃏 결투가 끝났어요. 다시 겨루려면 전투를 시작하세요.', 'info'); } // 이기면 곧바로 또 결투가 열리지 않게 전투를 멈춰요
+    else if (P2G()) bossFallback(150, 250, `빅 립과의 카드 결투에서 패배! ${D.why}`);
     else defeat(`빅 립과의 카드 결투에서 패배! ${D.why}`);
   });
 }
@@ -5592,6 +5810,7 @@ function guideSections() {
       beta(4) && '🔓 무거운 원소(=무기)는 <b>층을 올라갈수록</b> 열려요: 300층까지 1~50번 · 600층 ~70번 · 1000층 ~92번 · 1500층 ~100번 · 2200층 ~106번 · 3000층 ~111번 · 4000층 ~116번 · 오가네손은 4500층. 무기 재료는 열리는 시점의 생산량에 맞춰 커져요.',
       beta(4) && '🌌 2부 <b>환생</b>: 200층 이상을 깨고, 지금까지 깬 층에서 열리는 원소를 모두 해금하면 할 수 있어요. 만든 무기는 그대로 (강화 레벨만 초기화) · 막히면 환생해서 씨앗으로 넘어가요.',
       beta(4) && '🌑 <b>2500층</b>에서 누군가 기다리고 있어요… 최종은 5000층.',
+      beta(7) && '🌑 <b>2500층 「중력 붕괴」</b>: 매 턴 🎲 중력 주사위(블랙홀 ×3 · 역회전 · 가속 · 평온 · 확장 · 행운)로 조건이 정해지고, 회전하는 바늘을 초록(좋아요)·금색(완벽 ×2) 구역에서 멈춰 공격해요. 빗나가면 🕳️ 흡입 +25% — 100%가 되거나 12턴이 지나면 패배해서 <b>100~150층 뒤로</b> 밀려나요. 5000층 결투에서 지면 <b>150~250층 뒤로</b>.',
       beta(6) && '🃏 <b>5000층 최종 보스</b>는 카드 결투: 라운드마다 <b>3초 클릭 대결</b>(연타 · 스페이스바)로 선공권을 정하고, 손패 4장 중 1장을 내요. 선공 카드 ×1.5 (압도적이면 ×2) · 선공이면 ⚡반격·🌀교란이 통하고, 후공이면 빅 립의 카드를 보고 고를 수 있어요. 10라운드 안에 쓰러뜨리세요.',
       beta(5) && '🌀 <b>균열 봉인소</b> (2부의 공허 탭): 그 원소로 만든 무기를 가진 채 원소를 바쳐 균열 118개를 차례로 봉인 · 하나마다 생산·무기 ×1.03 (영구).',
       beta(5) && '💥 <b>입자 충돌기</b> (균열 20개 봉인 후): 수소로 입자를 충돌시켜 표준모형 입자 17종(쿼크·렙톤·보손·힉스)을 수집 · 빔 출력을 올리면 희귀 입자 · 입자마다 무기·채굴·생산 보너스.') },
@@ -6766,6 +6985,7 @@ function spawnEnemy() {
   }
   if (S.battle.autoDeck) applyBestDeck(true);
   if (E0.stage >= MAX_STAGE && P2D()) return startDuel();
+  if (E0.stage === P2_CRUNCH && P2G()) return startGrav();
   if (R.enemy.synth) {
     blog(`🧪 인공 원소 보스 등장: ${R.enemy.name}! 30초 안에 처치하면 ${EL[R.enemy.synth].sym} 1개 확정!`, 'boss');
     SFX.boss();
@@ -6812,7 +7032,7 @@ function stopBattle() {
   blog('🏳️ 전투를 중단했습니다.', 'info');
 }
 function battleTick(dt) {
-  if (R.storyPause || R.duel) return;
+  if (R.storyPause || R.duel || R.grav) return;
   const B = S.battle;
   const units = partyUnits();
   const maxHp = units.reduce((s, u) => s + u.hp, 0);
@@ -7030,6 +7250,10 @@ function updateCounts() {
 }
 function renderHeader() {
   setText('hCount', fmt(Math.floor(S.counts[1])));
+  // 2부: 헬륨 이상을 캐는 중이면 수소 옆에 그 원소 보유량
+  const mz = P2W() ? p2Z() : 1, mb = $('#hMineBox');
+  if (mb.hidden !== (mz <= 1)) mb.hidden = mz <= 1;
+  if (mz > 1) { setText('hMineL', `⛏️ ${EL[mz].name} (${EL[mz].sym})`); setText('hMine', fmtS(S.counts[mz])); mb.style.setProperty('--mc', CATS[EL[mz].cat].color); }
   setText('hRate', fmt(totalRate()) + '/s');
   setText('hMult', '×' + fmt(prodMult()));
   setText('hDisc', discCount() + '/118');
