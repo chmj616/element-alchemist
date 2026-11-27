@@ -294,6 +294,14 @@ body.p2w #tab-fusion > :not(#forgeBox){display:none}
 body:not(.p2w) #forgeBox{display:none}
 body.p2w #tab-shop > .tip:not(.p2only){display:none}
 body.p2w .shop-row [data-elup]{display:none}
+.p2shop-nav{margin:0 0 12px;flex-wrap:wrap}
+body.p2w .p2shop-nav{display:flex}
+body.p2w.p2s-weap #coinInv,body.p2w.p2s-weap #sellHead,body.p2w.p2s-weap #shopList{display:none}
+body.p2w.p2s-inv #weapShop,body.p2w.p2s-inv #sellHead,body.p2w.p2s-inv #shopList{display:none}
+body.p2w.p2s-sell #weapShop,body.p2w.p2s-sell #coinInv{display:none}
+.wcat-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.wcat-chips button{background:#ffffff0d;border:1px solid var(--line);color:inherit;border-radius:99px;padding:4px 10px;font-size:12px;cursor:pointer}
+.wcat-chips button.on{border-color:var(--c,#ffd43b);background:color-mix(in srgb,var(--c,#ffd43b) 25%,transparent);font-weight:700}
 .wcard{position:relative;width:62px;height:70px;flex:0 0 auto;border-radius:10px;border:2px solid var(--c);background:linear-gradient(160deg,color-mix(in srgb,var(--c) 30%,#1a1020),#120a12);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 10px color-mix(in srgb,var(--c) 40%,transparent)}
 .wcard .wic{font-size:28px;line-height:1;filter:drop-shadow(0 2px 3px #000a)}
 .wcard .wsym{position:absolute;top:2px;left:4px;font-size:10px;font-weight:800;color:var(--c)}
@@ -1362,7 +1370,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
       </div>
       <div id="genList" class="list"></div>
       <div id="hsBox"></div>
-      <div class="sec-head"><h3>🔧 강화</h3></div>
+      <div class="sec-head"><h3>🔧 강화</h3><div class="seg"><button data-amt="1" class="on">×1</button><button data-amt="10">×10</button><button data-amt="100">×100</button><button data-amt="max">MAX</button></div></div>
       <div id="upgList" class="list"></div>
     </div>
 
@@ -1436,9 +1444,10 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
       <p class="tip">💰 원소를 팔아 <b>🪙 코인</b>을 얻고, 코인으로 <b>원소 강화</b>를 하세요. 강화 1레벨마다 그 원소의 전투 <b>공격력·체력 ×1.2</b> (복리).<br>
       판매 가격은 그 원소를 만드는 데 드는 수소 비용에 비례해요. 무거운 원소일수록, 🧪 인공 원소일수록 비싸게 팔립니다. ⚠️ 파티에 넣은 원소를 팔면 보유량이 줄어 전투력이 떨어져요.</p>
       <p class="tip p2only">⚒️ <b>2부 상점</b>: 원소를 팔아 🪙 코인을 얻고, 코인으로 <b>무기를 강화</b>하세요. 강화 1레벨마다 그 무기의 공격력·체력 <b>×1.25</b> (복리). 원소 강화는 1부 전용이에요.</p>
+      <div class="seg p2shop-nav p2only" id="p2ShopNav"><button data-p2shop="weap" class="on">⚔️ 무기 강화</button><button data-p2shop="inv">💎 코인 투자소</button><button data-p2shop="sell">🏪 원소 판매</button></div>
       <div id="weapShop"></div>
       <div id="coinInv"></div>
-      <div class="sec-head"><h3>🏪 원소 상점</h3><div class="seg" id="sellAmt"><button data-sell-amt="1" class="on" title="판매·강화 수량">×1</button><button data-sell-amt="10">×10</button><button data-sell-amt="100">×100</button><button data-sell-amt="half" title="판매: 보유량 절반 · 강화: 코인 절반까지">절반</button></div></div>
+      <div class="sec-head" id="sellHead"><h3>🏪 원소 상점</h3><div class="seg" id="sellAmt"><button data-sell-amt="1" class="on" title="판매·강화 수량">×1</button><button data-sell-amt="10">×10</button><button data-sell-amt="100">×100</button><button data-sell-amt="half" title="판매: 보유량 절반 · 강화: 코인 절반까지">절반</button></div></div>
       <div id="shopList" class="list"></div>
     </div>
 
@@ -1637,11 +1646,11 @@ const GENERATORS = [
 const BASE_GENS = GENERATORS.filter(g => !g.p2).length;
 const genN = () => (P2W() ? GENERATORS.length : BASE_GENS);
 const REPEATS = [
-  { id: 'clickLv', name: '양성자 가속 장갑', icon: '👆', cost: lv => 30 * Math.pow(1.8, lv),
+  { id: 'clickLv', name: '양성자 가속 장갑', icon: '👆', g: 1.8, cost: lv => 30 * Math.pow(1.8, lv),
     desc: lv => `클릭 기본 수소 +0.1 (현재 클릭당 ${((1 + lv) * 0.1).toFixed(1)})` },
-  { id: 'atkLv', name: '이온 빔 증폭기', icon: '🗡️', cost: lv => 300 * Math.pow(2.5, lv),
+  { id: 'atkLv', name: '이온 빔 증폭기', icon: '🗡️', g: 2.5, cost: lv => 300 * Math.pow(2.5, lv),
     desc: lv => `파티 공격력 ×1.5 (현재 ×${fmt(Math.min(1e200, Math.pow(1.5, lv)))})` },
-  { id: 'hpLv', name: '전자기 보호막', icon: '🛡️', cost: lv => 300 * Math.pow(2.5, lv),
+  { id: 'hpLv', name: '전자기 보호막', icon: '🛡️', g: 2.5, cost: lv => 300 * Math.pow(2.5, lv),
     desc: lv => `파티 체력 ×1.5 (현재 ×${fmt(Math.min(1e200, Math.pow(1.5, lv)))})` },
 ];
 const UPGRADES = [
@@ -2505,11 +2514,26 @@ function buyGen(i) {
   R.sig.gen = null;
   SFX.buy();
 }
+// 레벨업 강화 수량: 생산 시설과 같은 ×1 · ×10 · ×100 · MAX (그만큼 못 사면 살 수 있는 만큼)
+// cost(lv) = c0 × g^lv → n레벨 합계 = c0 × (g^n − 1) / (g − 1)
+const geoSum = (c0, g, n) => c0 * (Math.pow(g, n) - 1) / (g - 1);
+function geoMaxN(c0, g, budget, room) {
+  if (!(budget >= c0) || room < 1) return 0;
+  const m = Math.floor(Math.log(budget * (g - 1) / c0 + 1) / Math.log(g));
+  return isFinite(m) ? Math.max(0, Math.min(m, room)) : 0;
+}
+function amtN(maxN, room) {
+  if (room < 1) return 0;
+  if (R.buyAmt === 'max') return Math.max(1, maxN);
+  return Math.min(room, maxN >= 1 && maxN < R.buyAmt ? maxN : R.buyAmt);
+}
+const REP_MAX = 1e4;
+const repBuyN = r => amtN(geoMaxN(r.cost(S[r.id]), r.g, S.counts[1], REP_MAX - S[r.id]), REP_MAX - S[r.id]);
 function buyRep(id) {
-  const r = REPEATS.find(x => x.id === id), c = r.cost(S[id]);
-  if (S.counts[1] < c) return;
+  const r = REPEATS.find(x => x.id === id), n = repBuyN(r), c = geoSum(r.cost(S[id]), r.g, n);
+  if (n < 1 || !(S.counts[1] >= c)) return;
   S.counts[1] -= c;
-  S[id]++;
+  S[id] += n;
   SFX.buy();
 }
 function buyUpg(id) {
@@ -4890,15 +4914,26 @@ function upgradeWeapon(z) {
 function renderWeapShop() {
   const box = $('#weapShop');
   if (!P2W()) { if (box.innerHTML) box.innerHTML = ''; return; }
-  const own = [];
-  for (let z = 1; z <= 118; z++) if (S.weap[z]) own.push(z);
-  const sig = own.join();
+  document.body.classList.toggle('p2s-weap', (R.p2shop || 'weap') === 'weap');
+  document.body.classList.toggle('p2s-inv', R.p2shop === 'inv');
+  document.body.classList.toggle('p2s-sell', R.p2shop === 'sell');
+  const all = [];
+  for (let z = 1; z <= 118; z++) if (S.weap[z]) all.push(z);
+  // 계열별 보기: ⚔️ 장착 중 · 전체 · 원소 계열마다
+  const party = S.party.slice(0, partySlots()).filter(z => z && S.weap[z]);
+  const cats = [...new Set(all.map(z => EL[z].cat))];
+  let wc = R.wcat || (party.length ? 'party' : 'all');
+  if (wc !== 'party' && wc !== 'all' && !cats.includes(wc)) wc = 'all';
+  const own = wc === 'party' ? party : wc === 'all' ? all : all.filter(z => EL[z].cat === wc);
+  const sig = all.join() + '|' + wc + '|' + party.join();
   if (R.sig.wshop !== sig) {
     R.sig.wshop = sig;
-    box.innerHTML = `<div class="sec-head"><h3>⚔️ 무기 강화</h3><small>강화 1레벨마다 공격력·체력 ×${WLV_EFF} · 수량 버튼 적용</small></div>
+    const chip = (k, label, c) => `<button data-wcat="${k}" class="${wc === k ? 'on' : ''}"${c ? ` style="--c:${c}"` : ''}>${label}</button>`;
+    box.innerHTML = `<div class="sec-head"><h3>⚔️ 무기 강화</h3><small>강화 1레벨마다 공격력·체력 ×${WLV_EFF} · 수량 버튼(×1·×10·×100·절반) 적용</small></div>
+      ${all.length ? `<div class="wcat-chips">${chip('party', `⚔️ 장착 중 ${party.length}`)}${chip('all', `전체 ${all.length}`)}${cats.map(c => chip(c, `${CATS[c].name} ${all.filter(z => EL[z].cat === c).length}`, CATS[c].color)).join('')}</div>` : ''}
       <div class="list wshop">${own.length ? own.map(z => `<div class="row">${weapCard(z)}<div class="rinfo"><div class="rname">${WEAPONS[z].icon} ${WEAPONS[z].name} <span class="badge" id="wuLv${z}"></span></div><div class="rdesc" id="wuD${z}"></div></div>
         <button class="buybtn" data-wup="${z}" id="wuB${z}"><span id="wuA${z}"></span><span id="wuC${z}"></span></button></div>`).join('')
-        : '<div class="row locked">⚒️ 아직 무기가 없어요. 융합 탭 자리의 <b>⚒️ 공방</b>에서 먼저 만들어 보세요!</div>'}</div>`;
+        : all.length ? '<div class="row locked">이 분류에 해당하는 무기가 없어요</div>' : '<div class="row locked">⚒️ 아직 무기가 없어요. 융합 탭 자리의 <b>⚒️ 공방</b>에서 먼저 만들어 보세요!</div>'}</div>`;
   }
   for (const z of own) {
     const lv = S.wlv[z] || 0, n = wlvBuyN(z), c = wlvCost(z, n);
@@ -5406,19 +5441,32 @@ function installState() {
   if (!b) return;
   if (isStandalone()) { b.textContent = '✅ 앱으로 실행 중'; b.disabled = true; }
 }
+// 설치 창이 아직 안 왔으면 잠깐(최대 3초) 기다렸다가 바로 띄움 (클릭 직후라 브라우저가 허용)
+const waitInstall = ms => new Promise(res => { if (deferredInstall) return res(deferredInstall); const t0 = performance.now(); const iv = setInterval(() => { if (deferredInstall || performance.now() - t0 > ms) { clearInterval(iv); res(deferredInstall); } }, 100); });
 async function installApp() {
   if (isStandalone()) return toast('✅ 이미 앱으로 실행 중이에요');
-  if (deferredInstall) {
-    deferredInstall.prompt();
-    const r = await deferredInstall.userChoice;
-    deferredInstall = null;
-    if (r && r.outcome === 'accepted') toast('📲 설치를 시작했어요! 홈 화면에서 아이콘을 찾아 보세요', 'disc', 5000);
-    return;
-  }
   const ua = navigator.userAgent;
   const inApp = /KAKAOTALK|Instagram|FBAN|FBAV|NAVER|Line\/|DaumApps|everytimeApp/i.test(ua);
   const ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const android = /Android/i.test(ua), samsung = /SamsungBrowser/i.test(ua);
+  // 앱 안 브라우저(카카오톡 등)는 설치가 안 돼요 → 바깥 브라우저로 열고 바로 설치 버튼을 보여 줘요
+  if (inApp) {
+    const url = location.origin + '/?install=1';
+    if (/KAKAOTALK/i.test(ua)) { location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url); return; }
+    if (android) { location.href = `intent://${location.host}/?install=1#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`; return; }
+  }
+  const supports = 'BeforeInstallPromptEvent' in window || 'onbeforeinstallprompt' in window;
+  if (!deferredInstall && supports && !inApp && !ios) { toast('📲 설치 준비 중…', '', 1500); await waitInstall(3000); }
+  if (deferredInstall) {
+    const ev = deferredInstall;
+    deferredInstall = null;
+    ev.prompt();
+    const r = await ev.userChoice.catch(() => null);
+    if (r && r.outcome === 'accepted') { localStorage.setItem('ea_installed', '1'); toast('📲 설치를 시작했어요! 홈 화면(바탕화면)에서 아이콘을 찾아 보세요', 'disc', 5000); }
+    else toast('설치를 취소했어요. 다시 누르면 다시 물어봐요 (안 뜨면 새로고침 후)', '', 3500);
+    return;
+  }
+  if (supports && localStorage.getItem('ea_installed')) return toast('✅ 이미 설치돼 있어요! 홈 화면이나 앱 목록에서 「원소 연금술사」를 여세요', 'disc', 5000);
   const steps = inApp ? [`지금은 앱 안의 브라우저라 설치할 수 없어요.`, `오른쪽 위(또는 아래) <b>⋮ / 공유</b> 메뉴에서 <b>${ios ? 'Safari' : 'Chrome'}로 열기</b>를 누른 뒤, 다시 이 버튼을 눌러 주세요.`]
     : ios ? ['<b>Safari</b>로 열어 주세요 (크롬 앱이면 주소창 오른쪽 공유 버튼도 같아요).', '화면 아래(아이패드는 위) <b>공유 버튼 <span class="ib">⬆️</span></b>을 누르세요.', '목록을 내려 <b>홈 화면에 추가 <span class="ib">➕</span></b>를 누르고, 오른쪽 위 <b>추가</b>를 누르면 끝!']
     : samsung ? ['아래 메뉴 버튼 <b>≡</b>을 누르세요.', '<b>현재 페이지 추가 → 홈 화면</b>을 누르면 끝!']
@@ -7048,13 +7096,14 @@ const HEX_PCT = 0.2, HEX_RATE = 0.05, HEX_CD = 600; // 수소 20% → 코인 (�
 const hsLv = id => (S.hs && S.hs[id]) || 0;
 const hsOpen = () => S.endings.e1 && S.endings.e2;
 const hsCost = h => rebirthBase() * h.f * Math.pow(h.g, hsLv(h.id));
+const hsBuyN = h => amtN(geoMaxN(hsCost(h), h.g, S.counts[1], h.max - hsLv(h.id)), h.max - hsLv(h.id));
 function hsBuy(id) {
   const h = HSINK.find(x => x.id === id);
   if (!h || !hsOpen() || hsLv(id) >= h.max) return;
-  const c = hsCost(h);
-  if (!(S.counts[1] >= c)) return;
+  const n = hsBuyN(h), c = geoSum(hsCost(h), h.g, n);
+  if (n < 1 || !(S.counts[1] >= c)) return;
   S.counts[1] -= c;
-  S.hs[id] = hsLv(id) + 1;
+  S.hs[id] = hsLv(id) + n;
   SFX.shop(true);
   const b = document.getElementById('hsB' + id);
   if (b) { const [x, y] = centerOf(b); floatText(x, y, `${h.icon} ${h.name} Lv.${S.hs[id]}`, 'crit'); particles(x, y, 14, '#ffd43b'); }
@@ -7075,10 +7124,10 @@ function renderHs() {
       <button class="buybtn" data-hs="${h.id}" id="hsB${h.id}"><span id="hsA${h.id}"></span><span id="hsC${h.id}"></span></button></div>`).join('')}
       <div class="row"><div class="ricon">🪙</div><div class="rinfo"><div class="rname">수소 환전소</div><div class="rdesc" id="hsXD"></div></div><button class="buybtn" data-hsx="1" id="hsX"></button></div></div>`;
   for (const h of HSINK) {
-    const L = hsLv(h.id), maxed = L >= h.max, c = hsCost(h);
+    const L = hsLv(h.id), maxed = L >= h.max, n = maxed ? 0 : hsBuyN(h), c = geoSum(hsCost(h), h.g, Math.max(1, n));
     setText('hsLv' + h.id, h.max < 1e4 ? `Lv.${L}/${h.max}` : `Lv.${L}`);
-    setText('hsD' + h.id, h.desc(L) + (maxed ? '' : ` → 다음 ${h.desc(L + 1).split(' (')[0]}`));
-    setText('hsA' + h.id, maxed ? '✅ 최대' : '강화');
+    setText('hsD' + h.id, h.desc(L) + (maxed ? '' : ` → ${n > 1 ? `Lv.${L + n} ` : '다음 '}${h.desc(L + Math.max(1, n)).split(' (')[0]}`));
+    setText('hsA' + h.id, maxed ? '✅ 최대' : n > 1 ? `강화 +${n}` : '강화');
     setText('hsC' + h.id, maxed ? '' : '💧' + fmt(c));
     $('#hsB' + h.id).disabled = maxed || !(S.counts[1] >= c);
   }
@@ -7121,7 +7170,7 @@ function renderProd() {
       <div class="row">
         <div class="ricon">${r.icon}</div>
         <div class="rinfo"><div class="rname">${r.name} <span class="badge" id="rLv${r.id}"></span></div><div class="rdesc" id="rDesc${r.id}"></div></div>
-        <button class="buybtn" data-rep="${r.id}" id="rBtn${r.id}"><span>강화</span><span id="rCost${r.id}"></span></button>
+        <button class="buybtn" data-rep="${r.id}" id="rBtn${r.id}"><span id="rAmt${r.id}">강화</span><span id="rCost${r.id}"></span></button>
       </div>`).join('') + UPGRADES.filter(u => !S.upg[u.id] && upgVisible(u)).map(u => `
       <div class="row">
         <div class="ricon">${u.icon}</div>
@@ -7130,11 +7179,12 @@ function renderProd() {
       </div>`).join('');
   }
   for (const r of REPEATS) {
-    const lv = S[r.id], c = r.cost(lv);
+    const lv = S[r.id], n = repBuyN(r), c = geoSum(r.cost(lv), r.g, n);
     setText('rLv' + r.id, 'Lv.' + lv);
-    setText('rDesc' + r.id, r.desc(lv));
+    setText('rDesc' + r.id, r.desc(lv) + (n > 1 ? ` → Lv.${lv + n}` : ''));
+    setText('rAmt' + r.id, n > 1 ? `강화 +${n}` : '강화');
     setText('rCost' + r.id, fmt(c) + ' H');
-    $('#rBtn' + r.id).disabled = S.counts[1] < c;
+    $('#rBtn' + r.id).disabled = n < 1 || !(S.counts[1] >= c);
   }
   for (const u of UPGRADES) {
     const b = document.getElementById('uBtn' + u.id);
@@ -7473,7 +7523,7 @@ document.addEventListener('click', e => {
   if ((el = t.closest('.tabbtn'))) return switchTab(el.dataset.tab);
   if ((el = t.closest('[data-amt]'))) {
     R.buyAmt = el.dataset.amt === 'max' ? 'max' : +el.dataset.amt;
-    $$('[data-amt]').forEach(b => b.classList.toggle('on', b === el));
+    $$('[data-amt]').forEach(b => b.classList.toggle('on', b.dataset.amt === el.dataset.amt)); // 생산 시설·강화 수량 버튼을 함께
     return;
   }
   if ((el = t.closest('[data-gen]'))) return buyGen(+el.dataset.gen);
@@ -7503,6 +7553,8 @@ document.addEventListener('click', e => {
   if (t.closest('[data-g2048-end]')) return end2048();
   if ((el = t.closest('[data-simon]'))) return clickSimon(+el.dataset.simon);
   if ((el = t.closest('[data-hs]'))) return hsBuy(el.dataset.hs);
+  if ((el = t.closest('[data-wcat]'))) { R.wcat = el.dataset.wcat; R.sig.wshop = null; return renderWeapShop(); }
+  if ((el = t.closest('[data-p2shop]'))) { R.p2shop = el.dataset.p2shop; $$('[data-p2shop]').forEach(b => b.classList.toggle('on', b === el)); return renderWeapShop(); }
   if (t.closest('[data-hsx]')) return hsExchange();
   if ((el = t.closest('[data-cinv]'))) return cinvBuy(el.dataset.cinv);
   if ((el = t.closest('[data-coinact]'))) return el.dataset.coinact === 'warp' ? coinWarp() : coinGolden();
@@ -7608,7 +7660,19 @@ document.addEventListener('click', e => { if (e.target.closest('#btnRebirth')) r
 /* ---------- PWA: 서비스 워커 + 설치 ---------- */
 let deferredInstall = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; $('#btnInstall').style.display = ''; });
-window.addEventListener('appinstalled', () => { $('#btnInstall').style.display = 'none'; setText('installState', '✅ 설치되었어요!'); });
+window.addEventListener('appinstalled', () => { localStorage.setItem('ea_installed', '1'); $('#btnInstall').style.display = 'none'; setText('installState', '✅ 설치되었어요!'); });
+// 카카오톡 등에서 넘어온 경우(?install=1): 설치 버튼 하나만 크게 (설치 창은 누를 때만 뜰 수 있어요)
+if (/[?&]install=1/.test(location.search)) {
+  history.replaceState(null, '', location.pathname);
+  setTimeout(() => {
+    if (isStandalone()) return;
+    let m = $('#installModal');
+    if (!m) { m = document.createElement('div'); m.id = 'installModal'; document.body.appendChild(m); }
+    m.innerHTML = `<div class="install-box"><div class="install-ic"><img src="icon-192.png" alt=""></div><h2>📲 앱으로 다운로드</h2>
+      <p class="install-note">아래 버튼을 누르면 바로 설치돼요.</p><button class="big-btn" data-install="1">📲 지금 설치</button> <button class="btn" data-install="close">나중에</button></div>`;
+    m.classList.add('on');
+  }, 600);
+}
 $('#btnInstall').onclick = async () => {
   if (!deferredInstall) return;
   deferredInstall.prompt();
