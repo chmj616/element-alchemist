@@ -720,6 +720,7 @@ body:not(.p2v) #riftBox{display:none}
 .rebirth{background:linear-gradient(135deg,#1b1440,#141a2e);border:1px solid #5f3dc4;border-radius:14px;padding:12px 14px;margin-bottom:12px}
 .rb-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;font-size:14px}
 .rb-head span{color:#c9d6ff;font-size:13px}
+.rb-msg{flex:1 1 260px;min-width:0;line-height:1.6}
 .rb-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:#c9d6ff}
 .rb-foot .big-btn{margin-left:0;background:linear-gradient(135deg,#f59f00,#e8590c)}
 .big-btn:disabled{background:#2a3050!important;color:#6c7499;cursor:not-allowed}
@@ -946,6 +947,7 @@ html.touch-input .pv-key{display:none}
 .pv-sp.has{opacity:1;border-color:#69db7c}
 .pv-sp-icon{font-size:36px}.pv-sp b{display:block}.pv-sp small{color:#c9d6ff;font-size:11px}
 #toasts{z-index:4600}
+body:has(#duelModal.on) #toasts,body:has(#gravModal.on) #toasts{display:none}
 @media (max-width:700px){
   .pv-top-left{width:52vw;left:8px;top:8px}.pv-name{font-size:15px}.pv-stage{font-size:12px}
   .pv-top-right{width:44vw;right:8px;top:8px}
@@ -1284,7 +1286,14 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
   .pt-detail{padding:10px}
   .statsbox{grid-template-columns:1fr 1fr}
   #toasts{left:8px;right:8px;bottom:8px;max-width:none}
-  .toast{font-size:13px;padding:8px 10px}
+  .toast{font-size:12px;padding:6px 10px;line-height:1.4}
+  .toast span[style*="font-size:26px"]{font-size:20px!important}
+  #toasts > .toast:nth-last-child(n+3){display:none}
+  body.hmine-on .hstat.hs-mult{display:none}
+  .duel-hand{gap:4px}
+  .dcard{width:calc((100vw - 44px) / 4);min-width:0}
+  .duel-box{gap:8px}
+  .duel-mid{min-height:140px}
   .disc-box{margin:12px;padding:20px}
   .end-box h1{font-size:24px}.end-box p{font-size:14px}.end-icon{font-size:64px}
   .end-stats{grid-template-columns:repeat(2,1fr)}
@@ -1341,7 +1350,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
     <div class="hstat"><span class="lbl">수소 (H)</span><span class="val" id="hCount">0</span></div>
     <div class="hstat hmine" id="hMineBox" hidden><span class="lbl" id="hMineL">채굴 중</span><span class="val" id="hMine">0</span></div>
     <div class="hstat"><span class="lbl">초당 생산</span><span class="val" id="hRate">0/s</span></div>
-    <div class="hstat"><span class="lbl">생산 배율</span><span class="val" id="hMult">×1</span></div>
+    <div class="hstat hs-mult"><span class="lbl">생산 배율</span><span class="val" id="hMult">×1</span></div>
     <div class="hstat"><span class="lbl">발견한 원소</span><span class="val" id="hDisc">1/118</span></div>
     <div class="hstat"><span class="lbl">최고 스테이지</span><span class="val" id="hStage">0</span></div>
     <div class="hstat"><span class="lbl">코인</span><span class="val" id="hCoins" style="color:#ffd43b">🪙 0</span></div>
@@ -1362,7 +1371,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
     </div>
     <div class="core-info">
       <div id="clickVal">클릭당 +1 H</div>
-      <div class="sub">원자핵이나 빈 곳을 눌러 수소를 모으세요 (스페이스바도 가능)</div>
+      <div class="sub" id="coreSub">원자핵이나 빈 곳을 눌러 수소를 모으세요 (스페이스바도 가능)</div>
       <div id="combo"></div>
       <div id="p2Pick"></div>
     </div>
@@ -2494,9 +2503,9 @@ function renderRebirth() {
     <div class="rb-caps">${P2W() ? `⚒️ 다음 우주(${stageCap(P.count + 1)}층까지)에서 새로 열리는 무기: <b>${Math.max(0, (() => { let n = 0; for (let z = 1; z <= 118; z++) if (p2UnlockStage(z) <= stageCap(P.count + 1)) n++; return n; })() - rbNeedN())}종</b>` : `🧪 인공 원소 보스: <b>${SYNTH_STAGE[43]}~${SYNTH_STAGE[118]}층 (고정)</b>`} · 🔒 도전 가능 스테이지: <b>${stageCap()}</b>${stageCap() < MAX_STAGE ? ` (환생 ${P.count + 1}회 → ${stageCap(P.count + 1)})` : ' (최종 5000)'} · 🏆 역대 최고: ${Math.max(P.best || 0, S.battle.maxStage)}</div>
     <div class="bar"><div class="fill ${ready ? 'red' : 'blue'}" style="width:${Math.min(1, d / rbNeedN()) * 100}%"></div><span>${P2W() ? `깬 층까지 열리는 원소 ${d} / ${rbNeedN()}${S.battle.maxStage < P2_RB_MIN ? ` · ${P2_RB_MIN}층 필요` : ''}` : `주기율표 ${d} / 118`}</span></div>
     <div class="bar"><div class="fill gold" id="rbEnergyFill"></div><span id="rbEnergyText"></span></div>
-    <div class="rb-foot">${ok ? `준비 완료! 지금 환생하면 수소 ${fmt(cost)}개를 쓰고 <b>별의 씨앗 +${seedsGain()}개</b> (127스테이지 이후 25스테이지마다 +1)`
+    <div class="rb-foot"><span class="rb-msg">${ok ? `준비 완료! 지금 환생하면 수소 ${fmt(cost)}개를 쓰고 <b>별의 씨앗 +${seedsGain()}개</b> (127스테이지 이후 25스테이지마다 +1)`
       : ready ? `${P2W() ? `지금까지 깬 층의 원소(${rbNeedN()}종)를 모두 해금했어요!` : '118개 원소를 모두 모았어요!'} 빅뱅을 일으키려면 <b>💧 수소 ${fmt(cost)}개</b>가 더 필요해요 (씨앗 보너스만큼 커지고 환생할 때마다 ×3)`
-      : `${P2W() ? `${P2_RB_MIN}층 이상을 깨고, 지금까지 깬 층에서 열리는 원소 ${rbNeedN()}종을 모두 해금하고` : '118개 원소를 모두 발견하고'} <b>💧 수소 ${fmt(cost)}개</b>(빅뱅 에너지)를 모으면 환생할 수 있어요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06 (복리, 영구)`}
+      : `${P2W() ? `${P2_RB_MIN}층 이상을 깨고, 지금까지 깬 층에서 열리는 원소 ${rbNeedN()}종을 모두 해금하고` : '118개 원소를 모두 발견하고'} <b>💧 수소 ${fmt(cost)}개</b>(빅뱅 에너지)를 모으면 환생할 수 있어요. 씨앗 1개당 생산량 ×1.08, 전투력 ×1.06 (복리, 영구)`}</span>
       <button class="big-btn" id="btnRebirth" ${ok ? '' : 'disabled'}>🌌 빅뱅 일으키기</button></div>${g2OfferHtml()}`;
   const el = $('#rebirth');
   if (R.rbHtml !== html || !el.firstChild) { el.innerHTML = html; R.rbHtml = html; }
@@ -7250,9 +7259,10 @@ function updateCounts() {
 }
 function renderHeader() {
   setText('hCount', fmt(Math.floor(S.counts[1])));
+  setText('coreSub', P2W() ? '원자핵이나 빈 곳을 눌러 고른 원소를 캐세요 (스페이스바도 가능)' : '원자핵이나 빈 곳을 눌러 수소를 모으세요 (스페이스바도 가능)');
   // 2부: 헬륨 이상을 캐는 중이면 수소 옆에 그 원소 보유량
   const mz = P2W() ? p2Z() : 1, mb = $('#hMineBox');
-  if (mb.hidden !== (mz <= 1)) mb.hidden = mz <= 1;
+  if (mb.hidden !== (mz <= 1)) { mb.hidden = mz <= 1; document.body.classList.toggle('hmine-on', mz > 1); }
   if (mz > 1) { setText('hMineL', `⛏️ ${EL[mz].name} (${EL[mz].sym})`); setText('hMine', fmtS(S.counts[mz])); mb.style.setProperty('--mc', CATS[EL[mz].cat].color); }
   setText('hRate', fmt(totalRate()) + '/s');
   setText('hMult', '×' + fmt(prodMult()));
@@ -7532,7 +7542,7 @@ function renderBattle() {
     const u = unitStats(S.party[i]);
     const el = document.getElementById('pst' + i);
     if (!el) continue;
-    const txt = u ? `${u.lv ? `<span style="color:#ffd43b">⬆️ 강화 Lv.${u.lv}</span><br>` : ''}⚔️ 공격 <b>${fmt(u.atk * lanth)}</b> · ❤️ 체력 <b>${fmt(u.hp)}</b><br>${CATS[u.cat].name} · 공속 ×${u.speed}`
+    const txt = u ? `${u.lv ? `<span style="color:#ffd43b">⬆️ 강화 Lv.${u.lv}</span><br>` : ''}⚔️ 공격 <b>${fmt(u.atk * lanth)}</b> · ❤️ 체력 <b>${fmt(u.hp)}</b><br>${CATS[u.cat].name} · 공속 ×${+u.speed.toFixed(2)}`
       : (S.party[i] ? `<span style="color:#ff8787">${P2W() ? '이 무기가 없어요' : '보유량이 없어 싸울 수 없음'}</span>` : P2W() ? '⚒️ 무기를 장착하세요' : '원소를 배치하세요');
     if (el.innerHTML !== txt) el.innerHTML = txt;
     $('#ptm' + i).style.width = (u && B.active ? Math.min(1, R.unitT[i]) * 100 : 0) + '%';
