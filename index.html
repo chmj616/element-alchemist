@@ -5062,6 +5062,7 @@ function startGrav() {
   E.timeLeft = Infinity;
   R.grav = { E, turn: 0, pMax: ev.maxHp, pHp: ev.maxHp, pd: Math.max(1, ev.dps * GRAV_SEC), bd: E.atk / 1.5 * (1 - nobleRed) * GRAV_SEC,
     pull: 0, phase: 'intro', dice: 0, ang: 0, dir: 1, msg: [], hits: { p: 0, g: 0, m: 0 } };
+  R.grav.bd = Math.max(R.grav.bd, ev.maxHp * 0.07); // 빅 크런치 한 방은 최소 최대 체력의 7% (체력 승부가 사라지지 않게)
   blog('🌑 빅 크런치가 주변의 모든 것을 끌어당기기 시작했어요! 「중력 붕괴」', 'boss');
   SFX.boss();
   renderGrav();
@@ -5287,7 +5288,7 @@ function startDuel() {
   E.timeLeft = Infinity;
   const v2 = DUEL2(), sec = v2 ? 2.5 : DUEL_SEC; // 개편 결투는 카드 1장 = 2.5초어치 (2500층보다 어렵게)
   const modes = ['tap', 'react', 'aim'].sort(() => Math.random() - 0.5);
-  R.duel = { E, v2, modes, gauge: 0, ph: 1, round: 0, pMax: ev.maxHp, pHp: ev.maxHp, pd: Math.max(1, ev.dps * sec), bd: E.atk / 1.5 * (1 - nobleRed) * sec,
+  R.duel = { E, v2, modes, gauge: 0, ph: 1, round: 0, pMax: ev.maxHp, pHp: ev.maxHp, pd: Math.max(1, ev.dps * sec), bd: Math.max(E.atk / 1.5 * (1 - nobleRed) * sec, v2 ? ev.maxHp * 0.1 : 0), // 개편: 빅 립 한 방은 최소 최대 체력의 10%
     pSh: 0, bSh: 0, hand: [], bCard: null, shown: false, phase: 'intro', first: null, perfect: false, me: 0, boss: 0, goal: 0,
     msg: [], wz: units.map(u => u.z), counter: false, jam: false, lastTap: 0 };
   blog('🃏 빅 립이 카드 결투를 걸어 왔어요!', 'boss');
@@ -6004,6 +6005,8 @@ function adminPanelHtml() {
       <button class="btn" data-admin="p2rift">🌀 2부: 균열 20개 봉인 (입자 충돌기 열기) + 수소</button>
       <button class="btn" data-admin="p2crunch">🌑 2부: 2500층 빅 크런치 앞으로</button>
       <button class="btn" data-admin="p2duel">🃏 2부: 5000층 빅 립 카드 결투 앞으로</button>
+      <button class="btn" data-admin="p2spec:2500">💪 2부: 2500층 깰 스펙<br><small>그 층까지 무기 전부 + 강화 · 최고 덱 장착</small></button>
+      <button class="btn" data-admin="p2spec:5000">💪 2부: 5000층 깰 스펙<br><small>무기 118종 + 강화 · 최고 덱 장착</small></button>
       <button class="btn" data-admin="partswap">🔁 ${S.part === 1 ? '2부로 전환' : '1부로 전환'} (지금 ${S.part}부)</button>
       <div class="admin-sec">🎁 지급</div>
       <button class="btn" data-admin="voidfeed">🕳️ 공허 봉헌 원소 지급<br><small>118종 모두 바치고도 절반이 남게 (필요량 ×2)</small></button>
@@ -6095,6 +6098,12 @@ async function adminAction(a) {
   if (a === 'p2kit') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); for (let z = 1; z <= 118; z++) { S.disc[z] = true; S.counts[z] = Math.max(S.counts[z], 1e7); } R.discQueue = []; S.battle.maxStage = Math.max(S.battle.maxStage, 300); }
   if (a === 'p2rift') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.rift = Math.max(S.rift || 0, COL_UNLOCK); for (let z = 1; z <= 21; z++) { S.disc[z] = true; S.weap[z] = 1; } S.counts[1] = Math.max(S.counts[1], 1e15); R.riftSig = null; }
   if (a === 'p2crunch') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.prestige.count = Math.max(S.prestige.count, 5); S.battle.maxStage = Math.max(S.battle.maxStage, P2_CRUNCH - 1); S.battle.stage = P2_CRUNCH; S.p2talk = false; S.p2talk2 = false; R.enemy = null; }
+  if (a.startsWith('p2spec:')) {
+    if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요');
+    const r = adminP2Spec(+a.slice(7));
+    if (!r) return toast('⚠️ 스펙을 맞추지 못했어요');
+    toast(`💪 ${r.st}층 스펙: 무기 ${r.n}종 · 강화 +${r.lv} · 예상 처치 ${fmtSec(r.ttk)} (일반 전투 기준)`, 'disc', 5000);
+  }
   if (a === 'p2duel') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.prestige.count = Math.max(S.prestige.count, 7); S.battle.maxStage = Math.max(S.battle.maxStage, MAX_STAGE - 1); S.battle.stage = MAX_STAGE; R.enemy = null; }
   if (a === 'p2weap') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); for (let z = 1; z <= 118; z++) if (S.disc[z]) { S.weap[z] = 1; S.wlv[z] = Math.max(S.wlv[z], 30); } }
   if (a === 'elements') doEl();
@@ -7353,6 +7362,25 @@ function defeat(reason) {
   R.unitT = [0, 0, 0, 0, 0];
 }
 // 건너뛴 인공 원소 보스 층으로 이동 (잡으면 R.synthBack 층으로 복귀)
+// 관리자: 2부에서 st층 보스를 여유 있게 깰 스펙 (그 층까지 열리는 무기 전부 제작 · 같은 강화 레벨 · 최고 덱)
+// 기준: 일반 전투로 12초 안에 처치 → 중력 붕괴·카드 결투도 실력이 조금만 있으면 이길 수 있는 정도
+function adminP2Spec(st) {
+  S.prestige.count = Math.max(S.prestige.count, st >= MAX_STAGE ? 7 : 5);
+  let n = 0;
+  for (let z = 1; z <= 118; z++) if (p2UnlockStage(z) <= st) { S.disc[z] = true; S.weap[z] = 1; S.counts[z] = Math.max(S.counts[z], 1e6); n++; }
+  R.discQueue = [];
+  const E = makeEnemy(st), own = [];
+  for (let z = 1; z <= 118; z++) if (S.weap[z]) own.push(z);
+  const ok = L => { for (const z of own) S.wlv[z] = L; const r = bestDeck(st, E); return r && r.result.win && r.result.ttk <= 12 ? r : null; };
+  let lo = 0, hi = 4000;
+  if (!ok(hi)) return null;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (ok(m)) hi = m; else lo = m; }
+  const r = ok(hi);
+  S.party = r.team.map(u => u.z).concat([0, 0, 0, 0, 0]).slice(0, 5);
+  S.battle.maxStage = Math.max(S.battle.maxStage, Math.min(st - 1, stageCap()));
+  R.unitT = [0, 0, 0, 0, 0];
+  return { st, n, lv: hi, ttk: r.result.ttk };
+}
 function synthGoBack(st) {
   const B = S.battle;
   if (!R.synthBack || R.synthBack < B.stage) R.synthBack = B.stage;
