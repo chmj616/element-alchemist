@@ -1,0 +1,20 @@
+[
+  { "name": "게임 로드 · 최신 공개 단계까지 켜짐", "js": "typeof S === 'object' && RELEASE_ID >= 11 && beta(RELEASE_ID)", "expect": true },
+  { "name": "최대 융합이 10^15에서 막히지 않음 (회귀)", "js": "(()=>{S=Object.assign(defaultState(),{part:1});S.counts[1]=1e40;S.disc[2]=true;return fusionMax([1,1])>1e37})()", "expect": true },
+  { "name": "오버플로: NaN·∞가 남지 않음", "js": "(()=>{S.counts[1]=NaN;S.coins=Infinity;overflowGuard();return isFinite(S.counts[1])&&isFinite(S.coins)})()", "expect": true },
+  { "name": "저장/불러오기에서 새 필드 유지", "js": "(()=>{S=Object.assign(defaultState(),{part:2});S.frag=77;S.synthAt={43:505};S.col.parts={u:3,grav:1};S.col.shiny={u:1};S.crunch.back=true;S.battle.maxAt=123;const t=normalizeSave(JSON.parse(JSON.stringify(S)));return [t.frag,t.synthAt[43],t.col.parts.grav,t.col.shiny.u,t.crunch.back,t.battle.maxAt]})()", "expect": [77, 505, 1, 1, true, 123] },
+  { "name": "2부 무기 해금 층 (오가네손 4500층)", "js": "[p2UnlockStage(10),p2UnlockStage(50),p2UnlockStage(118)]", "expect": [0, 280, 4500] },
+  { "name": "무기 재료가 뒤로 갈수록 비쌈", "js": "(()=>{const h=z=>Object.entries(weapRecipe(z)).reduce((a,[k,n])=>a+n*EL_VALUE[k],0);return h(118)>h(92)&&h(92)>h(50)&&h(50)>h(10)})()", "expect": true },
+  { "name": "가중치 0인 카드는 절대 안 뽑힘", "js": "(()=>{let c=0,n=0;for(let i=0;i<3000;i++){if(pickW(DUEL_BOSS,{cut:0})==='cut')c++;if(pickW(DUEL_CARDS)==='nova')n++;}return [c,n]})()", "expect": [0, 0] },
+  { "name": "입자 충돌기 효과가 폭주하지 않음 (47종 전부 · 빔 Lv30)", "js": "(()=>{S=Object.assign(defaultState(),{part:2});S.col.lv=30;for(const P of COL_ALL){S.col.parts[P.id]=1e6;S.col.shiny[P.id]=1;}return colMult('weap')<5000&&colMult('prod')<5000&&colMult('mine')<5000})()", "expect": true },
+  { "name": "입자 충돌기: 예전 방식보다 낮아지지 않음", "js": "(()=>{S=Object.assign(defaultState(),{part:2});for(const P of PARTICLES)S.col.parts[P.id]=30;let old=1;for(const P of PARTICLES)if(P.kind==='weap')old*=1+COL_TIERS[P.tier].eff*30;return colMult('weap')>=old})()", "expect": true },
+  { "name": "파편: 처음 100개 · 재전투 50개", "js": "(()=>{S=Object.assign(defaultState(),{part:2});const a=fragNeed();S.crunch.back=true;return [a,fragNeed()]})()", "expect": [100, 50] },
+  { "name": "2500층: 파편 부족하면 소환 막힘 · 충분하면 「중력 붕괴」", "js": "(()=>{S=Object.assign(defaultState(),{part:2});S.tut=99;S.p2talk=true;S.p2talk2=true;adminP2Spec(2500);S.battle.maxStage=2499;S.battle.stage=2500;S.frag=10;startBattle();const a=!!R.grav;document.getElementById('fragModal')?.classList.remove('on');S.frag=100;S.battle.stage=2500;R.enemy=null;R.cooldown=0;spawnEnemy();const b=!!R.grav;R.grav=null;renderGrav();S.battle.active=false;R.enemy=null;return [a,b,S.frag]})()", "expect": [false, true, 0] },
+  { "name": "5000층: 카드 결투 시작", "js": "(()=>{S=Object.assign(defaultState(),{part:2});S.tut=99;S.p2rip1=true;adminP2Spec(5000);S.battle.maxStage=4999;S.battle.stage=5000;startBattle();const ok=!!R.duel&&R.duel.v2;R.duel=null;renderDuel();S.battle.active=false;R.enemy=null;return ok})()", "expect": true },
+  { "name": "2부 환생 조건 (200층 + 깬 층 원소)", "js": "(()=>{S=Object.assign(defaultState(),{part:2});S.battle.maxStage=150;const a=rebirthReady();S.battle.maxStage=250;for(let z=1;z<=118;z++)S.disc[z]=p2UnlockStage(z)<=250;return [a,rebirthReady()]})()", "expect": [false, true] },
+  { "name": "1부 워프: 못 잡은 인공 원소 보스를 앞쪽 층으로", "js": "(()=>{S=Object.assign(defaultState(),{part:1});for(let z=1;z<=118;z++)S.disc[z]=!SYNTHETIC.has(z);S.prestige.count=4;S.prestige.best=3000;const mv=synthRelocate(warpStage());return mv.length===28&&mv[0][1]===warpStage()+5&&synthBossFor(mv[0][1])===mv[0][0]})()", "expect": true },
+  { "name": "우클릭 메뉴 막힘 (입력 칸 제외)", "js": "(()=>{const e=new MouseEvent('contextmenu',{bubbles:true,cancelable:true});document.body.dispatchEvent(e);const i=document.createElement('input');document.body.appendChild(i);const e2=new MouseEvent('contextmenu',{bubbles:true,cancelable:true});i.dispatchEvent(e2);i.remove();return [e.defaultPrevented,e2.defaultPrevented]})()", "expect": [true, false] },
+  { "vp": [390, 844, 1] },
+  { "wait": 300 },
+  { "name": "모바일: 가로 스크롤 없음", "js": "document.documentElement.scrollWidth <= innerWidth + 1", "expect": true }
+]

@@ -53,7 +53,18 @@ function playerSummary(d) {
     weapons: Array.isArray(d.weap) ? d.weap.filter(Boolean).length : 0, hs: d.hs ? Object.values(d.hs).reduce((s, v) => s + n0(v), 0) : 0,
     crunch: { clearAt: n0(c.clearAt), eventAt: n0(c.eventAt), gone: !!c.gone, fresh: !!c.fresh },
     other: a ? { part: a.part === 2 ? 2 : 1, ...side(a) } : null, lastSave: n0(d.lastSave),
+    maxAt: typeof b.maxAt === 'number' ? b.maxAt : null, warn: saveWarnings(d),
   };
+}
+// 저장 이상 표시 (막지는 않고 관리자 기록에만): 숫자가 깨졌거나(NaN→null), 층 상한을 넘었거나, 상한 근처
+const STAGE_CAPS = [300, 600, 1000, 1500, 2200, 3000, 4000, 5000];
+function saveWarnings(d) {
+  const w = [], c = Array.isArray(d.counts) ? d.counts : [];
+  if (c[1] === null || d.coins === null || c.some(v => v === null)) w.push('숫자 깨짐(오버플로 피해 의심)');
+  const cap = STAGE_CAPS[Math.min(7, n0(d.prestige?.count))], ms = n0(d.battle?.maxStage);
+  if (ms > cap) w.push(`층 상한 초과(${ms} > ${cap})`);
+  if (n0(c[1]) >= 1e299 || n0(d.coins) >= 1e299) w.push('수치 상한 근처');
+  return w;
 }
 
 const routes = {

@@ -1,0 +1,12 @@
+[
+ {
+  "name": "2부 밸런스: 4999층 도달 · 3시간 넘게 막히는 곳 없음 · 무기 강화 없으면 멈춤 (수 분 걸려요)",
+  "file": "balance-p2.js",
+  "js": "(()=>{const a=P2SIM({hours:260});const reach=/4999층 도달/.test(a);const st=+(/가장 오래 막힘 ([\\d.]+)h/.exec(a)||[0,99])[1];const b=P2SIM({hours:120,noWeap:true});const stuck=+(/최종 [\\d.]+h 층 (\\d+)/.exec(b)||[0,9999])[1];return [reach, st < 4, stuck < 300]})()",
+  "expect": [
+   true,
+   true,
+   true
+  ]
+ }
+]

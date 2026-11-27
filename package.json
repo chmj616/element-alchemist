@@ -7,5 +7,9 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "1.2.1"
+  },
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "test:balance": "node tests/run.mjs tests/balance.json"
   }
 }

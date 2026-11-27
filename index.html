@@ -2164,7 +2164,7 @@ function defaultState() {
     cinv: { prod: 0, atk: 0, hp: 0 }, warpAt: 0, goldBuyAt: 0, hs: { star: 0, arms: 0, vault: 0, accel: 0 }, hexAt: 0,
     part: 1, crunch: { clearAt: 0, eventAt: 0, gone: false }, alt: null,
     weap: new Array(119).fill(0), wlv: new Array(119).fill(0), p2z: 1, p2talk: false, p2talk2: false, p2rip1: false, p2rip2: false,
-    rift: 0, col: { lv: 0, auto: 0, parts: {}, shots: 0 },
+    rift: 0, col: { lv: 0, auto: 0, parts: {}, shots: 0, shiny: {} },
   };
 }
 /* ---------- 세이브 검사: 아는 항목만, 올바른 형식으로만 받아들임 ---------- */
@@ -2192,7 +2192,7 @@ function normalizeSave(raw, nested) {
   s.endings = Object.assign({ e1: false, e2: false, e3: false, e4: false }, flags(d.endings, ['e1', 'e2', 'e3', 'e4']));
 
   const b = obj(d.battle);
-  Object.assign(s.battle, { stage: int(b.stage, 1, 1, MAX_STAGE), maxStage: int(b.maxStage, 0, 0, MAX_STAGE), auto: b.auto !== false, autoDeck: b.autoDeck === true, hp: num(b.hp), maxHp: num(b.maxHp) });
+  Object.assign(s.battle, { stage: int(b.stage, 1, 1, MAX_STAGE), maxStage: int(b.maxStage, 0, 0, MAX_STAGE), auto: b.auto !== false, autoDeck: b.autoDeck === true, hp: num(b.hp), maxHp: num(b.maxHp), maxAt: num(b.maxAt) });
   const p = obj(d.prestige);
   s.prestige = { count: int(p.count), seeds: num(p.seeds), best: int(p.best, 0, 0, MAX_STAGE) };
   s.frag = int(d.frag, 0, 0, 999);
@@ -5353,6 +5353,7 @@ const DUEL_BOSS = {
 // 3페이즈: 체력 66%·33%에서 바뀌어요 (빅 립 피해 ×1 → ×1.3 → ×1.6)
 const duelPh = D => (D.E.hp > D.E.maxHp * 0.66 ? 1 : D.E.hp > D.E.maxHp * 0.33 ? 2 : 3);
 const DUEL_PH_MULT = [0, 1, 1.3, 1.6];
+const DUEL_TOUCH_MS = 60;
 const DUEL_MODES = { tap: '⚡ 연타 대결', react: '🚦 반응 속도', aim: '🎯 조준' };
 function pickW(tbl, mod) {
   const ks = Object.keys(tbl), ws = ks.map(k => tbl[k].w * (mod && k in mod ? mod[k] : 1)); // 0이면 안 나와요
@@ -5465,7 +5466,7 @@ function duelModeTap() {
   const D = R.duel, now = performance.now();
   if (D.mode === 'react') {
     if (!D.go) return duelModeResult('boss', false, '🚦 <b>부정 출발!</b> 신호 전에 눌렀어요');
-    const rt = now - D.goAt;
+    const rt = Math.max(1, now - D.goAt - (D.touch ? DUEL_TOUCH_MS : 0)); // 터치 화면은 반응이 늦게 잡혀서 보정
     if (rt < D.bossRT) return duelModeResult('me', rt < D.bossRT * 0.65, `🚦 반응 ${Math.round(rt)}ms vs 빅 립 ${Math.round(D.bossRT)}ms`);
     return duelModeResult('boss', false, `🚦 반응 ${Math.round(rt)}ms — 빅 립(${Math.round(D.bossRT)}ms)이 더 빨랐어요`);
   }
@@ -5488,7 +5489,7 @@ function duelModeResult(first, perfect, text) {
 function duelTap(e, x, y) {
   const D = R.duel;
   if (!D || D.phase !== 'click' || !clickAllowed(e, 'duel', x, y)) return; // 오토 클릭은 다른 클릭과 같은 규칙으로 막아요
-  if (D.mode && D.mode !== 'tap') return D.done ? null : duelModeTap();
+  if (D.mode && D.mode !== 'tap') { D.touch = !!(e && e.pointerType === 'touch'); return D.done ? null : duelModeTap(); }
   const now = performance.now();
   if (now - D.lastTap < 40) return; // 매크로 방지: 초당 25회까지만
   D.lastTap = now; D.me++;
@@ -6109,7 +6110,7 @@ function guideSections() {
       beta(4) && '🔓 무거운 원소(=무기)는 <b>층을 올라갈수록</b> 열려요: 300층까지 1~50번 · 600층 ~70번 · 1000층 ~92번 · 1500층 ~100번 · 2200층 ~106번 · 3000층 ~111번 · 4000층 ~116번 · 오가네손은 4500층. 무기 재료는 열리는 시점의 생산량에 맞춰 커져요.',
       beta(4) && '🌌 2부 <b>환생</b>: 200층 이상을 깨고, 지금까지 깬 층에서 열리는 원소를 모두 해금하면 할 수 있어요. 만든 무기는 그대로 (강화 레벨만 초기화) · 막히면 환생해서 씨앗으로 넘어가요.',
       beta(4) && '🌑 <b>2500층</b>에서 누군가 기다리고 있어요… 최종은 5000층.',
-      beta(11) && '🌑 <b>빅 크런치 파편</b>: 「빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 40% 확률로 파편. 2500층에서 빅 크런치를 불러내려면 파편 100개가 필요해요 (한 번 잡은 뒤 다시 싸우려면 50개 · 불러낼 때 소모 · 지면 절반 돌려받음). 부족하면 「파편 모으러 가기」 · 전시장에서 보스를 눌러 「⚔️ 이 층으로」도 돼요. 빅 크런치·빅 립은 싸우는 동안 체력을 회복해요.',
+      beta(11) && '🌑 <b>빅 크런치 파편</b>: 「빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 40% 확률로 파편 1~3개. 2500층에서 빅 크런치를 불러내려면 파편 100개가 필요해요 (한 번 잡은 뒤 다시 싸우려면 50개 · 불러낼 때 소모 · 지면 절반 돌려받음). 부족하면 「파편 모으러 가기」 · 전시장에서 보스를 눌러 「⚔️ 이 층으로」도 돼요. 빅 크런치·빅 립은 싸우는 동안 체력을 회복해요.',
       beta(10) && '⚔️ 2부에선 <b>무기 강화가 핵심</b>: 이온 빔 증폭기·전자기 보호막은 레벨당 ×1.2뿐이라 수소만으로는 보스를 못 넘어요. 🪙 코인은 원소 판매 · 몹 처치(보스는 3배) · 상점 「코인 투자소」 탭의 수소 환전소(10분마다)에서 모아요.',
       beta(9) && '🃏 <b>5000층 카드 결투</b>: 라운드마다 선공 미니게임이 ⚡ 연타 · 🚦 반응 속도 · 🎯 조준으로 바뀌어요. 이기면 🌟 필살 게이지가 차고, 100%면 「원소 대폭발」(×3, 보호막 무시)! 빅 립은 체력 66%·33%에서 강해지는 3페이즈예요.',
       beta(8) && '🌑 <b>2500층 「중력 붕괴」</b>: 매 턴 🎲 중력 주사위(블랙홀 ×3 · 역회전 · 가속 · 평온 · 확장 · 행운)로 조건이 정해지고, 회전하는 바늘을 초록(좋아요)·금색(완벽 ×2) 구역에서 멈춰 공격해요. 빗나가면 🕳️ 흡입 +25% — 100%가 되거나 12턴이 지나면 패배해서 <b>100~150층 뒤로</b> 밀려나요. 5000층 결투에서 지면 <b>150~250층 뒤로</b>.',
@@ -7501,6 +7502,7 @@ function victory() {
   if (E.stage > B.maxStage) {
     const before = partySlots();
     B.maxStage = E.stage;
+    B.maxAt = S.playTime; // 관리자 기록: 마지막으로 최고층이 오른 때
     if (partySlots() > before) toast('🎉 파티 슬롯이 하나 늘어났습니다!');
     const nc = fuseCap();
     if (nc > cap) {
@@ -7610,9 +7612,12 @@ const fragNeed = () => (S.crunch && S.crunch.back ? FRAG_AGAIN : FRAG_FIRST);
 const fragFloor = st => Math.max(10, Math.floor((Math.min(st, P2_CRUNCH - 1) - 10) / 40) * 40 + 10);
 function fragDrop(E) {
   if (!P2F() || !E.frag || S.frag >= 999 || Math.random() >= FRAG_CHANCE) return '';
-  S.frag++;
-  if (S.frag === fragNeed() || S.frag % 10 === 0) toast(`🌑 <b>빅 크런치 파편</b> ${S.frag}/${fragNeed()}${S.frag === fragNeed() ? '<br>2500층에서 빅 크런치를 불러낼 수 있어요!' : ''}`, 'disc', 3500); // 10개마다만 알림
-  return ` · 🌑 파편! (${S.frag}/${fragNeed()})`;
+  const r = Math.random(), k = 1 + (r < 0.3 ? 1 : 0) + (r < 0.08 ? 1 : 0); // 1~3개 (평균 약 1.4개)
+  const before = S.frag;
+  S.frag = Math.min(999, S.frag + k);
+  if (before < fragNeed() && S.frag >= fragNeed() && S.battle.maxStage >= P2_CRUNCH - 1) setTimeout(showFragReady, 400);
+  if (Math.floor(S.frag / 10) > Math.floor(before / 10) && S.frag < fragNeed()) toast(`🌑 <b>빅 크런치 파편</b> ${S.frag}/${fragNeed()}${S.frag === fragNeed() ? '<br>2500층에서 빅 크런치를 불러낼 수 있어요!' : ''}`, 'disc', 3500); // 10개마다만 알림
+  return ` · 🌑 파편 +${k}! (${S.frag}/${fragNeed()})`;
 }
 function goStage(st, auto) {
   const B = S.battle;
@@ -7621,13 +7626,23 @@ function goStage(st, auto) {
   R.enemy = null;
   if (B.active) { R.cooldown = 0.3; B.hp = B.maxHp; } else startBattle();
 }
+// 파편이 다 모였을 때: 2500층으로 바로
+function showFragReady() {
+  let m = $('#fragModal');
+  if (!m) { m = document.createElement('div'); m.id = 'fragModal'; document.body.appendChild(m); }
+  m.innerHTML = `<div class="install-box"><div style="font-size:56px">🌑✨</div><h2>파편이 모였어요!</h2>
+    <p><b>빅 크런치의 파편 ${S.frag}/${fragNeed()}</b> — 2500층에서 빅 크런치를 불러낼 수 있어요.</p>
+    <div class="btnrow" style="justify-content:center"><button class="big-btn" data-frag="fight">🌑 2500층으로</button><button class="btn" data-frag="close">조금 더 모을래요</button></div></div>`;
+  m.classList.add('on');
+  SFX.bonus();
+}
 function showFragNeed() {
   let m = $('#fragModal');
   if (!m) { m = document.createElement('div'); m.id = 'fragModal'; document.body.appendChild(m); }
   const f = fragFloor(S.battle.maxStage);
   m.innerHTML = `<div class="install-box"><div style="font-size:56px">🌑</div><h2>빅 크런치를 불러내려면</h2>
     <p>흩어진 <b>빅 크런치의 파편 ${fragNeed()}개</b>가 필요해요. 지금 <b>${S.frag}/${fragNeed()}</b></p>
-    <p class="install-note">파편은 「🌘 빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 ${Math.round(FRAG_CHANCE * 100)}% 확률로 나와요. 불러낼 때 ${fragNeed()}개를 쓰고, 지면 ${Math.floor(fragNeed() * FRAG_REFUND)}개를 돌려받아요.</p>
+    <p class="install-note">파편은 「🌘 빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 ${Math.round(FRAG_CHANCE * 100)}% 확률로 1~3개 나와요. 불러낼 때 ${fragNeed()}개를 쓰고, 지면 ${Math.floor(fragNeed() * FRAG_REFUND)}개를 돌려받아요.</p>
     <div class="btnrow" style="justify-content:center"><button class="big-btn" data-frag="go">🌘 파편 모으러 가기 (${f}층)</button><button class="btn" data-frag="close">닫기</button></div></div>`;
   m.classList.add('on');
 }
@@ -7636,6 +7651,7 @@ document.addEventListener('click', e => {
   const a = e.target.closest('[data-frag]');
   if (!a) return;
   $('#fragModal')?.classList.remove('on');
+  if (a.dataset.frag === 'fight') { switchTab('battle'); goStage(P2_CRUNCH, true); return; }
   if (a.dataset.frag === 'go') { switchTab('battle'); goStage(fragFloor(S.battle.maxStage), false); blog(`🌘 파편 보스 층(${S.battle.stage})에서 파편을 모아요. 자동 진행은 꺼 두었어요 — 같은 층을 반복해요.`, 'info'); }
 });
 // 보스 회복 (중력 붕괴 · 카드 결투): 너무 빨리 끝나지 않게
@@ -8613,19 +8629,20 @@ async function openPlayers() {
   const P = r.players || [];
   const end = s => s ? ['e1', 'e2', 'e3', 'e4'].filter(k => s.endings[k]).map(k => ({ e1: '1', e2: '2', e3: '3', e4: '2부' }[k])).join('·') || '-' : '-';
   const crunch = s => { if (!s || !s.crunch) return '-'; const c = s.crunch; return c.gone ? '🚨 발생함' : c.eventAt ? `⏳ ${fmtDate(c.eventAt)}` : (s.endings.e1 || (s.other && s.other.endings && s.other.endings.e1)) ? '접속 대기' : '-'; };
+  const stall = s => s && s.maxAt != null && s.playTime ? Math.max(0, (s.playTime - s.maxAt) / 3600) : null;
   const rows = P.map((p, i) => {
-    const s = p.s;
+    const s = p.s, st = stall(s), warn = s && s.warn && s.warn.length ? ` <span title="${esc(s.warn.join(' · '))}">⚠️</span>` : '';
     const det = s ? `<div class="pl-det" data-pldet="${i}" hidden>
       <b>${esc(p.user)}</b> · 가입 ${fmtDate(p.created)} · 마지막 로그인 ${p.lastLogin ? fmtDate(p.lastLogin) : '-'} · 저장 ${p.rev}회 (${fmt(p.size)}바이트)<br>
       지금 ${s.part}부 · 현재 층 ${s.stage} · 최고 ${s.maxStage} (역대 ${s.best}) · 환생 ${s.rebirths}회 · 🌱 씨앗 ${fmt(s.seeds)} · 원소 ${s.disc}/118<br>
       💧 수소 ${fmt(s.h)} · 🪙 코인 ${fmt(s.coins)} · 플레이 ${fmtDur(s.playTime)} · 클릭 ${fmt(s.clicks)} · 처치 ${fmt(s.kills)} · 융합 ${fmt(s.fusions)}<br>
       🕳️ 공허 ${s.voidDone}/118 · ⚛️ 원소 쪼개기 ${s.g2 ? s.g2 + '번째 우주' : '-'} · 🌟 항성 공방 Lv 합 ${s.hs} · ⚒️ 무기 ${s.weapons} · 🌀 균열 ${s.rift}<br>
-      🚨 빅 크런치: ${s.crunch.gone ? '사라짐 (2부 열림)' : s.crunch.eventAt ? `${fmtDate(s.crunch.eventAt)} 예정 (${s.crunch.fresh ? '공개 뒤 클리어' : '공개 전 클리어'})` : '아직 일정 없음'}${s.crunch.clearAt ? ` · 기록 시작 ${fmtDate(s.crunch.clearAt)}` : ''}
+      ${s.warn && s.warn.length ? `<span style="color:#ff8787">⚠️ ${esc(s.warn.join(' · '))}</span><br>` : ''}🚨 빅 크런치: ${s.crunch.gone ? '사라짐 (2부 열림)' : s.crunch.eventAt ? `${fmtDate(s.crunch.eventAt)} 예정 (${s.crunch.fresh ? '공개 뒤 클리어' : '공개 전 클리어'})` : '아직 일정 없음'}${s.crunch.clearAt ? ` · 기록 시작 ${fmtDate(s.crunch.clearAt)}` : ''}
       ${s.other ? `<br>📦 보관 중인 ${s.other.part}부: 최고 ${s.other.maxStage}층 · 환생 ${s.other.rebirths}회 · 엔딩 ${end({ endings: s.other.endings })}` : ''}</div>` : `<div class="pl-det" data-pldet="${i}" hidden>저장 데이터 없음 · 가입 ${fmtDate(p.created)}</div>`;
-    return `<tr data-plrow="${i}"><td><b>${esc(p.user)}</b></td><td>${s ? s.part + '부' : '-'}</td><td>${s ? s.maxStage : '-'}</td><td>${s ? s.rebirths : '-'}</td><td>${end(s)}</td><td>${s ? s.disc : '-'}</td><td>${s ? fmtDur(s.playTime) : '-'}</td><td>${fmtAgo(p.saved)}</td><td>${crunch(s)}</td></tr><tr class="pl-detrow"><td colspan="9">${det}</td></tr>`;
+    return `<tr data-plrow="${i}"><td><b>${esc(p.user)}</b>${warn}</td><td>${s ? s.part + '부' : '-'}</td><td>${s ? s.maxStage : '-'}</td><td>${s ? s.rebirths : '-'}</td><td>${end(s)}</td><td>${s ? s.disc : '-'}</td><td>${s ? fmtDur(s.playTime) : '-'}</td><td>${st == null ? '-' : st >= 3 ? `<b style="color:#ff8787">${st.toFixed(1)}h</b>` : st.toFixed(1) + 'h'}</td><td>${fmtAgo(p.saved)}</td><td>${crunch(s)}</td></tr><tr class="pl-detrow"><td colspan="10">${det}</td></tr>`;
   }).join('');
-  m.innerHTML = `<div class="pl-box"><h2>📋 플레이어 기록 <small>${P.length}명 · 줄을 누르면 자세히</small></h2>
-    <div class="pl-wrap"><table class="pl-table"><thead><tr><th>아이디</th><th>부</th><th>최고층</th><th>환생</th><th>엔딩</th><th>원소</th><th>플레이</th><th>마지막 저장</th><th>빅 크런치</th></tr></thead><tbody>${rows}</tbody></table></div>
+  m.innerHTML = `<div class="pl-box"><h2>📋 플레이어 기록 <small>${P.length}명 · 줄을 누르면 자세히 · 정체 = 최고층이 마지막으로 오른 뒤 지난 시간 · ⚠️ = 저장 이상</small></h2>
+    <div class="pl-wrap"><table class="pl-table"><thead><tr><th>아이디</th><th>부</th><th>최고층</th><th>환생</th><th>엔딩</th><th>원소</th><th>플레이</th><th title="최고층이 마지막으로 오른 뒤 지난 플레이 시간 (3시간 넘으면 빨강 — 막힌 곳)">정체</th><th>마지막 저장</th><th>빅 크런치</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="btnrow"><button class="btn" data-pl="reload">🔄 새로고침</button><button class="btn" data-pl="close">닫기</button></div></div>`;
 }
 
