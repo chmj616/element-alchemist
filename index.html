@@ -5466,11 +5466,21 @@ async function installApp() {
     else toast('설치를 취소했어요. 다시 누르면 다시 물어봐요 (안 뜨면 새로고침 후)', '', 3500);
     return;
   }
-  if (supports && localStorage.getItem('ea_installed')) return toast('✅ 이미 설치돼 있어요! 홈 화면이나 앱 목록에서 「원소 연금술사」를 여세요', 'disc', 5000);
+  // 이미 설치돼 있으면 설치 창이 안 와요 → 알려 주기 (안드로이드 크롬은 실제 설치 여부를 확인할 수 있어요)
+  let installed = !!localStorage.getItem('ea_installed');
+  try { if (navigator.getInstalledRelatedApps) installed = (await navigator.getInstalledRelatedApps()).length > 0 || installed; } catch (e) { /* 확인 못 함 */ }
+  if (installed) return toast('✅ 이미 설치돼 있어요! 홈 화면이나 앱 목록에서 「원소 연금술사」 아이콘을 눌러 여세요', 'disc', 5000);
+  // 안드로이드에서 설치 창을 못 띄우는 브라우저(삼성 인터넷·웨일·파이어폭스 등)면 크롬으로 열어서 바로 설치
+  const chrome = android && /Chrome\/\d+/.test(ua) && !/SamsungBrowser|EdgA|OPR|Whale|Firefox|YaBrowser|wv\)/i.test(ua);
+  if (android && !chrome && !/[?&]via=chrome/.test(location.search)) {
+    toast('📲 크롬으로 열어서 설치할게요', 'disc', 2000);
+    location.href = `intent://${location.host}/?install=1&via=chrome#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.android.chrome')};end`;
+    return;
+  }
   const steps = inApp ? [`지금은 앱 안의 브라우저라 설치할 수 없어요.`, `오른쪽 위(또는 아래) <b>⋮ / 공유</b> 메뉴에서 <b>${ios ? 'Safari' : 'Chrome'}로 열기</b>를 누른 뒤, 다시 이 버튼을 눌러 주세요.`]
-    : ios ? ['<b>Safari</b>로 열어 주세요 (크롬 앱이면 주소창 오른쪽 공유 버튼도 같아요).', '화면 아래(아이패드는 위) <b>공유 버튼 <span class="ib">⬆️</span></b>을 누르세요.', '목록을 내려 <b>홈 화면에 추가 <span class="ib">➕</span></b>를 누르고, 오른쪽 위 <b>추가</b>를 누르면 끝!']
+    : ios ? ['아이폰·아이패드는 애플 정책상 버튼으로 바로 설치할 수 없어서, 홈 화면에 추가하면 앱처럼 쓸 수 있어요.', '<b>Safari</b>로 열어 주세요 (크롬 앱이면 주소창 오른쪽 공유 버튼도 같아요).', '화면 아래(아이패드는 위) <b>공유 버튼 <span class="ib">⬆️</span></b>을 누르세요.', '목록을 내려 <b>홈 화면에 추가 <span class="ib">➕</span></b>를 누르고, 오른쪽 위 <b>추가</b>를 누르면 끝!']
     : samsung ? ['아래 메뉴 버튼 <b>≡</b>을 누르세요.', '<b>현재 페이지 추가 → 홈 화면</b>을 누르면 끝!']
-    : android ? ['오른쪽 위 <b>⋮ 메뉴</b>를 누르세요.', '<b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 누르면 끝!']
+    : android ? ['크롬이 설치 창을 잠시 막았어요 (한 번 취소하면 한동안 안 떠요).', '오른쪽 위 <b>⋮ 메뉴</b>를 누르세요.', '<b>앱 설치</b> (또는 <b>홈 화면에 추가 → 설치</b>)를 누르면 끝!']
     : ['주소창 오른쪽 끝의 <b>설치 아이콘 <span class="ib">⊕</span></b>을 누르세요 (크롬·엣지).', '안 보이면 <b>⋮ 메뉴 → 전송, 저장, 공유 → 페이지를 앱으로 설치</b> (엣지: <b>앱 → 이 사이트를 앱으로 설치</b>).'];
   let m = $('#installModal');
   if (!m) { m = document.createElement('div'); m.id = 'installModal'; document.body.appendChild(m); }
