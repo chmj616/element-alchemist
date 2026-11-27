@@ -333,6 +333,7 @@ body.p2mine .electron{border-radius:2px;background:var(--p2c,#ff6b8b);box-shadow
 body:not(.b7) .b7only{display:none!important}
 /* 7단계: 2부 원소 고르기 버튼 크게, 오른쪽 여백 없이 꽉 채우기 */
 body.b7 .p2pick{width:100%;padding:8px}
+body.b7 .p2pick{text-align:center}body.b7 .p2-cur{text-align:center}body.b7 .p2-next{justify-content:center;flex-wrap:wrap;text-align:center}body.b7 #nextGoal{text-align:center}body.b7 #corePanel>*{margin-left:auto;margin-right:auto}
 @media (min-width:901px){body.b7.p2w main{grid-template-columns:370px 1fr}body.b7 .p2-chips{grid-template-columns:repeat(6,1fr);max-height:196px}}
 body.b7 .p2-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:5px;max-height:162px;padding:0;scrollbar-width:none}
 body.b7 .p2-chips::-webkit-scrollbar{display:none}
@@ -476,9 +477,22 @@ body.b7 .p2pick .srch{width:100%;margin-bottom:6px}
 .dcard.n{background:linear-gradient(160deg,#f59f00,#7a4b00);border-color:#ffd43b;box-shadow:0 0 18px #ffd43b}
 .duel-box.phase{animation:phaseFlash .8s}
 @keyframes phaseFlash{0%{filter:brightness(2.2) saturate(1.5)}100%{filter:none}}
+#fragModal{position:fixed;inset:0;z-index:3950;display:none;align-items:center;justify-content:center;background:#05081acc;backdrop-filter:blur(4px);padding:16px}
+#fragModal.on{display:flex}
+.col-card{position:relative;overflow:hidden}
+.col-bar{position:absolute;left:0;bottom:0;height:3px;background:var(--c);opacity:.8}
+.col-card.full{box-shadow:0 0 12px var(--c)}
+.col-max{color:#ffd43b;font-size:10px}
+.col-card .ic{position:relative}.col-card .ic em{position:absolute;right:-10px;top:-8px;font-size:14px;font-style:normal}
+.col-card.shiny{background:linear-gradient(135deg,#ffffff14,#ffd43b22,#ffffff14);background-size:200% 200%;animation:shine 3s linear infinite}
+@keyframes shine{to{background-position:200% 200%}}
+.col-book{height:8px;border-radius:4px;background:#0006;margin:6px 0;overflow:hidden}.col-book i{display:block;height:100%;background:linear-gradient(90deg,#4dabf7,#cc5de8,#ffd43b)}
+.col-tabs{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.col-tabs .btn{padding:3px 9px;font-size:12px}.col-tabs .btn.on{border-color:var(--accent);background:#ffffff1a}
+@media (max-width:600px){.mus-top{flex-wrap:wrap}.mus-top h2{order:3;flex-basis:100%;text-align:center;font-size:18px}}
 #storyModal{position:fixed;inset:0;z-index:4050;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#1a0526 0%,#000 75%);padding:16px}
 #storyModal.on{display:flex}
 .story-box{max-width:620px;text-align:center}
+.story-orb.rip{background:radial-gradient(circle,#ffd43b,#e03131 45%,#5c0a1e 70%,transparent 72%);box-shadow:0 0 60px #ff6b6b}
 .story-orb{width:120px;height:120px;margin:0 auto 10px;border-radius:50%;background:radial-gradient(circle,#000 38%,#3c096c 58%,#c77dff 70%,transparent 72%);box-shadow:0 0 70px #9d4edd;animation:musPulse 3s ease-in-out infinite}
 .story-sub{letter-spacing:4px;color:#c77dff;font-size:12px;font-weight:800;margin-bottom:10px}
 .story-box p{opacity:0;animation:fadeup .8s forwards;margin:10px 0;line-height:1.7;color:#e5dbff;font-size:16px}
@@ -1477,6 +1491,8 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
         <div id="stageLbl" class="stage-lbl">스테이지 1</div>
         <button id="stNext" class="sbtn" title="다음 스테이지">▶</button>
         <button id="stWarp" class="sbtn warp-btn" style="display:none" title="환생 전 최고 기록의 절반까지 바로 이동">⏩ 워프</button>
+        <button id="stTop" class="sbtn warp-btn" style="display:none" title="지금까지 깬 가장 높은 층으로">⏫ 최고 층</button>
+        <span id="fragLbl" class="cap-lbl" style="display:none"></span>
         <span id="stageCapLbl" class="cap-lbl"></span>
         <label class="chk"><input type="checkbox" id="autoAdv"> 자동 진행</label>
         <label class="chk" title="새 적이 나올 때마다 그 적의 약점에 맞춰 최고 덱으로 자동 편성"><input type="checkbox" id="autoDeck"> 🔄 적마다 자동 편성</label>
@@ -2107,7 +2123,7 @@ const R = {
   sellAmt: 1, combo: 0, lastClick: 0, buffs: {}, goldenAt: 0, goldenUntil: 0, discQueue: [],
 };
 // 공개 단계: 새 기능은 관리자 모드에서 먼저 보이고, 관리자가 「일반 사이트에 배포」를 누르면 모두에게 열림
-const RELEASE_ID = 10; // 최신 단계
+const RELEASE_ID = 11; // 최신 단계
 const RELEASE_NOTES = {
   1: '환생 강화 · 강화 수량 버튼 · 💎 코인 투자소 · 📲 앱으로 다운로드 · 원소 쪼개기 업데이트(연구/스킬/동위원소/임무/발전소/대기 발전/도감/💠 쿼크 상점 · 난이도 상향: 원소 더 단단 · 보스 체력 ×10·22초·재생 · 초신성 비용 ×25)',
   2: '🏛️ 몬스터 전시장 · 🚨 빅 크런치 소실 이벤트 · 🌘 2부 (1부 보관 · 오가기)',
@@ -2118,6 +2134,7 @@ const RELEASE_NOTES = {
   7: '[6.5] 🔎 검색 (원소 상점·공방·무기 강화·융합 결과 고르기) · ⛏️ 2부 원소 고르기 버튼 크게',
   8: '🌑 2부 2500층 빅 크런치 「중력 붕괴」 (주사위 + 타이밍) · 2500층 패배 시 100~150층, 5000층 패배 시 150~250층 뒤로',
   9: '🃏 5000층 카드 결투 개편: 선공 미니게임 3종(연타·반응속도·조준) · 빅 립 3페이즈 · 🌟 필살 게이지와 원소 대폭발 · 더 어렵게',
+  11: '🌑 빅 크런치 파편으로 2500층 소환 · 🏛️ 전시장에서 그 층으로 · ⏫ 최고 층으로 · 💥 입자 충돌기 손질 · 보스 회복',
   10: '⚔️ 2부 무기 강화 중심: 이온 빔·보호막 강화 ×1.5 → ×1.2 · 🪙 몹 처치 코인 · 🪙 2부 수소 환전소',
 };
 const beta = (n = 1) => !!R.admin || (R.release || 0) >= n;
@@ -2142,11 +2159,11 @@ function defaultState() {
     totalH: 0, goldens: 0, ach: {}, sound: true,
     prestige: { count: 0, seeds: 0, best: 0 },
     coins: 0, totalCoins: 0, elv: new Array(119).fill(0),
-    void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false, e3: false, e4: false }, god: godDefault(), godCleared: 0, godAst: 0, misPaid: {}, godGrant: false, offFrom: 0, offPlayed: 0, synthAt: {},
+    void: { idx: 1, fed: 0 }, endings: { e1: false, e2: false, e3: false, e4: false }, god: godDefault(), godCleared: 0, godAst: 0, misPaid: {}, godGrant: false, offFrom: 0, offPlayed: 0, synthAt: {}, frag: 0,
     arcade: { plays: 0, earned: 0, best: {} }, synthKills: 0, rareKills: 0, g2: g2Default(),
     cinv: { prod: 0, atk: 0, hp: 0 }, warpAt: 0, goldBuyAt: 0, hs: { star: 0, arms: 0, vault: 0, accel: 0 }, hexAt: 0,
     part: 1, crunch: { clearAt: 0, eventAt: 0, gone: false }, alt: null,
-    weap: new Array(119).fill(0), wlv: new Array(119).fill(0), p2z: 1, p2talk: false, p2talk2: false,
+    weap: new Array(119).fill(0), wlv: new Array(119).fill(0), p2z: 1, p2talk: false, p2talk2: false, p2rip1: false, p2rip2: false,
     rift: 0, col: { lv: 0, auto: 0, parts: {}, shots: 0 },
   };
 }
@@ -2178,6 +2195,7 @@ function normalizeSave(raw, nested) {
   Object.assign(s.battle, { stage: int(b.stage, 1, 1, MAX_STAGE), maxStage: int(b.maxStage, 0, 0, MAX_STAGE), auto: b.auto !== false, autoDeck: b.autoDeck === true, hp: num(b.hp), maxHp: num(b.maxHp) });
   const p = obj(d.prestige);
   s.prestige = { count: int(p.count), seeds: num(p.seeds), best: int(p.best, 0, 0, MAX_STAGE) };
+  s.frag = int(d.frag, 0, 0, 999);
   s.synthAt = {};
   for (const [k, v] of Object.entries(obj(d.synthAt))) if (SYNTHETIC.has(+k)) s.synthAt[k] = int(v, 5, 5, MAX_STAGE - 5);
   s.void = { idx: int(obj(d.void).idx, 1, 1, 119), fed: num(obj(d.void).fed) };
@@ -2248,13 +2266,14 @@ function normalizeSave(raw, nested) {
   s.weap = list(d.weap, 119, (v, i) => (i > 0 && v ? 1 : 0));
   s.wlv = list(d.wlv, 119, v => int(v, 0, 0, 4000));
   s.p2z = int(d.p2z, 1, 1, 118); if (!s.disc[s.p2z]) s.p2z = 1;
-  s.p2talk = d.p2talk === true; s.p2talk2 = d.p2talk2 === true;
+  s.p2talk = d.p2talk === true; s.p2talk2 = d.p2talk2 === true; s.p2rip1 = d.p2rip1 === true; s.p2rip2 = d.p2rip2 === true;
   s.rift = int(d.rift, 0, 0, 118);
   const oc = obj(d.col);
   s.col = { lv: int(oc.lv, 0, 0, 1000), auto: int(oc.auto, 0, 0, 60), parts: {}, shots: int(oc.shots, 0, 0, 1e12) };
-  for (const P of PARTICLES) { const v = int(obj(oc.parts)[P.id], 0, 0, 1e9); if (v) s.col.parts[P.id] = v; }
+  s.col.shiny = {};
+  for (const P of COL_ALL) { const v = int(obj(oc.parts)[P.id], 0, 0, 1e9); if (v) s.col.parts[P.id] = v; const w = int(obj(oc.shiny)[P.id], 0, 0, 1e9); if (w) s.col.shiny[P.id] = w; }
   const cr = obj(d.crunch);
-  s.crunch = { clearAt: num(cr.clearAt), eventAt: num(cr.eventAt), gone: cr.gone === true, fresh: cr.fresh === true };
+  s.crunch = { clearAt: num(cr.clearAt), eventAt: num(cr.eventAt), gone: cr.gone === true, fresh: cr.fresh === true, back: cr.back === true };
   s.alt = null;
   if (!nested && d.alt && typeof d.alt === 'object' && !Array.isArray(d.alt)) {
     s.alt = normalizeSave(d.alt, true);
@@ -2519,7 +2538,7 @@ function rebirth() {
   const keep = {
     misPaid: S.misPaid, godGrant: S.godGrant, lastSave: S.lastSave, offFrom: S.offFrom, offPlayed: S.offPlayed, ach: S.ach, sound: S.sound, void: S.void, endings: S.endings, god: S.god, godCleared: S.godCleared, godAst: S.godAst, arcade: S.arcade, synthKills: S.synthKills, rareKills: S.rareKills, g2: S.g2,
     totalClicks: S.totalClicks, totalFusions: S.totalFusions, kills: S.kills, playTime: S.playTime, totalH: S.totalH, goldens: S.goldens,
-    hs: S.hs, hexAt: S.hexAt, rift: S.rift, col: S.col, part: S.part, alt: S.alt, crunch: S.crunch, p2talk: S.p2talk, p2talk2: S.p2talk2, weap: P2W() ? S.weap : new Array(119).fill(0),
+    hs: S.hs, hexAt: S.hexAt, rift: S.rift, col: S.col, frag: S.frag, part: S.part, alt: S.alt, crunch: S.crunch, p2talk: S.p2talk, p2talk2: S.p2talk2, p2rip1: S.p2rip1, p2rip2: S.p2rip2, weap: P2W() ? S.weap : new Array(119).fill(0),
     prestige: { count: S.prestige.count + 1, seeds: S.prestige.seeds + gain, best: Math.max(S.prestige.best || 0, S.battle.maxStage) },
   };
   S = Object.assign(defaultState(), keep);
@@ -4748,18 +4767,19 @@ function renderMuseum() {
     if (!museumSeen(sel, part)) info = `<div class="mus-info"><span class="em">❔</span><div><b>${sel}층 보스 · ???</b><small>2부에서 아직 쓰러뜨리지 못했어요</small></div></div>`;
     else {
       const B = museumBoss(sel, part), hp = 150 * stageGrowth(sel, 1.18, 1.05, 1.02) * 20 * (part === 2 ? P2_HP : 1);
-      info = `<div class="mus-info"><span class="em">${B.emoji}</span><div><b>${sel}층 보스 · ${B.name}</b><small>체력 ${fmt(hp)}${B.synth ? ' · 🧪 인공 원소 보스' : ''}${B.special ? ' · 「나를 데려간 존재가 있다」' : ''}</small></div></div>`;
+      const can = beta(11) && part === S.part && sel <= maxSelectable() && sel < MAX_STAGE;
+      info = `<div class="mus-info"><span class="em">${B.emoji}</span><div><b>${sel}층 보스 · ${B.name}</b><small>체력 ${fmt(hp)}${B.synth ? ' · 🧪 인공 원소 보스' : ''}${B.special ? ' · 「나를 데려간 존재가 있다」' : ''}${part === 2 && B.name === '빅 크런치의 파편' && sel < P2_CRUNCH ? ` · 🌑 파편 ${Math.round(FRAG_CHANCE * 100)}%` : ''}</small></div>${can ? `<button class="btn" data-musgo="${sel}">⚔️ 이 층으로</button>` : ''}</div>`;
     }
   }
   if (part === 1) {
-    const C = S.crunch, gone = C.gone;
+    const C = S.crunch, back = C.gone && C.back && beta(11), gone = C.gone && !back;
     c.className = 'mus-center' + (gone ? ' gone' : '');
     c.innerHTML = `<div class="mus-stage">
         <div class="mus-glass">${gone ? '<div class="mus-empty"><span>💔</span></div><div class="mus-alarm"></div>' : '<div class="mus-crunch"><i></i></div>'}</div>
         <div class="mus-pedestal"></div>
       </div>
-      <div class="mus-plate"><b>${gone ? '🚨 빅 크런치 — 사라짐' : '🌑 빅 크런치'}</b><small>5000층 최종 보스 · ${gone ? '진열장이 깨진 채 비어 있어요' : '모든 것을 삼키려던 우주의 종말'}${C.clearAt ? ` · 전시 ${fmtDate(C.clearAt)}` : ''}</small>
-        ${gone ? `<button class="big-btn p2-go" data-part="2">🌘 ${S.part === 2 ? '2부 진행 중' : '2부에서 쫓기'}</button>` : ''}</div>`;
+      <div class="mus-plate"><b>${gone ? '🚨 빅 크런치 — 사라짐' : back ? '🌑 빅 크런치 — 돌아왔어요' : '🌑 빅 크런치'}</b><small>5000층 최종 보스 · ${gone ? '진열장이 깨진 채 비어 있어요' : back ? '2부 2500층에서 되찾아, 금 간 진열장으로 돌아왔어요' : '모든 것을 삼키려던 우주의 종말'}${C.clearAt ? ` · 전시 ${fmtDate(C.clearAt)}` : ''}</small>
+        ${gone || back ? `<button class="big-btn p2-go" data-part="2">🌘 ${S.part === 2 ? '2부 진행 중' : back ? '2부로' : '2부에서 쫓기'}</button>` : ''}</div>`;
   } else {
     const P = p2Slot(), won = !!(P && P.endings && P.endings.e4);
     c.className = 'mus-center p2c' + (won ? '' : ' unknown');
@@ -4779,6 +4799,7 @@ document.addEventListener('click', e => {
   if ((el = e.target.closest('[data-museum]'))) return el.dataset.museum === 'open' ? openMuseum(S.part) : closeMuseum();
   if ((el = e.target.closest('[data-muspart]'))) return openMuseum(+el.dataset.muspart);
   if ((el = e.target.closest('[data-mus]'))) { R.musSel = +el.dataset.mus; return renderMuseum(); }
+  if ((el = e.target.closest('[data-musgo]'))) { const st = +el.dataset.musgo; closeMuseum(); switchTab('battle'); goStage(st, false); blog(`🏛️ 전시장에서 ${st}층 보스에게 갑니다 (자동 진행 꺼짐 — 같은 층 반복)`, 'info'); return; }
   if ((el = e.target.closest('[data-part]'))) { $('#crunchModal')?.classList.remove('on'); return partSwitch(+el.dataset.part); }
   if (e.target.closest('[data-crunch="close"]')) return $('#crunchModal').classList.remove('on');
 });
@@ -4926,6 +4947,12 @@ function p2Goal() {
   const nz = p2NextZ();
   if (rebirthReady()) { goTo('table'); return canRebirth() ? '🌌 <b>환생 준비 완료!</b> 주기율표 탭에서 빅뱅을 일으키면 층 상한과 새 무기가 열려요' : `🌌 환생할 수 있어요! 수소 ${fmt(rebirthCost())}개를 모아 빅뱅을 일으키면 🌱 씨앗과 함께 <b>${stageCap(S.prestige.count + 1)}층</b>까지 열리고, 만든 무기는 그대로예요`; }
   if (nz && S.battle.maxStage >= p2UnlockStage(nz)) return `🎯 ${EL[nz - 1].sym} ${fmt(p2UnlockCost(nz))}개를 모아 <b>${EL[nz].name}</b>을 해금하면 클릭으로 캘 수 있어요 (원자핵 아래 🔓)`;
+  if (P2F() && S.battle.maxStage >= P2_CRUNCH - 1 && S.battle.maxStage < P2_CRUNCH) {
+    goTo('battle');
+    if (S.frag >= FRAG_NEED) { R.goalAct.go = P2_CRUNCH; return `🌑 파편 ${S.frag}/${FRAG_NEED} — <b>2500층에서 빅 크런치를 불러내세요!</b>`; }
+    R.goalAct.go = fragFloor(S.battle.maxStage); R.goalAct.farm = true;
+    return `🌑 빅 크런치 파편 <b>${S.frag}/${FRAG_NEED}</b> — 눌러서 파편 보스(${fragFloor(S.battle.maxStage)}층)로`;
+  }
   goTo('battle');
   if (S.battle.maxStage < P2_CRUNCH) return '🎯 무기를 만들고 🏪 상점에서 강화해서 더 높은 층으로! <b>2500층</b>에서 누군가 기다리고 있어요…';
   return '🎯 빅 크런치를 데려간 존재가 <b>5000층</b>에서 기다려요';
@@ -5037,6 +5064,35 @@ function renderWeapShop() {
     const b = document.getElementById('wuB' + z); if (b) b.disabled = n < 1 || S.coins < c;
   }
 }
+// 이야기 장면 (닫으면 then 실행)
+function storyShow(L, sub, btn, orb, then) {
+  R.storyPause = true; R.storyThen = then || null;
+  let m = $('#storyModal');
+  if (!m) { m = document.createElement('div'); m.id = 'storyModal'; document.body.appendChild(m); }
+  m.innerHTML = `<div class="story-box"><div class="story-orb ${orb || ''}"></div><div class="story-sub">${sub}</div>
+    ${L.map(([ic, who, t], i) => `<p style="animation-delay:${0.3 + i * 1.3}s"><b>${ic} ${who}</b>${t}</p>`).join('')}
+    <button class="big-btn" data-story="close" style="animation-delay:${0.5 + L.length * 1.3}s">${btn}</button></div>`;
+  m.classList.add('on');
+  SFX.discover();
+}
+/* 💥 5000층: 빅 립과의 대화 (11단계) */
+function p2RipTalk(n, then) {
+  if (n === 1 ? S.p2rip1 : S.p2rip2) return then && then();
+  if (n === 1) S.p2rip1 = true; else S.p2rip2 = true;
+  save();
+  const W = '빅 립';
+  storyShow(n === 1 ? [
+    ['💥', W, '…빅 크런치가 결국 너를 여기까지 보냈군.'],
+    ['💥', W, '나는 빅 립. 모든 것을 끝없이 늘이고 찢어, 원자 하나까지 흩어 놓는 우주의 마지막 숨.'],
+    ['💥', W, '그 녀석은 모든 것을 한 점으로 모으려 했지. 그래서 찢어 버렸다. 모이는 건 끝이 아니야 — 흩어지는 것이 끝이다.'],
+    ['💥', W, '네가 원소를 엮어 만든 그 무기들도 곧 흩어질 먼지일 뿐. 카드로 겨루자, 연금술사. 네 운과 손끝이 우주를 붙잡을 수 있는지.'],
+  ] : [
+    ['💥', W, '…찢어지지 않는다고? 원소들이 서로를… 붙잡고 있어.'],
+    ['💥', W, '흩어지는 것만이 끝이라 믿었다. 그런데 너는 흩어진 것들을 다시 엮어 냈군.'],
+    ['🌑', '빅 크런치', '(멀리서) 들었나, 빅 립. 모으는 것도, 흩어지는 것도 아니다. 엮는 것 — 그게 이 연금술사의 답이다.'],
+    ['💥', W, '좋다. 이번 우주는 네 것이다. 하지만 기억해라, 연금술사 — 팽창은 멈추지 않는다.'],
+  ], n === 1 ? '5000층 · 우주를 찢는 자' : '5000층 · 멈춘 찢김', n === 1 ? '🃏 결투를 받아들인다' : '🌌 우주를 지켜냈다', 'rip', then);
+}
 /* 🌑 2500층: 빅 크런치와의 대화 */
 function p2CrunchTalk(n) {
   if (n === 1 ? S.p2talk : S.p2talk2) return;
@@ -5051,7 +5107,7 @@ function p2CrunchTalk(n) {
     ['🌑', '빅 크런치', '크윽… 훌륭하다. 원소로 벼린 그 무기들이라면…'],
     ['🌑', '빅 크런치', '나를 데려간 존재의 이름은 「빅 립」. 우주를 끝없이 늘이고 찢어 원자 하나까지 흩어 버리는 자.'],
     ['🌑', '빅 크런치', '그자는 5000번째 문 너머에 있다. 가라, 연금술사. 이번엔 네가 우주를 붙잡아라.'],
-  ];
+  ].concat(n === 2 && P2F() ? [['🌑', '빅 크런치', '…나는 1부의 전시장으로 돌아가 있겠다. 깨진 진열장이라도, 거기가 내 자리니까.']] : []);
   R.storyPause = true;
   let m = $('#storyModal');
   if (!m) { m = document.createElement('div'); m.id = 'storyModal'; document.body.appendChild(m); }
@@ -5068,7 +5124,7 @@ document.addEventListener('click', e => {
   if (e.target.closest('[data-p2unlock]')) return p2Unlock();
   if ((el = e.target.closest('[data-craft]'))) return craftWeapon(+el.dataset.craft);
   if ((el = e.target.closest('[data-wup]'))) return upgradeWeapon(+el.dataset.wup);
-  if (e.target.closest('[data-story="close"]')) { $('#storyModal').classList.remove('on'); R.storyPause = false; }
+  if (e.target.closest('[data-story="close"]')) { $('#storyModal').classList.remove('on'); R.storyPause = false; const t = R.storyThen; R.storyThen = null; if (t) t(); }
 });
 
 
@@ -5176,7 +5232,9 @@ function gravStop(timeout) {
     const d = G.bd * (res === 'p' ? 0.5 : res === 'g' ? 1 : 1.5) * (G.E.hp < G.E.maxHp * 0.5 ? 1.3 : 1);
     G.pHp -= d;
     gravFx('gravMe', '-' + fmt(d), '#ff6b6b'); SFX.hurt();
-    gravSay(`🌑 빅 크런치의 중력 당김 — 피해 ${fmt(d)}`);
+    let heal = 0;
+    if (P2F()) { heal = Math.min(G.E.maxHp - G.E.hp, G.E.maxHp * BOSS_REGEN_GRAV * (res === 'm' ? 2 : 1)); G.E.hp += heal; if (heal > 0) gravFx('gravBoss', '+' + fmt(heal), '#69db7c'); }
+    gravSay(`🌑 빅 크런치의 중력 당김 — 피해 ${fmt(d)}${heal > 0 ? ` · 주변 물질을 삼켜 체력 +${fmt(heal)}` : ''}`);
     renderGrav();
     if (G.pHp <= 0) return gravLater(900, () => gravEnd(false, '중력에 짓눌려 쓰러졌어요…'));
     gravLater(1000, gravNextTurn);
@@ -5329,6 +5387,7 @@ function startDuel() {
   R.duel = { E, v2, modes, gauge: 0, ph: 1, round: 0, pMax: ev.maxHp, pHp: ev.maxHp, pd: Math.max(1, ev.dps * sec), bd: Math.max(E.atk / 1.5 * (1 - nobleRed) * sec, v2 ? ev.maxHp * 0.1 : 0), // 개편: 빅 립 한 방은 최소 최대 체력의 10%
     pSh: 0, bSh: 0, hand: [], bCard: null, shown: false, phase: 'intro', first: null, perfect: false, me: 0, boss: 0, goal: 0,
     msg: [], wz: units.map(u => u.z), counter: false, jam: false, lastTap: 0 };
+  if (P2F() && v2) { E.maxHp *= 1.6; E.hp = E.maxHp; R.duel.bd = Math.max(R.duel.bd, ev.maxHp * 0.12); } // 11단계: 빅 립을 더 단단하게
   blog('🃏 빅 립이 카드 결투를 걸어 왔어요!', 'boss');
   SFX.boss();
   renderDuel();
@@ -5336,6 +5395,10 @@ function startDuel() {
 function duelSay(t) { const D = R.duel; D.msg.push(t); if (D.msg.length > 3) D.msg.shift(); }
 function duelNextRound() {
   const D = R.duel;
+  if (P2F() && D.v2 && D.round > 0 && D.E.hp > 0) {
+    const h = Math.min(D.E.maxHp - D.E.hp, D.E.maxHp * BOSS_REGEN_DUEL[duelPh(D)]);
+    if (h > 0) { D.E.hp += h; duelSay(`💥 빅 립이 찢어진 시공을 꿰매요 — 체력 +${fmt(h)}`); }
+  }
   D.round++;
   if (D.round > DUEL_ROUNDS) return duelEnd(false, '10라운드가 지나 빅 립이 우주를 끝까지 찢어 버렸어요…');
   D.mode = D.v2 ? D.modes[(D.round - 1) % 3] : 'tap';
@@ -5485,6 +5548,7 @@ function duelPhaseCheck() {
   if (ph <= D.ph) return;
   D.ph = ph;
   duelSay(ph === 2 ? '🌌 <b>2페이즈 · 우주 팽창!</b> 빅 립 피해 ×1.3 · 반응이 빨라져요' : '✂️ <b>3페이즈 · 시공 붕괴!</b> 빅 립 피해 ×1.6 · 「시공 절단」 등장');
+  if (P2F()) duelSay(ph === 2 ? '💥 「우주는 늘어난다… 너도, 네 원소들도 함께!」' : '💥 「찢어져라! 원자 하나 남김없이!」');
   SFX.boss(); duelShake();
   const b = $('#duelBox'); if (b) { b.classList.remove('phase'); void b.offsetWidth; b.classList.add('phase'); }
 }
@@ -5715,18 +5779,55 @@ const COL_TIERS = [
   { name: '흔함', color: '#adb5bd', w: 100, need: 0, eff: 0.02 }, { name: '드묾', color: '#69db7c', w: 30, need: 1, eff: 0.04 },
   { name: '희귀', color: '#4dabf7', w: 8, need: 3, eff: 0.08 }, { name: '영웅', color: '#cc5de8', w: 2, need: 6, eff: 0.15 },
   { name: '전설', color: '#ffd43b', w: 0.4, need: 10, eff: 0.5 },
+  { name: '신화', color: '#ff6b6b', w: 0.08, need: 15, eff: 1 }, // 11단계
 ];
+// 11단계: 입자 도감 확장 (반입자 · 강입자 · 가상 입자 30종 → 모두 47종) · ✨ 빛나는 입자(1%) · 도감 보너스
+const PARTICLES_X = [
+  { id: 'au', name: '반업 쿼크', icon: '🔺', tier: 1, kind: 'weap', g: 'anti' }, { id: 'ad', name: '반다운 쿼크', icon: '🔻', tier: 1, kind: 'weap', g: 'anti' },
+  { id: 'as', name: '반스트레인지 쿼크', icon: '🌀', tier: 2, kind: 'weap', g: 'anti' }, { id: 'ac', name: '반참 쿼크', icon: '💗', tier: 2, kind: 'weap', g: 'anti' },
+  { id: 'ab', name: '반보텀 쿼크', icon: '🔽', tier: 3, kind: 'weap', g: 'anti' }, { id: 'at', name: '반톱 쿼크', icon: '👑', tier: 4, kind: 'weap', g: 'anti' },
+  { id: 'pos', name: '양전자', icon: '⚡', tier: 1, kind: 'mine', g: 'anti' }, { id: 'ave', name: '반전자 중성미자', icon: '👻', tier: 1, kind: 'mine', g: 'anti' },
+  { id: 'amu', name: '반뮤온', icon: '🌠', tier: 2, kind: 'mine', g: 'anti' }, { id: 'avmu', name: '반뮤온 중성미자', icon: '🫥', tier: 2, kind: 'mine', g: 'anti' },
+  { id: 'atau', name: '반타우', icon: '☄️', tier: 3, kind: 'mine', g: 'anti' }, { id: 'avtau', name: '반타우 중성미자', icon: '🌫️', tier: 3, kind: 'mine', g: 'anti' },
+  { id: 'pro', name: '양성자', icon: '🔴', tier: 0, kind: 'prod', g: 'had' }, { id: 'neu', name: '중성자', icon: '⚪', tier: 0, kind: 'prod', g: 'had' },
+  { id: 'pi', name: '파이 중간자', icon: '🥧', tier: 1, kind: 'prod', g: 'had' }, { id: 'ka', name: '케이 중간자', icon: '🔑', tier: 1, kind: 'weap', g: 'had' },
+  { id: 'lam', name: '람다 입자', icon: '🌙', tier: 2, kind: 'mine', g: 'had' }, { id: 'sig', name: '시그마 입자', icon: '🔆', tier: 2, kind: 'prod', g: 'had' },
+  { id: 'xi', name: '크사이 입자', icon: '✳️', tier: 3, kind: 'weap', g: 'had' }, { id: 'ome', name: '오메가 입자', icon: '🔱', tier: 3, kind: 'mine', g: 'had' },
+  { id: 'jpsi', name: 'J/ψ 중간자', icon: '🎐', tier: 3, kind: 'prod', g: 'had' }, { id: 'ups', name: '입실론 중간자', icon: '🏺', tier: 4, kind: 'weap', g: 'had' },
+  { id: 'sq', name: '스쿼크', icon: '🧩', tier: 2, kind: 'weap', g: 'hypo' }, { id: 'pho', name: '포티노', icon: '🕯️', tier: 2, kind: 'prod', g: 'hypo' },
+  { id: 'glu', name: '글루이노', icon: '🪢', tier: 3, kind: 'weap', g: 'hypo' }, { id: 'axi', name: '액시온', icon: '🪐', tier: 3, kind: 'mine', g: 'hypo' },
+  { id: 'wimp', name: '윔프 (암흑 물질)', icon: '🌑', tier: 3, kind: 'prod', g: 'hypo' }, { id: 'tac', name: '타키온', icon: '⏩', tier: 4, kind: 'mine', g: 'hypo' },
+  { id: 'grav', name: '그래비톤', icon: '🌌', tier: 5, kind: 'prod', g: 'hypo' }, { id: 'mono', name: '자기 홀극', icon: '🧲', tier: 5, kind: 'weap', g: 'hypo' },
+];
+const COL_GROUPS = [['sm', '⚛️ 표준모형'], ['anti', '🪞 반입자'], ['had', '🧱 강입자'], ['hypo', '🔮 가상 입자']];
+const COL_ALL = PARTICLES.concat(PARTICLES_X);
+const colList = () => (P2F() ? COL_ALL : PARTICLES);
+const COL_SHINY = 0.01, COL_X_EFF = 0.5; // 확장 입자는 등급 효과의 절반 (도감 수집이 주 목적)
+const pEff = P => COL_TIERS[P.tier].eff * (P.g ? COL_X_EFF : 1);
+// 도감 보너스: 발견한 종류마다 +3%, ✨빛나는 종류마다 +5% (무기·채굴·생산 모두)
+function colBook() {
+  if (!P2F()) return 1;
+  let n = 0, k = 0;
+  for (const P of COL_ALL) { if (S.col.parts[P.id]) n++; if (S.col.shiny && S.col.shiny[P.id]) k++; }
+  return 1 + 0.03 * n + 0.05 * k;
+}
 const COL_CAP = 30; // 같은 입자는 30개까지 효과가 쌓여요 (전부 모아도 무기 약 ×145 · 생산 약 ×29)
 const colOpen = () => P2V() && (S.rift || 0) >= COL_UNLOCK;
 // 입자 효과: 종류별 (1 + 등급 효과 × min(보유, 30)) 를 곱함, 힉스는 모든 배율 × (1 + 0.5 × 보유, 최대 ×5)
-function colMult(kind) { let m = 1; for (const P of PARTICLES) if (P.kind === kind) m *= 1 + COL_TIERS[P.tier].eff * Math.min(COL_CAP, S.col.parts[P.id] || 0); return m; }
+// 11단계: 같은 입자 상한이 빔 출력 레벨마다 +10 (빔 출력을 올릴 이유 · 중복 입자가 헛되지 않게)
+const colCap = () => (P2F() ? COL_CAP + 10 * Math.min(20, S.col.lv) : COL_CAP); // 최대 230
+function colMult(kind) {
+  // 11단계: 같은 종류 입자 효과는 더하기(1 + Σ) × 도감 보너스 — 입자가 47종으로 늘어도 폭주하지 않게
+  if (P2F()) { let a = 0; for (const P of COL_ALL) if (P.kind === kind) a += pEff(P) * Math.min(colCap(), S.col.parts[P.id] || 0); return (1 + a) * colBook(); }
+  let m = 1; for (const P of PARTICLES) if (P.kind === kind) m *= 1 + COL_TIERS[P.tier].eff * Math.min(COL_CAP, S.col.parts[P.id] || 0); return m;
+}
 const colHiggs = () => Math.min(5, 1 + 0.5 * (S.col.parts.h || 0));
 // 비용은 지금 생산량 기준 (충돌 1번 = 수소 생산 30초어치, 최소 1000)
 const colShotCost = () => Math.max(1000, baseRate() * 30);
 const colLvCost = () => Math.max(1e5, baseRate() * 600) * Math.pow(2, S.col.lv);
 const colAutoCost = () => Math.max(1e5, baseRate() * 900) * Math.pow(2.5, S.col.auto);
 function colRoll() {
-  const lv = S.col.lv, pool = PARTICLES.filter(P => lv >= COL_TIERS[P.tier].need);
+  const lv = S.col.lv, pool = colList().filter(P => lv >= COL_TIERS[P.tier].need);
   const w = P => COL_TIERS[P.tier].w * (1 + lv * 0.25 * P.tier);
   let r = Math.random() * pool.reduce((a, P) => a + w(P), 0);
   for (const P of pool) { r -= w(P); if (r <= 0) return P; }
@@ -5739,16 +5840,26 @@ function colFire(n = 1, auto) {
   if (n < 1) { if (!auto) toast('💧 충돌에 쓸 수소가 부족해요'); return; }
   S.counts[1] -= c * n;
   const got = {};
-  for (let i = 0; i < n; i++) { const P = colRoll(); got[P.id] = (got[P.id] || 0) + 1; }
+  const shiny = {};
+  for (let i = 0; i < n; i++) { const P = colRoll(); got[P.id] = (got[P.id] || 0) + 1; if (P2F() && Math.random() < COL_SHINY) shiny[P.id] = (shiny[P.id] || 0) + 1; }
+  if (P2F()) {
+    S.col.shiny = S.col.shiny || {};
+    for (const id in shiny) {
+      const P = COL_ALL.find(x => x.id === id), first = !S.col.shiny[id];
+      S.col.shiny[id] = (S.col.shiny[id] || 0) + shiny[id];
+      if (first) toast(`<span>✨ <b>빛나는 ${P.name}</b> 발견! (도감 보너스 +5%)</span>`, 'disc', 4500);
+    }
+    R.colShinyLast = shiny;
+  }
   let best = null;
   for (const id in got) {
-    const P = PARTICLES.find(x => x.id === id), first = !S.col.parts[id];
+    const P = COL_ALL.find(x => x.id === id), first = !S.col.parts[id];
     S.col.parts[id] = (S.col.parts[id] || 0) + got[id];
     if (!best || P.tier > best.tier) best = P;
     if (first) toast(`<span>${P.icon} <b>새 입자 발견: ${P.name}</b> (${COL_TIERS[P.tier].name})</span>`, 'disc', 4000);
   }
   S.col.shots += n;
-  R.colLast = Object.entries(got).map(([id, k]) => { const P = PARTICLES.find(x => x.id === id); return { P, k }; }).sort((a, b) => b.P.tier - a.P.tier);
+  R.colLast = Object.entries(got).map(([id, k]) => { const P = COL_ALL.find(x => x.id === id); return { P, k }; }).sort((a, b) => b.P.tier - a.P.tier);
   if (!auto && R.colOpen) {
     const ring = $('#colRing'); if (ring) { ring.classList.remove('fire'); void ring.offsetWidth; ring.classList.add('fire'); }
     const [x, y] = ring ? centerOf(ring) : [innerWidth / 2, innerHeight / 2];
@@ -5780,7 +5891,7 @@ function openCol() {
   R.colOpen = true; R.colSig = null;
   v.innerHTML = `<div class="g2-top"><button class="btn" data-col="close">✕ 나가기</button><div class="g2-title">💥 입자 충돌기 <small>2부</small></div><div class="g2-energy">💧 <b id="colH"></b></div></div>
     <div class="col-main"><div class="col-stage"><div class="col-ring" id="colRing"><i class="b1"></i><i class="b2"></i><div class="col-core">💥</div></div>
-      <div class="btnrow" style="justify-content:center"><button class="big-btn p2-go" data-col="fire" id="colF1"></button><button class="btn" data-col="fire10" id="colF10"></button></div>
+      <div class="btnrow" style="justify-content:center"><button class="big-btn p2-go" data-col="fire" id="colF1"></button><button class="btn" data-col="fire10" id="colF10"></button>${P2F() ? '<button class="btn" data-col="fire100" id="colF100"></button>' : ''}</div>
       <div class="col-last" id="colLast"></div></div>
       <div class="col-side" id="colSide"></div></div>`;
   v.classList.add('on');
@@ -5795,24 +5906,31 @@ function renderCol() {
   setText('colF1', `💥 충돌 (💧${fmt(sc)})`);
   setText('colF10', `×10 (💧${fmt(sc * 10)})`);
   $('#colF1').disabled = S.counts[1] < sc; $('#colF10').disabled = S.counts[1] < sc * 10;
-  const sig = JSON.stringify(C.parts) + '|' + C.lv + '|' + C.auto + '|' + (R.colLast || []).length + '|' + C.shots;
+  const f100 = $('#colF100'); if (f100) { f100.textContent = `×100 (💧${fmt(sc * 100)})`; f100.disabled = S.counts[1] < sc * 100; }
+  const sig = JSON.stringify(C.parts) + JSON.stringify(C.shiny || {}) + (R.colGroup || '') + '|' + C.lv + '|' + C.auto + '|' + (R.colLast || []).length + '|' + C.shots;
   if (R.colSig === sig) { const b1 = $('#colUpLv'), b2 = $('#colUpAuto'); if (b1) b1.disabled = S.counts[1] < colLvCost(); if (b2) b2.disabled = C.auto >= 60 || S.counts[1] < colAutoCost(); return; }
   R.colSig = sig;
-  $('#colLast').innerHTML = R.colLast ? '이번 충돌: ' + R.colLast.map(({ P, k }) => `<span style="color:${COL_TIERS[P.tier].color}">${P.icon} ${P.name}${k > 1 ? ' ×' + k : ''}</span>`).join(' · ') : '충돌 버튼을 눌러 입자를 만들어 보세요! 빔 출력이 높을수록 희귀한 입자가 나와요.';
+  $('#colLast').innerHTML = R.colLast ? '이번 충돌: ' + R.colLast.map(({ P, k }) => `<span style="color:${COL_TIERS[P.tier].color}">${R.colShinyLast && R.colShinyLast[P.id] ? '✨' : ''}${P.icon} ${P.name}${k > 1 ? ' ×' + k : ''}</span>`).join(' · ') : '충돌 버튼을 눌러 입자를 만들어 보세요! 빔 출력이 높을수록 희귀한 입자가 나와요.';
   const kinds = [['weap', '🗡️ 무기 공격·체력'], ['mine', '⛏️ 채굴'], ['prod', '🏭 생산']];
   const avail = t => C.lv >= COL_TIERS[t].need;
-  $('#colSide').innerHTML = `<div class="g2-note">📊 입자 효과: ${kinds.map(([k, l]) => `${l} ×${fmtM(colMult(k))}`).join(' · ')} · 🌟 힉스 모든 배율 ×${fmtM(colHiggs())}<br>충돌 ${fmt(C.shots)}번 · 같은 입자는 ${COL_CAP}개까지 효과가 쌓여요</div>
-    <div class="g2-row"><div class="g2-ico">🔋</div><div class="g2-info"><b>빔 출력 Lv.${C.lv}</b><small>희귀한 입자가 더 자주 나와요 · ${COL_TIERS.filter((t, i) => !avail(i)).map(t => `Lv.${t.need}에 ${t.name} 등급`).join(' · ') || '모든 등급 해금'}</small></div><button class="btn g2-buy" data-col="lv" id="colUpLv">💧 ${fmt(colLvCost())}</button></div>
+  $('#colSide').innerHTML = `<div class="g2-note">📊 입자 효과: ${kinds.map(([k, l]) => `${l} ×${fmtM(colMult(k))}`).join(' · ')} · 🌟 힉스 모든 배율 ×${fmtM(colHiggs())}<br>충돌 ${fmt(C.shots)}번 · 같은 입자는 ${colCap()}개까지 효과가 쌓여요${P2F() ? ' (빔 출력 레벨마다 +10)' : ''}</div>
+    <div class="g2-row"><div class="g2-ico">🔋</div><div class="g2-info"><b>빔 출력 Lv.${C.lv}</b><small>희귀한 입자가 더 자주 나와요${P2F() ? (S.col.lv < 20 ? ` · 입자 상한 ${colCap()} → ${colCap() + 10}` : ` · 입자 상한 ${colCap()} (최대)`) : ''} · ${COL_TIERS.filter((t, i) => !avail(i)).map(t => `Lv.${t.need}에 ${t.name} 등급`).join(' · ') || '모든 등급 해금'}</small></div><button class="btn g2-buy" data-col="lv" id="colUpLv">💧 ${fmt(colLvCost())}</button></div>
     <div class="g2-row"><div class="g2-ico">🤖</div><div class="g2-info"><b>자동 충돌 Lv.${C.auto}</b><small>1분에 ${C.auto}번 자동 충돌 (수소 소모) · 레벨마다 +1번</small></div><button class="btn g2-buy" data-col="auto" id="colUpAuto" ${C.auto >= 60 ? 'disabled' : ''}>${C.auto >= 60 ? '최대' : '💧 ' + fmt(colAutoCost())}</button></div>
-    <div class="sec-head"><h3>🧬 입자 도감</h3><small>${PARTICLES.filter(P => C.parts[P.id]).length} / 17</small></div>
-    <div class="col-grid">${PARTICLES.map(P => { const n = C.parts[P.id] || 0, T = COL_TIERS[P.tier];
-      return n ? `<div class="col-card" style="--c:${T.color}"><span class="ic">${P.icon}</span><b>${P.name}</b><small>${T.name} · ×${fmt(n)}</small><small>${P.kind === 'higgs' ? `모든 배율 ×${fmt(colHiggs())}` : `+${Math.round(T.eff * Math.min(COL_CAP, n) * 100)}%`}</small></div>`
+    <div class="sec-head"><h3>🧬 입자 도감</h3><small>${colList().filter(P => C.parts[P.id]).length} / ${colList().length}${P2F() ? ` · ✨ ${colList().filter(P => C.shiny && C.shiny[P.id]).length} / ${colList().length}` : ''}</small></div>
+    ${P2F() ? `<div class="g2-note">📖 <b>도감 보너스 ×${fmtM(colBook())}</b> (무기·채굴·생산) — 새 입자마다 +3%, ✨빛나는 입자(충돌마다 ${COL_SHINY * 100}%)마다 +5%
+      <div class="col-book"><i style="width:${colList().filter(P => C.parts[P.id]).length / colList().length * 100}%"></i></div>
+      <div class="col-tabs">${[['all', '전체'], ...COL_GROUPS].map(([k, l]) => `<button class="btn ${(R.colGroup || 'all') === k ? 'on' : ''}" data-colg="${k}">${l} ${k === 'all' ? '' : `${colList().filter(P => (P.g || 'sm') === k && C.parts[P.id]).length}/${colList().filter(P => (P.g || 'sm') === k).length}`}</button>`).join('')}</div></div>` : ''}
+    <div class="col-grid">${colList().filter(P => !P2F() || (R.colGroup || 'all') === 'all' || (P.g || 'sm') === R.colGroup).map(P => { const n = C.parts[P.id] || 0, T = COL_TIERS[P.tier], sh = C.shiny && C.shiny[P.id];
+      const cap = P.kind === 'higgs' ? 8 : colCap(), full = n >= cap;
+      return n ? `<div class="col-card ${full ? 'full' : ''} ${sh ? 'shiny' : ''}" style="--c:${T.color}"><span class="ic">${P.icon}${sh ? '<em>✨</em>' : ''}</span><b>${P.name}</b><small>${T.name} · ${fmt(Math.min(n, cap))}/${cap}${full ? ' <b class="col-max">MAX</b>' : ''}</small><small>${P.kind === 'higgs' ? `모든 배율 ×${fmt(colHiggs())}` : `+${Math.round(pEff(P) * Math.min(colCap(), n) * 100)}%`}${sh ? ` · ✨${sh}` : ''}</small><i class="col-bar" style="width:${Math.min(100, n / cap * 100)}%"></i></div>`
         : `<div class="col-card unknown" style="--c:${T.color}"><span class="ic">❔</span><b>???</b><small>${T.name}${avail(P.tier) ? '' : ` · 빔 Lv.${T.need}`}</small></div>`; }).join('')}</div>`;
   const b1 = $('#colUpLv'), b2 = $('#colUpAuto'); if (b1) b1.disabled = S.counts[1] < colLvCost(); if (b2) b2.disabled = C.auto >= 60 || S.counts[1] < colAutoCost();
 }
 document.addEventListener('click', e => {
   if (!e.target.closest) return;
   if (e.target.closest('[data-rift="seal"]')) return sealRift();
+  const g = e.target.closest('[data-colg]');
+  if (g) { R.colGroup = g.dataset.colg; R.colSig = null; return renderCol(); }
   const el = e.target.closest('[data-col]');
   if (!el) return;
   const a = el.dataset.col;
@@ -5820,6 +5938,7 @@ document.addEventListener('click', e => {
   if (a === 'close') return closeCol();
   if (a === 'fire') return colFire(1);
   if (a === 'fire10') return colFire(10);
+  if (a === 'fire100') return colFire(100);
   if (a === 'lv' || a === 'auto') return colUp(a);
 });
 document.addEventListener('keydown', e => { if (R.colOpen && e.key === 'Escape') closeCol(); });
@@ -5888,6 +6007,7 @@ document.addEventListener('click', e => {
   switchTab(A.tab);
   if (A.tab === 'fusion' && A.list && !P2W()) { setFuse(A.list); SFX.buy(); }
   if (A.stage) synthGoBack(A.stage);
+  if (A.go) goStage(A.go, A.farm ? false : true);
   if (innerWidth <= 900) document.getElementById('tab-' + A.tab)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 document.addEventListener('click', e => {
@@ -5982,6 +6102,7 @@ function guideSections() {
       beta(4) && '🔓 무거운 원소(=무기)는 <b>층을 올라갈수록</b> 열려요: 300층까지 1~50번 · 600층 ~70번 · 1000층 ~92번 · 1500층 ~100번 · 2200층 ~106번 · 3000층 ~111번 · 4000층 ~116번 · 오가네손은 4500층. 무기 재료는 열리는 시점의 생산량에 맞춰 커져요.',
       beta(4) && '🌌 2부 <b>환생</b>: 200층 이상을 깨고, 지금까지 깬 층에서 열리는 원소를 모두 해금하면 할 수 있어요. 만든 무기는 그대로 (강화 레벨만 초기화) · 막히면 환생해서 씨앗으로 넘어가요.',
       beta(4) && '🌑 <b>2500층</b>에서 누군가 기다리고 있어요… 최종은 5000층.',
+      beta(11) && '🌑 <b>빅 크런치 파편</b>: 「빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 40% 확률로 파편. 2500층에서 빅 크런치를 불러내려면 파편 5개가 필요해요 (불러낼 때 소모). 부족하면 「파편 모으러 가기」 · 전시장에서 보스를 눌러 「⚔️ 이 층으로」도 돼요. 빅 크런치·빅 립은 싸우는 동안 체력을 회복해요.',
       beta(10) && '⚔️ 2부에선 <b>무기 강화가 핵심</b>: 이온 빔 증폭기·전자기 보호막은 레벨당 ×1.2뿐이라 수소만으로는 보스를 못 넘어요. 🪙 코인은 원소 판매 · 몹 처치(보스는 3배) · 상점 「코인 투자소」 탭의 수소 환전소(10분마다)에서 모아요.',
       beta(9) && '🃏 <b>5000층 카드 결투</b>: 라운드마다 선공 미니게임이 ⚡ 연타 · 🚦 반응 속도 · 🎯 조준으로 바뀌어요. 이기면 🌟 필살 게이지가 차고, 100%면 「원소 대폭발」(×3, 보호막 무시)! 빅 립은 체력 66%·33%에서 강해지는 3페이즈예요.',
       beta(8) && '🌑 <b>2500층 「중력 붕괴」</b>: 매 턴 🎲 중력 주사위(블랙홀 ×3 · 역회전 · 가속 · 평온 · 확장 · 행운)로 조건이 정해지고, 회전하는 바늘을 초록(좋아요)·금색(완벽 ×2) 구역에서 멈춰 공격해요. 빗나가면 🕳️ 흡입 +25% — 100%가 되거나 12턴이 지나면 패배해서 <b>100~150층 뒤로</b> 밀려나요. 5000층 결투에서 지면 <b>150~250층 뒤로</b>.',
@@ -6143,7 +6264,7 @@ async function adminAction(a) {
     if (!r) return toast('⚠️ 스펙을 맞추지 못했어요');
     toast(`💪 ${r.st}층 스펙: 무기 ${r.n}종 · 강화 +${r.lv} · 예상 처치 ${fmtSec(r.ttk)} (일반 전투 기준)`, 'disc', 5000);
   }
-  if (a === 'p2duel') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.prestige.count = Math.max(S.prestige.count, 7); S.battle.maxStage = Math.max(S.battle.maxStage, MAX_STAGE - 1); S.battle.stage = MAX_STAGE; R.enemy = null; }
+  if (a === 'p2duel') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.prestige.count = Math.max(S.prestige.count, 7); S.battle.maxStage = Math.max(S.battle.maxStage, MAX_STAGE - 1); S.battle.stage = MAX_STAGE; S.p2rip1 = false; S.p2rip2 = false; R.enemy = null; }
   if (a === 'p2weap') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); for (let z = 1; z <= 118; z++) if (S.disc[z]) { S.weap[z] = 1; S.wlv[z] = Math.max(S.wlv[z], 30); } }
   if (a === 'elements') doEl();
   if (a === 'end1') doEnd1();
@@ -7150,7 +7271,7 @@ function makeEnemy(stage) {
   const p2late = S.part === 2 ? Math.pow(P2_LATE, Math.max(0, stage - P2_CRUNCH)) : 1;  // 2부 후반(2500층~) 추가 성장
   const hp = 150 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 20 : 1) * p2r(P2_HP) * p2late;
   const atk = 3 * stageGrowth(stage, 1.17, 1.048, 1.019) * (boss ? 1.6 : 1) * p2r(P2_ATK);
-  const E = { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, timeLeft: boss ? 30 : Infinity, synth: 0 };
+  const E = { stage, name, emoji, boss, weak, hp, maxHp: hp, atk, timeLeft: boss ? 30 : Infinity, synth: 0, frag: S.part === 2 && boss && stage < P2_CRUNCH && name === '빅 크런치의 파편' };
   const sz = boss ? synthBossFor(stage) : 0;
   return sz ? applySynthBoss(E, sz, false) : E;
 }
@@ -7163,6 +7284,15 @@ function spawnEnemy() {
   R.enemy = makeEnemy(S.battle.stage);
   R.enemyT = 0;
   const E0 = R.enemy;
+  if (E0.stage === P2_CRUNCH && P2F() && !R.grav) {
+    if (S.frag < FRAG_NEED) {
+      R.enemy = null; S.battle.stage = P2_CRUNCH - 1; S.battle.auto = false; R.cooldown = 0.5;
+      blog(`🌑 빅 크런치를 불러내려면 파편 ${FRAG_NEED}개가 필요해요 (지금 ${S.frag}개)`, 'boss');
+      return showFragNeed();
+    }
+    S.frag -= FRAG_NEED;
+    blog(`🌑 파편 ${FRAG_NEED}개가 하나로 모이며 빅 크런치가 깨어났어요! (남은 파편 ${S.frag})`, 'boss');
+  }
   if (E0.stage === P2_CRUNCH && P2W()) p2CrunchTalk(1);
   if (E0.boss && !E0.synth && E0.stage < MAX_STAGE && !P2W() && Math.random() < SYNTH_RARE_CHANCE) {
     const pool = SYNTH_ORDER.filter(z => SYNTH_STAGE[z] < E0.stage); // 자기 원래 층에서는 재등장 X
@@ -7172,7 +7302,7 @@ function spawnEnemy() {
     }
   }
   if (S.battle.autoDeck) applyBestDeck(true);
-  if (E0.stage >= MAX_STAGE && P2D()) return startDuel();
+  if (E0.stage >= MAX_STAGE && P2D()) { startDuel(); if (P2F() && !S.p2rip1) p2RipTalk(1); return; }
   if (E0.stage === P2_CRUNCH && P2G()) return startGrav();
   if (R.enemy.synth) {
     blog(`🧪 인공 원소 보스 등장: ${R.enemy.name}! 30초 안에 처치하면 ${EL[R.enemy.synth].sym} 1개 확정!`, 'boss');
@@ -7330,9 +7460,10 @@ function victory() {
     const n = Math.max(1, reward * (E.boss ? 2 : 1) / EL_VALUE[z]);
     addEl(z, n);
     msg = `✅ ${E.name} 처치! 🎁 ${EL[z].name}(${EL[z].sym}) ×${fmt(n)}`;
+    msg += fragDrop(E);
     const cg = p2KillCoins(E.stage, E.boss);
     if (cg) { S.coins = capB(S.coins + cg); S.totalCoins = capB(S.totalCoins + cg); msg += ` · 🪙 +${fmt(cg)}`; }
-    if (E.stage === P2_CRUNCH) setTimeout(() => p2CrunchTalk(2), 700);
+    if (E.stage === P2_CRUNCH) { if (P2F() && !S.crunch.back) { S.crunch.back = true; blog('🏛️ 빅 크런치가 1부 전시장의 진열장으로 돌아갔어요', 'boss'); } setTimeout(() => p2CrunchTalk(2), 700); }
   } else {
     addH(reward);
     msg = `✅ ${E.name} 처치! +${fmt(reward)} H`;
@@ -7374,7 +7505,8 @@ function victory() {
   if (E.stage >= MAX_STAGE && S.part === 2 && !S.endings.e4) {
     S.endings.e4 = true;
     blog('🏆 2부 최종 보스 빅 립을 쓰러뜨렸습니다! 2부 엔딩 달성!', 'boss');
-    setTimeout(() => showEnding(4), 900);
+    if (P2F() && !S.p2rip2) setTimeout(() => p2RipTalk(2, () => showEnding(4)), 700);
+    else setTimeout(() => showEnding(4), 900);
   } else if (E.stage >= MAX_STAGE && S.part !== 2 && !S.endings.e1) {
     S.endings.e1 = true;
     if (beta(2)) S.crunch.fresh = true; // 2부 공개 뒤에 깬 것 → 소실 사건은 원래 일정(하루 + 3~12시간)
@@ -7428,8 +7560,8 @@ function adminP2Spec(st) {
   R.unitT = [0, 0, 0, 0, 0];
   return { st, n, lv: hi, ttk: r.result.ttk };
 }
-// 2부(9단계) 코인: 몹 처치 보상의 3% (보스 ×3) · 🪙 수소 환전소(수소 20% → 1개당 0.02코인, 10분마다)
-const P2_KILL_COIN = 0.03, P2_HEX_PCT = 0.2, P2_HEX_RATE = 0.02, P2_HEX_CD = 600;
+// 2부 코인: 몹 처치 보상의 3% (보스 ×3) · 🪙 수소 환전소(수소 5% → 1개당 0.02코인, 10분마다 — 뒤로 갈수록 수소가 기하급수로 늘어서 5%로)
+const P2_KILL_COIN = 0.03, P2_HEX_PCT = 0.05, P2_HEX_RATE = 0.02, P2_HEX_CD = 600;
 function p2KillCoins(stage, boss) {
   if (!P2C()) return 0;
   return 10 * stageGrowth(stage, 1.18, 1.05, 1.02) * (boss ? 5 : 1) * (S.upg.gravity ? 5 : 1) * P2_KILL_COIN * (boss ? 3 : 1);
@@ -7462,6 +7594,44 @@ document.addEventListener('input', e => {
   const k = e.target.dataset && e.target.dataset.search;
   if (k) { R.q[k] = e.target.value; applySearch(k); }
 });
+
+/* ---------- 🌑 11단계: 빅 크런치 파편 · 2500층 소환 · 최고 층 · 보스 회복 ---------- */
+const P2F = () => P2W() && beta(11);
+const FRAG_NEED = 5, FRAG_CHANCE = 0.4;
+// 파편 보스 층: 2부 보스 순서상 「빅 크런치의 파편」은 10층부터 40층마다 (10 · 50 · 90 …)
+const fragFloor = st => Math.max(10, Math.floor((Math.min(st, P2_CRUNCH - 1) - 10) / 40) * 40 + 10);
+function fragDrop(E) {
+  if (!P2F() || !E.frag || S.frag >= 99 || Math.random() >= FRAG_CHANCE) return '';
+  S.frag++;
+  toast(`🌑 <b>빅 크런치 파편</b> 획득! (${S.frag}/${FRAG_NEED})${S.frag === FRAG_NEED ? '<br>2500층에서 빅 크런치를 불러낼 수 있어요!' : ''}`, 'disc', 3500);
+  return ` · 🌑 파편! (${S.frag}/${FRAG_NEED})`;
+}
+function goStage(st, auto) {
+  const B = S.battle;
+  B.stage = Math.max(1, Math.min(st, maxSelectable()));
+  if (auto != null) B.auto = auto;
+  R.enemy = null;
+  if (B.active) { R.cooldown = 0.3; B.hp = B.maxHp; } else startBattle();
+}
+function showFragNeed() {
+  let m = $('#fragModal');
+  if (!m) { m = document.createElement('div'); m.id = 'fragModal'; document.body.appendChild(m); }
+  const f = fragFloor(S.battle.maxStage);
+  m.innerHTML = `<div class="install-box"><div style="font-size:56px">🌑</div><h2>빅 크런치를 불러내려면</h2>
+    <p>흩어진 <b>빅 크런치의 파편 ${FRAG_NEED}개</b>가 필요해요. 지금 <b>${S.frag}/${FRAG_NEED}</b></p>
+    <p class="install-note">파편은 「🌘 빅 크런치의 파편」 보스(10층부터 40층마다)를 잡으면 ${Math.round(FRAG_CHANCE * 100)}% 확률로 나와요. 불러낼 때 ${FRAG_NEED}개를 써요.</p>
+    <div class="btnrow" style="justify-content:center"><button class="big-btn" data-frag="go">🌘 파편 모으러 가기 (${f}층)</button><button class="btn" data-frag="close">닫기</button></div></div>`;
+  m.classList.add('on');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest) return;
+  const a = e.target.closest('[data-frag]');
+  if (!a) return;
+  $('#fragModal')?.classList.remove('on');
+  if (a.dataset.frag === 'go') { switchTab('battle'); goStage(fragFloor(S.battle.maxStage), false); blog(`🌘 파편 보스 층(${S.battle.stage})에서 파편을 모아요. 자동 진행은 꺼 두었어요 — 같은 층을 반복해요.`, 'info'); }
+});
+// 보스 회복 (중력 붕괴 · 카드 결투): 너무 빨리 끝나지 않게
+const BOSS_REGEN_GRAV = 0.04, BOSS_REGEN_DUEL = [0, 0.04, 0.05, 0.07];
 function synthGoBack(st) {
   const B = S.battle;
   if (!R.synthBack || R.synthBack < B.stage) R.synthBack = B.stage;
@@ -7827,6 +7997,12 @@ function renderBattle() {
   const warpBtn = $('#stWarp');
   warpBtn.style.display = wp > B.maxStage + 1 && B.stage < wp ? '' : 'none';
   setText('stWarp', `⏩ 워프 → ${wp}`);
+  const topSt = Math.min(B.maxStage, maxSelectable()), tb2 = $('#stTop');
+  tb2.style.display = beta(11) && B.stage < topSt - 1 ? '' : 'none';
+  setText('stTop', `⏫ 최고 층 ${topSt}`);
+  const fl = $('#fragLbl');
+  fl.style.display = P2F() && (S.frag > 0 || B.maxStage >= 1000) && B.maxStage < P2_CRUNCH + 1 ? '' : 'none';
+  setText('fragLbl', `🌑 파편 ${S.frag}/${FRAG_NEED}`);
   const capTxt = B.stage >= stageCap() && stageCap() < MAX_STAGE ? `🔒 다음 스테이지는 환생 ${S.prestige.count + 1}회 필요` : (B.stage >= MAX_STAGE ? '🏁 최종 스테이지' : '');
   setText('stageCapLbl', capTxt);
   $('#autoAdv').checked = B.auto;
@@ -8122,6 +8298,7 @@ document.addEventListener('pointerout', e => { if (holdEl && e.target.closest &&
 document.addEventListener('contextmenu', e => { if (!(e.target.closest && e.target.closest('input, textarea, [contenteditable="true"]'))) e.preventDefault(); });
 $('#stPrev').onclick = () => changeStage(-1);
 $('#stNext').onclick = () => changeStage(1);
+$('#stTop').onclick = () => { const st = Math.min(S.battle.maxStage, maxSelectable()); if (st > S.battle.stage) { goStage(st, true); blog(`⏫ 지금까지 깬 가장 높은 층 ${st}(으)로 이동했어요`, 'info'); } };
 $('#stWarp').onclick = () => {
   const B = S.battle, wp = warpStage();
   if (wp <= B.stage) return;
