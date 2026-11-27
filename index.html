@@ -5158,7 +5158,8 @@ function startGrav() {
   E.timeLeft = Infinity;
   R.grav = { E, turn: 0, pMax: ev.maxHp, pHp: ev.maxHp, pd: Math.max(1, ev.dps * GRAV_SEC), bd: E.atk / 1.5 * (1 - nobleRed) * GRAV_SEC,
     pull: 0, phase: 'intro', dice: 0, ang: 0, dir: 1, msg: [], hits: { p: 0, g: 0, m: 0 } };
-  R.grav.bd = Math.max(R.grav.bd, ev.maxHp * 0.07); // 빅 크런치 한 방은 최소 최대 체력의 7% (체력 승부가 사라지지 않게)
+  R.grav.bd = Math.max(R.grav.bd, ev.maxHp * 0.07);
+  if (P2F()) { E.maxHp = Math.max(E.maxHp, R.grav.pd * BOSS_MIN_CARDS.grav); E.hp = E.maxHp; } // 빅 크런치 한 방은 최소 최대 체력의 7% (체력 승부가 사라지지 않게)
   blog('🌑 빅 크런치가 주변의 모든 것을 끌어당기기 시작했어요! 「중력 붕괴」', 'boss');
   SFX.boss();
   renderGrav();
@@ -5393,7 +5394,7 @@ function startDuel() {
   R.duel = { E, v2, modes, gauge: 0, ph: 1, round: 0, pMax: ev.maxHp, pHp: ev.maxHp, pd: Math.max(1, ev.dps * sec), bd: Math.max(E.atk / 1.5 * (1 - nobleRed) * sec, v2 ? ev.maxHp * 0.1 : 0), // 개편: 빅 립 한 방은 최소 최대 체력의 10%
     pSh: 0, bSh: 0, hand: [], bCard: null, shown: false, phase: 'intro', first: null, perfect: false, me: 0, boss: 0, goal: 0,
     msg: [], wz: units.map(u => u.z), counter: false, jam: false, lastTap: 0 };
-  if (P2F() && v2) { E.maxHp *= 1.6; E.hp = E.maxHp; R.duel.bd = Math.max(R.duel.bd, ev.maxHp * 0.12); } // 11단계: 빅 립을 더 단단하게
+  if (P2F() && v2) { E.maxHp = Math.max(E.maxHp * 1.6, R.duel.pd * BOSS_MIN_CARDS.duel); E.hp = E.maxHp; R.duel.bd = Math.max(R.duel.bd, ev.maxHp * 0.12); } // 11단계: 빅 립을 더 단단하게 + 최소 싸움 길이
   blog('🃏 빅 립이 카드 결투를 걸어 왔어요!', 'boss');
   SFX.boss();
   renderDuel();
@@ -6139,7 +6140,17 @@ function renderGuide() {
 /* ---------- 관리자 모드 (테스트용) ---------- */
 const ADMIN_HINT = '시작'; // 비밀번호는 서버 환경 변수로 확인
 const BACKUP_KEY = SAVE_KEY + '_backup';
+// 관리자 버튼은 admin 계정으로 로그인했을 때만 보여요 (일반 계정 · 게스트에겐 숨김 · 서버 비밀번호 확인은 그대로)
+const adminAllowed = () => !HAS_SERVER || A.user === 'admin';
+function adminVisibility() {
+  const card = $('#adminCard');
+  if (card) card.style.display = R.adminLink && adminAllowed() ? '' : 'none';
+  if (R.admin && !adminAllowed()) { R.admin = false; R.adminPw = ''; R.godNoCd = false; betaChanged(); $('#adminModal')?.classList.remove('on'); }
+  if (R.adminLinkOpen && adminAllowed()) { R.adminLinkOpen = false; switchTab('settings'); openAdmin(); }
+  else if (R.adminLinkOpen && A.state !== 'boot') { R.adminLinkOpen = false; toast('🔐 관리자 기능은 admin 계정으로 로그인해야 쓸 수 있어요', '', 4000); }
+}
 function openAdmin() {
+  if (!adminAllowed()) return toast('🔐 관리자 기능은 admin 계정으로 로그인해야 쓸 수 있어요');
   const m = $('#adminModal');
   m.innerHTML = R.admin ? adminPanelHtml() : `<div class="admin-box"><h2>🔐 관리자 모드</h2>
     <p>비밀번호를 입력하세요</p>
@@ -6175,6 +6186,7 @@ function adminPanelHtml() {
       <button class="btn" data-admin="p2duel">🃏 2부: 5000층 빅 립 카드 결투 앞으로</button>
       <button class="btn" data-admin="p2spec:2500">💪 2부: 2500층 깰 스펙<br><small>그 층까지 무기 전부 + 강화 · 최고 덱 장착</small></button>
       <button class="btn" data-admin="p2spec:5000">💪 2부: 5000층 깰 스펙<br><small>무기 118종 + 강화 · 최고 덱 장착</small></button>
+      <button class="btn" data-admin="frag:100">🌑 2부: 빅 크런치 파편 +100</button>
       <button class="btn" data-admin="p2spec:2500:tight">😰 2부: 2500층 빠듯한 스펙<br><small>일반 전투로 25~28초 · 처음 도착한 플레이어 수준</small></button>
       <button class="btn" data-admin="p2spec:5000:tight">😰 2부: 5000층 빠듯한 스펙<br><small>일반 전투로 25~28초 · 처음 도착한 플레이어 수준</small></button>
       <button class="btn" data-admin="partswap">🔁 ${S.part === 1 ? '2부로 전환' : '1부로 전환'} (지금 ${S.part}부)</button>
@@ -6268,6 +6280,7 @@ async function adminAction(a) {
   if (a === 'p2kit') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); for (let z = 1; z <= 118; z++) { S.disc[z] = true; S.counts[z] = Math.max(S.counts[z], 1e7); } R.discQueue = []; S.battle.maxStage = Math.max(S.battle.maxStage, 300); }
   if (a === 'p2rift') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.rift = Math.max(S.rift || 0, COL_UNLOCK); for (let z = 1; z <= 21; z++) { S.disc[z] = true; S.weap[z] = 1; } S.counts[1] = Math.max(S.counts[1], 1e15); R.riftSig = null; }
   if (a === 'p2crunch') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.prestige.count = Math.max(S.prestige.count, 5); S.battle.maxStage = Math.max(S.battle.maxStage, P2_CRUNCH - 1); S.battle.stage = P2_CRUNCH; S.p2talk = false; S.p2talk2 = false; R.enemy = null; }
+  if (a.startsWith('frag:')) { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.frag = Math.min(999, (S.frag || 0) + +a.slice(5)); }
   if (a.startsWith('p2spec:')) {
     if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요');
     const [, st, mode] = a.split(':'), r = adminP2Spec(+st, mode === 'tight');
@@ -7662,6 +7675,7 @@ document.addEventListener('click', e => {
   if (a.dataset.frag === 'go') { switchTab('battle'); goStage(fragFloor(S.battle.maxStage), false); blog(`🌘 파편 보스 층(${S.battle.stage})에서 파편을 모아요. 자동 진행은 꺼 두었어요 — 같은 층을 반복해요.`, 'info'); }
 });
 // 보스 회복 (중력 붕괴 · 카드 결투): 너무 빨리 끝나지 않게
+const BOSS_MIN_CARDS = { grav: 8, duel: 12 }; // 보스 체력 ≥ 내 기본 공격 카드 N장분
 const BOSS_REGEN_GRAV = 0.04, BOSS_REGEN_DUEL = [0, 0.04, 0.05, 0.07];
 function synthGoBack(st) {
   const B = S.battle;
@@ -8478,9 +8492,8 @@ document.addEventListener('keydown', e => {
 function adminLinkCheck() {
   const p = location.pathname.replace(/\/+$/, '');
   const on = p.endsWith('/admin') || location.hash === '#admin';
-  if (on) R.adminLink = true;
-  $('#adminCard').style.display = R.adminLink ? '' : 'none';
-  if (on) { switchTab('settings'); openAdmin(); }
+  if (on) { R.adminLink = true; R.adminLinkOpen = true; }
+  adminVisibility(); // 아직 로그인 확인 전이면 계정이 정해진 뒤(acctBadge) 열리거나 안내해요
 }
 window.addEventListener('hashchange', adminLinkCheck);
 setTimeout(adminLinkCheck, 300);
@@ -8781,6 +8794,7 @@ function acctBadge() {
   const label = A.state === 'ok' ? `${A.failed ? '⚠️' : '☁️'} ${name}` : A.state === 'conflict' ? '⚠️ 저장 선택' : A.state === 'expired' ? '🔑 다시 로그인' : A.state === 'offline' ? '📴 오프라인' : '👤 로그인';
   setText('btnAcct', label);
   b.hidden = A.state === 'local';
+  if (typeof adminVisibility === 'function') adminVisibility();
   b.title = A.state === 'ok' ? (A.failed ? '클라우드 저장 실패: 1분 뒤 다시 시도' : '클라우드에 저장 중') : label;
 }
 function saveSummary(s, when) {
