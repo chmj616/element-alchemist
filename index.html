@@ -6175,6 +6175,8 @@ function adminPanelHtml() {
       <button class="btn" data-admin="p2duel">🃏 2부: 5000층 빅 립 카드 결투 앞으로</button>
       <button class="btn" data-admin="p2spec:2500">💪 2부: 2500층 깰 스펙<br><small>그 층까지 무기 전부 + 강화 · 최고 덱 장착</small></button>
       <button class="btn" data-admin="p2spec:5000">💪 2부: 5000층 깰 스펙<br><small>무기 118종 + 강화 · 최고 덱 장착</small></button>
+      <button class="btn" data-admin="p2spec:2500:tight">😰 2부: 2500층 빠듯한 스펙<br><small>일반 전투로 25~28초 · 처음 도착한 플레이어 수준</small></button>
+      <button class="btn" data-admin="p2spec:5000:tight">😰 2부: 5000층 빠듯한 스펙<br><small>일반 전투로 25~28초 · 처음 도착한 플레이어 수준</small></button>
       <button class="btn" data-admin="partswap">🔁 ${S.part === 1 ? '2부로 전환' : '1부로 전환'} (지금 ${S.part}부)</button>
       <div class="admin-sec">🎁 지급</div>
       <button class="btn" data-admin="voidfeed">🕳️ 공허 봉헌 원소 지급<br><small>118종 모두 바치고도 절반이 남게 (필요량 ×2)</small></button>
@@ -6268,9 +6270,9 @@ async function adminAction(a) {
   if (a === 'p2crunch') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.prestige.count = Math.max(S.prestige.count, 5); S.battle.maxStage = Math.max(S.battle.maxStage, P2_CRUNCH - 1); S.battle.stage = P2_CRUNCH; S.p2talk = false; S.p2talk2 = false; R.enemy = null; }
   if (a.startsWith('p2spec:')) {
     if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요');
-    const r = adminP2Spec(+a.slice(7));
+    const [, st, mode] = a.split(':'), r = adminP2Spec(+st, mode === 'tight');
     if (!r) return toast('⚠️ 스펙을 맞추지 못했어요');
-    toast(`💪 ${r.st}층 스펙: 무기 ${r.n}종 · 강화 +${r.lv} · 예상 처치 ${fmtSec(r.ttk)} (일반 전투 기준)`, 'disc', 5000);
+    toast(`${mode === 'tight' ? '😰 빠듯한' : '💪'} ${r.st}층 스펙: 무기 ${r.n}종 · 강화 +${r.lv} · 예상 처치 ${fmtSec(r.ttk)} (일반 전투 기준)`, 'disc', 5000);
   }
   if (a === 'p2duel') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); S.prestige.count = Math.max(S.prestige.count, 7); S.battle.maxStage = Math.max(S.battle.maxStage, MAX_STAGE - 1); S.battle.stage = MAX_STAGE; S.p2rip1 = false; S.p2rip2 = false; R.enemy = null; }
   if (a === 'p2weap') { if (S.part !== 2) return toast('🌘 2부에서 눌러 주세요'); for (let z = 1; z <= 118; z++) if (S.disc[z]) { S.weap[z] = 1; S.wlv[z] = Math.max(S.wlv[z], 30); } }
@@ -7552,14 +7554,16 @@ function defeat(reason) {
 // 건너뛴 인공 원소 보스 층으로 이동 (잡으면 R.synthBack 층으로 복귀)
 // 관리자: 2부에서 st층 보스를 여유 있게 깰 스펙 (그 층까지 열리는 무기 전부 제작 · 같은 강화 레벨 · 최고 덱)
 // 기준: 일반 전투로 12초 안에 처치 → 중력 붕괴·카드 결투도 실력이 조금만 있으면 이길 수 있는 정도
-function adminP2Spec(st) {
+// tight: 일반 전투로 겨우 이기는 수준(25~28초) — 처음 보스에 도착한 플레이어 체감 확인용
+function adminP2Spec(st, tight) {
   S.prestige.count = Math.max(S.prestige.count, st >= MAX_STAGE ? 7 : 5);
   let n = 0;
   for (let z = 1; z <= 118; z++) if (p2UnlockStage(z) <= st) { S.disc[z] = true; S.weap[z] = 1; S.counts[z] = Math.max(S.counts[z], 1e6); n++; }
   R.discQueue = [];
   const E = makeEnemy(st), own = [];
   for (let z = 1; z <= 118; z++) if (S.weap[z]) own.push(z);
-  const ok = L => { for (const z of own) S.wlv[z] = L; const r = bestDeck(st, E); return r && r.result.win && r.result.ttk <= 12 ? r : null; };
+  const lim = tight ? 28 : 12;
+  const ok = L => { for (const z of own) S.wlv[z] = L; const r = bestDeck(st, E); return r && r.result.win && r.result.ttk <= lim ? r : null; };
   let lo = 0, hi = 4000;
   if (!ok(hi)) return null;
   while (hi - lo > 1) { const m = (lo + hi) >> 1; if (ok(m)) hi = m; else lo = m; }
