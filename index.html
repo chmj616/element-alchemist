@@ -5823,8 +5823,10 @@ const colOpen = () => P2V() && (S.rift || 0) >= COL_UNLOCK;
 const colCap = () => (P2F() ? COL_CAP + 10 * Math.min(20, S.col.lv) : COL_CAP); // 최대 230
 function colMult(kind) {
   // 11단계: 같은 종류 입자 효과는 더하기(1 + Σ) × 도감 보너스 — 입자가 47종으로 늘어도 폭주하지 않게
-  if (P2F()) { let a = 0; for (const P of COL_ALL) if (P.kind === kind) a += pEff(P) * Math.min(colCap(), S.col.parts[P.id] || 0); return (1 + a) * colBook(); }
-  let m = 1; for (const P of PARTICLES) if (P.kind === kind) m *= 1 + COL_TIERS[P.tier].eff * Math.min(COL_CAP, S.col.parts[P.id] || 0); return m;
+  let m = 1; for (const P of PARTICLES) if (P.kind === kind) m *= 1 + COL_TIERS[P.tier].eff * Math.min(COL_CAP, S.col.parts[P.id] || 0);
+  if (!P2F()) return m;
+  let a = 0; for (const P of COL_ALL) if (P.kind === kind) a += pEff(P) * Math.min(colCap(), S.col.parts[P.id] || 0);
+  return Math.max(m, (1 + a) * colBook()); // 예전 방식보다 낮아지지 않게 (이미 모은 플레이어 보호)
 }
 const colHiggs = () => Math.min(5, 1 + 0.5 * (S.col.parts.h || 0));
 // 비용은 지금 생산량 기준 (충돌 1번 = 수소 생산 30초어치, 최소 1000)
