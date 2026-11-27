@@ -483,6 +483,9 @@ body.b7 .p2pick .srch{width:100%;margin-bottom:6px}
 .col-bar{position:absolute;left:0;bottom:0;height:3px;background:var(--c);opacity:.8}
 .col-card.full{box-shadow:0 0 12px var(--c)}
 .col-max{color:#ffd43b;font-size:10px}
+.crunch-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.crunch-row .crunch-re{margin:0;flex:1 1 160px;max-width:260px}
+.frag-go{background:linear-gradient(135deg,#2b8a3e,#0b2a1a)!important;border-color:#69db7c!important}
 .crunch-re{display:block;margin:8px auto 0;padding:8px 16px;background:linear-gradient(135deg,#5f3dc4,#1a0b33);border:1px solid #9775fa;font-size:14px;line-height:1.4}
 .crunch-re small{font-size:11px;opacity:.85}.crunch-re:disabled{opacity:.5}
 .col-card .ic{position:relative}.col-card .ic em{position:absolute;right:-10px;top:-8px;font-size:14px;font-style:normal}
@@ -1511,7 +1514,7 @@ body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-i
           <div class="bar tbar" id="eTimeBar"><div class="fill gold" id="eTimeFill"></div><span id="eTimeText"></span></div>
           <div class="e-meta"><span id="eSynth" class="e-synth"></span><span id="eAtk"></span><span id="eWeak"></span><span id="eTimer"></span></div>
         </div>
-        <button id="crunchRe" class="big-btn crunch-re" style="display:none"></button>
+        <div class="crunch-row" id="crunchRow" style="display:none"><button id="crunchRe" class="big-btn crunch-re"></button><button id="fragGo" class="big-btn crunch-re frag-go"></button></div>
         <div class="arena-tip">👆 적을 클릭하면 파티 전원의 공격 쿨타임이 0.1초 줄어요! · 5스테이지마다 보스</div>
       </div>
       <div class="deck-info" id="deckInfo"></div>
@@ -8057,7 +8060,8 @@ function renderBattle() {
   fl.style.display = P2F() && (S.frag > 0 || B.maxStage >= 1000) && B.maxStage < P2_CRUNCH + 1 ? '' : 'none';
   setText('fragLbl', `🌑 파편 ${S.frag}/${fragNeed()}`);
   const cr = $('#crunchRe'), showRe = P2F() && B.stage === P2_CRUNCH && crunchBeaten() && !R.grav;
-  cr.style.display = showRe ? '' : 'none';
+  $('#crunchRow').style.display = showRe ? '' : 'none';
+  if (showRe) { const fh = `🌘 파편 모으러 가기<br><small>${fragFloor(S.battle.maxStage)}층 파편 보스 · 같은 층 반복</small>`; if ($('#fragGo').innerHTML !== fh) $('#fragGo').innerHTML = fh; }
   if (showRe) {
     const need = fragNeed(), html = `🌑 빅 크런치에게 다시 도전하기<br><small>파편 ${S.frag}/${need}${S.frag < need ? ' — 파편 보스에서 더 모으세요' : ' · 도전하면 ' + need + '개를 써요'}</small>`;
     if (cr.innerHTML !== html) cr.innerHTML = html;
@@ -8358,6 +8362,12 @@ document.addEventListener('pointerout', e => { if (holdEl && e.target.closest &&
 document.addEventListener('contextmenu', e => { if (!(e.target.closest && e.target.closest('input, textarea, [contenteditable="true"]'))) e.preventDefault(); });
 $('#stPrev').onclick = () => changeStage(-1);
 $('#stNext').onclick = () => changeStage(1);
+$('#fragGo').onclick = e => {
+  e.stopPropagation();
+  const f = fragFloor(S.battle.maxStage);
+  goStage(f, false);
+  blog(`🌘 파편 보스 층(${f})에서 파편을 모아요. 자동 진행은 꺼 두었어요 — 같은 층을 반복해요. 다 모이면 「2500층으로」 창이 떠요.`, 'info');
+};
 $('#crunchRe').onclick = e => {
   e.stopPropagation();
   if (S.frag < fragNeed() || R.grav) return;
